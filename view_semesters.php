@@ -1,54 +1,63 @@
 <?php
 include 'db.php';
+function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 
 $scheme_id = intval($_GET['scheme_id'] ?? 0);
-$stmt = $pdo->prepare("SELECT name FROM schemes WHERE id = ?");
-$stmt->execute([$scheme_id]);
-$scheme = $stmt->fetch();
+if (!$scheme_id) { header('Location: view_scheme.php'); exit; }
 
-$branches = $pdo->prepare("SELECT * FROM branches WHERE scheme_id = ? ORDER BY name");
-$branches->execute([$scheme_id]);
-$branches = $branches->fetchAll();
+// fetch scheme
+$sq = $pdo->prepare('SELECT * FROM schemes WHERE id = ?');
+$sq->execute([$scheme_id]);
+$scheme = $sq->fetch();
+if (!$scheme) { header('Location: view_scheme.php'); exit; }
+
+// For UX show available semesters based on courses under scheme
+$semesters = $pdo->prepare('SELECT DISTINCT semester FROM courses WHERE scheme_id = ? AND semester IS NOT NULL ORDER BY semester');
+$semesters->execute([$scheme_id]);
+$semesters = $semesters->fetchAll(PDO::FETCH_COLUMN);
+
+// if none, fall back to 1..8
+if (empty($semesters)) {
+  $semesters = range(1,8);
+}
 ?>
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Branches - KTU Magic</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = { darkMode:'class' }
-function toggleTheme(){document.documentElement.classList.toggle("dark");localStorage.setItem("theme",document.documentElement.classList.contains("dark")?"dark":"light");}
-document.addEventListener("DOMContentLoaded",()=>{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");});
-</script>
+  <meta charset="utf-8">
+  <title>Semesters — <?= safe($scheme['name']) ?> — KTU Magic</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+<?php include 'nav.php'; ?>
 
-<body class="bg-gray-100 dark:bg-gray-900">
-
-<!-- NAV -->
-<nav class="bg-white dark:bg-gray-800 shadow-md p-4 mb-4">
-  <div class="max-w-5xl mx-auto flex justify-between items-center">
-    <h1 class="text-xl font-bold dark:text-white">KTU Magic</h1>
-
-    <button onclick="toggleTheme()" class="px-3 py-1 rounded-lg border dark:border-gray-600 text-sm dark:text-gray-300">
-      🌙 / ☀️
-    </button>
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <!-- Breadcrumbs -->
+  <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+    <a href="view_scheme.php" class="hover:underline">Home</a> &rsaquo;
+    <span class="font-semibold"><?= safe($scheme['name']) ?></span>
   </div>
-</nav>
 
-<div class="max-w-5xl mx-auto px-4 pb-10">
-  <a href="view_scheme.php" class="text-blue-600 dark:text-blue-400">← Back</a>
-  <h2 class="text-2xl font-bold mt-2 mb-4 dark:text-white"><?= htmlspecialchars($scheme['name']) ?> - Branches</h2>
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-3xl font-bold"><?= safe($scheme['name']) ?> — Select Semester</h1>
+    <div class="flex items-center gap-2">
+      <!-- Quick jump: change scheme -->
+      <a href="view_scheme.php" class="text-sm px-3 py-1 border rounded text-gray-700 dark:text-gray-200">Change Scheme</a>
+    </div>
+  </div>
 
-  <div class="grid md:grid-cols-3 gap-6">
-    <?php foreach ($branches as $b): ?>
-      <a href="view_semesters.php?branch_id=<?= $b['id'] ?>" 
-         class="block bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition p-4 text-center">
-        <h3 class="text-lg font-semibold dark:text-white"><?= htmlspecialchars($b['name']) ?></h3>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+    <?php foreach ($semesters as $sem): ?>
+      <a href="view_branch.php?scheme_id=<?= $scheme_id ?>&semester=<?= intval($sem) ?>"
+         class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-2xl transition">
+        <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Sem <?= intval($sem) ?></div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">View branches for this semester</div>
       </a>
     <?php endforeach; ?>
   </div>
 </div>
+
+<?php include 'footer.php'; ?>
 </body>
 </html>
