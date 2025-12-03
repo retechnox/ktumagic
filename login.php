@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
-            $_SESSION['loggedin'] = true;
+            $_SESSION['admin_logged_in'] = true;
             header("Location: admin.php");
             exit();
         } else {
