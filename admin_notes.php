@@ -1,14 +1,10 @@
 <?php
-
 include __DIR__ . '/db.php';
 session_start();
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: login.php");
     exit();
 }
-
-// Start session for flash and CSRF
-if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Simple flash helper
 function flash($msg = null, $type = 'info') {
@@ -187,9 +183,17 @@ try {
             flash('Course deleted.', 'success');
         }
 
+        // IMPORTANT: save_links now updates course name, semester and image_path in addition to links
         elseif ($action === 'save_links') {
             $course_id = intval($_POST['course_id'] ?? 0);
             if (!$course_id) throw new Exception('Invalid course id.');
+
+            // New editable course fields from the links editor
+            $course_name = trim($_POST['course_name_edit'] ?? '');
+            $semester = intval($_POST['semester_edit'] ?? 0) ?: null;
+            $rawImage = trim($_POST['course_image_edit'] ?? '');
+            $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
+
             $links = $_POST['links'] ?? [];
             $validLinks = [];
             foreach ($links as $l) {
@@ -197,11 +201,35 @@ try {
                 $url = trim($l['url'] ?? '');
                 if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
             }
+
+            // Update links
             $stmt = $pdo->prepare('UPDATE courses SET links = ? WHERE id = ?');
             $stmt->execute([json_encode($validLinks), $course_id]);
-            flash('Links saved.', 'success');
+
+            // Update optional course metadata if provided (name/sem/image)
+            if ($course_name !== '') {
+                if ($image !== null) {
+                    $u = $pdo->prepare('UPDATE courses SET name = ?, semester = ?, image_path = ? WHERE id = ?');
+                    $u->execute([$course_name, $semester, $image, $course_id]);
+                } else {
+                    $u = $pdo->prepare('UPDATE courses SET name = ?, semester = ? WHERE id = ?');
+                    $u->execute([$course_name, $semester, $course_id]);
+                }
+            } else {
+                // Even if course_name empty (shouldn't happen) still allow image/semester update
+                if ($image !== null) {
+                    $u = $pdo->prepare('UPDATE courses SET semester = ?, image_path = ? WHERE id = ?');
+                    $u->execute([$semester, $image, $course_id]);
+                } else {
+                    $u = $pdo->prepare('UPDATE courses SET semester = ? WHERE id = ?');
+                    $u->execute([$semester, $course_id]);
+                }
+            }
+
+            flash('Course links and metadata saved.', 'success');
         }
 
+        // redirect after POST to avoid double submit
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
     }
@@ -210,6 +238,9 @@ try {
     flash('Error: ' . $e->getMessage(), 'danger');
 }
 
+// -----------------------------
+// Fetch data for rendering
+// -----------------------------
 $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
 $branches = $pdo->query('SELECT * FROM branches ORDER BY name')->fetchAll();
 $courses = $pdo->query("
@@ -232,7 +263,8 @@ if (isset($_GET['course_id'])) {
 
 $flashes = flash();
 $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
-?><!doctype html>
+?>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -308,7 +340,6 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
     </div>
 
     <nav class="nav flex-column mb-3">
-      <!-- Dashboard removed as requested -->
       <a href="#" class="nav-link" data-target="schemesSection"><span class="nav-caption">Schemes</span></a>
       <a href="#" class="nav-link" data-target="branchesSection"><span class="nav-caption">Branches</span></a>
       <a href="#" class="nav-link" data-target="coursesSection"><span class="nav-caption">Courses</span></a>
@@ -330,7 +361,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
       </div>
 
       <div class="d-flex align-items-center gap-2">
-        <!-- removed table/card toggle -->
+        <!-- (intentionally blank) -->
       </div>
     </header>
 
@@ -475,12 +506,12 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
         <div id="branchEditContainer" class="mt-4"></div>
       </section>
 
-      <!-- Links Section (default visible) -->
+      <!-- LINKS SECTION (DEFAULT VISIBLE) -->
       <section id="linksSection" class="page-section">
         <div class="card card-rounded p-3">
           <h6 class="mb-3">Update Course Links</h6>
 
-          <!-- FILTERS (Scheme / Branch / Semester / Search) -->
+          <!-- FILTERS -->
           <div class="row g-2 mb-3 align-items-center">
             <div class="col-md-3">
               <label class="form-label small">Scheme</label>
@@ -515,11 +546,12 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
             </div>
           </div>
 
+          <!-- SELECT COURSE -->
           <form method="GET" id="selectCourseForLinksForm" class="mb-3">
             <label class="form-label small">Select course</label>
             <select name="course_id" id="course_select_for_links" class="form-select form-select-sm" onchange="this.form.submit()">
               <option value="">Select a course</option>
-              <?php foreach ($courses as $course): 
+              <?php foreach ($courses as $course):
                 $dScheme = safe(strtolower($course['scheme_name']));
                 $dBranch = safe(strtolower($course['branch_name']));
                 $dSem = safe($course['semester']);
@@ -531,23 +563,51 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                         data-sem="<?= $dSem ?>"
                         data-name="<?= $dName ?>"
                         <?= (isset($_GET['course_id']) && intval($_GET['course_id']) === $course['id']) ? 'selected' : '' ?>>
-                  <?= safe($course['name']) ?> (<?= safe($course['branch_name']) ?> — sem <?= safe($course['semester']) ?>)
+                  <?= safe($course['name']) ?> (<?= safe($course['branch_name']) ?> — Sem <?= safe($course['semester']) ?>)
                 </option>
               <?php endforeach; ?>
             </select>
           </form>
 
           <?php if ($selected_course): ?>
+            <!-- EDITABLE COURSE META + LINKS -->
             <form method="POST">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="save_links">
               <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
 
+              <!-- Editable Course Name -->
               <div class="mb-2">
-                <label class="form-label small">Course</label>
-                <input type="text" class="form-control form-control-sm" readonly value="<?= safe($selected_course['name']) ?>">
+                <label class="form-label small">Course Name</label>
+                <input type="text"
+                       name="course_name_edit"
+                       class="form-control form-control-sm"
+                       value="<?= safe($selected_course['name']) ?>"
+                       required>
               </div>
 
+              <!-- Editable Semester -->
+              <div class="mb-2">
+                <label class="form-label small">Semester</label>
+                <select name="semester_edit" class="form-select form-select-sm" required>
+                  <?php for ($i=1;$i<=8;$i++): ?>
+                    <option value="<?= $i ?>" <?= ($selected_course['semester']==$i?'selected':'') ?>><?= $i ?></option>
+                  <?php endfor; ?>
+                </select>
+              </div>
+
+              <!-- Editable Image Path -->
+              <div class="mb-2">
+                <label class="form-label small">Drive Image Link</label>
+                <input type="text"
+                       name="course_image_edit"
+                       class="form-control form-control-sm"
+                       value="<?= safe($selected_course['image_path']) ?>"
+                       placeholder="Drive link (optional)">
+              </div>
+
+              <!-- Editable Links -->
+              <label class="form-label small mt-3">Course Links</label>
               <div id="links-list-update">
                 <?php if (!empty($links)): ?>
                   <?php foreach ($links as $idx => $lnk): ?>
@@ -583,7 +643,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
               </div>
 
               <div class="mt-3">
-                <button class="btn btn-primary btn-sm">Save Links</button>
+                <button class="btn btn-primary btn-sm">Save Course</button>
               </div>
 
             </form>
@@ -594,7 +654,6 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
 
       <!-- Courses Section -->
       <section id="coursesSection" class="page-section" style="display:none">
-
         <div class="card card-rounded p-4 mb-4">
           <h5 class="mb-3">Add Course</h5>
 
@@ -675,106 +734,48 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
         </div>
 
       </section>
-
-    </main>
-  </div>
-</div>
-
-<!-- BOOTSTRAP JS -->
+      <!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- EDIT COURSE MODAL — MOVED OUT -->
-<div class="modal fade" id="courseEditModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <form id="courseEditForm" method="POST">
-        <?= csrf_field() ?>
-        <input type="hidden" name="action" value="edit_course">
-        <input type="hidden" name="course_id" id="modal_course_id">
-
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Course</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-
-          <div class="mb-2">
-            <label class="form-label small">Course name</label>
-            <input type="text" name="course_name_edit" id="modal_course_name" class="form-control form-control-sm" required>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small">Semester</label>
-            <select name="semester_edit" id="modal_course_sem" class="form-select form-select-sm" required>
-              <?php for ($i=1;$i<=8;$i++): ?>
-                <option value="<?= $i ?>"><?= $i ?></option>
-              <?php endfor; ?>
-            </select>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small">Drive image link (optional)</label>
-            <input type="text" name="course_image_edit" class="form-control form-control-sm">
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-primary btn-sm">Save</button>
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-        </div>
-
-      </form>
-
-    </div>
-  </div>
-</div>
 
 <script>
 (function(){
+
+  /* -------------------------
+        SECTION HANDLING
+  -------------------------- */
+  const sections = document.querySelectorAll('.page-section');
+  function showSection(id){
+    sections.forEach(sec => sec.style.display = (sec.id === id ? '' : 'none'));
+    document.querySelectorAll('.nav-link[data-target]').forEach(a=>{
+      if(a.dataset.target === id) a.classList.add('active');
+      else a.classList.remove('active');
+    });
+  }
+
+  // default visible = LINKS SECTION
+  showSection("linksSection");
+
+  document.querySelectorAll('.nav-link[data-target]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      showSection(a.dataset.target);
+    });
+  });
+
+
+  /* -------------------------
+        MOBILE SIDEBAR
+  -------------------------- */
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const mobileCloseSidebarBtn = document.getElementById('mobileCloseSidebarBtn');
   const collapseSidebarBtn = document.getElementById('collapseSidebarBtn');
 
-  const sections = document.querySelectorAll('.page-section');
-  const schemesSection = document.getElementById('schemesSection');
-  const branchesSection = document.getElementById('branchesSection');
-  const coursesSection = document.getElementById('coursesSection');
-  const linksSection = document.getElementById('linksSection');
-
-  // Filter elements in Links section
-  const filterScheme = document.getElementById('filter_scheme');
-  const filterBranch = document.getElementById('filter_branch');
-  const filterSem = document.getElementById('filter_sem');
-  const filterSearch = document.getElementById('filter_search');
-  const courseSelectForLinks = document.getElementById('course_select_for_links');
-
-  // default: show linksSection (as requested)
-  function showSection(id){
-    sections.forEach(s => s.style.display = (s.id === id ? '' : 'none'));
-    document.querySelectorAll('.nav-link[data-target]').forEach(a => {
-      if (a.getAttribute('data-target') === id) a.classList.add('active');
-      else a.classList.remove('active');
-    });
-    if (window.innerWidth < 992) sidebar.classList.remove('show');
-  }
-  showSection('linksSection');
-
-  document.querySelectorAll('.nav-link[data-target]').forEach(a=>{
-    a.addEventListener('click', function(e){
-      e.preventDefault();
-      showSection(this.getAttribute('data-target'));
-    });
-  });
-
   mobileMenuBtn && mobileMenuBtn.addEventListener('click', ()=> sidebar.classList.add('show'));
   mobileCloseSidebarBtn && mobileCloseSidebarBtn.addEventListener('click', ()=> sidebar.classList.remove('show'));
   collapseSidebarBtn && collapseSidebarBtn.addEventListener('click', ()=> document.body.classList.toggle('sidebar-collapsed'));
 
-  document.addEventListener('click', function(e){
+  document.addEventListener('click', (e)=>{
     if(window.innerWidth < 992){
       if(!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)){
         sidebar.classList.remove('show');
@@ -782,115 +783,106 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
     }
   });
 
-  // Branch edit: insert inline form (delegation)
+
+  /* -------------------------
+      BRANCH EDIT INLINE FORM
+  -------------------------- */
   const branchEditContainer = document.getElementById('branchEditContainer');
+
   document.addEventListener('click', function(e){
     const btn = e.target.closest('.btn-branch-edit');
-    if (!btn) return;
-    const id = btn.getAttribute('data-id');
-    const name = btn.getAttribute('data-name');
+    if(!btn) return;
 
-    // remove existing
-    branchEditContainer.innerHTML = '';
+    const id = btn.dataset.id;
+    const name = btn.dataset.name;
 
-    // create form element (safe insertion)
-    const formWrap = document.createElement('div');
-    formWrap.className = 'card card-rounded p-3 mb-3';
+    branchEditContainer.innerHTML = `
+      <div class="card card-rounded p-3 mb-3">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="<?php echo $csrfToken ?>">
+          <input type="hidden" name="action" value="edit_branch">
+          <input type="hidden" name="branch_id" value="${id}">
 
-    // Build form HTML with CSRF token provided from server variable
-    formWrap.innerHTML = `
-      <form method="POST" action="">
-        <input type="hidden" name="csrf_token" value="${"<?php echo $csrfToken ?>".replace(/"/g,'&quot;')}">
-        <input type="hidden" name="action" value="edit_branch">
-        <input type="hidden" name="branch_id" value="${safeHtml(id)}">
-        <div class="mb-2">
-          <label class="form-label small">Branch name</label>
-          <input type="text" name="branch_name" class="form-control form-control-sm" value="${safeHtml(name)}" required>
-        </div>
-        <div class="mb-2">
-          <label class="form-label small">Drive image link (optional)</label>
-          <input type="text" name="branch_image_edit" placeholder="Drive image link" class="form-control form-control-sm">
-        </div>
-        <div class="d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
-          <button class="btn btn-sm btn-primary">Save</button>
-        </div>
-      </form>
+          <div class="mb-2">
+            <label class="form-label small">Branch name</label>
+            <input type="text" name="branch_name" class="form-control form-control-sm" value="${name}" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Drive image link (optional)</label>
+            <input type="text" name="branch_image_edit" class="form-control form-control-sm">
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
+            <button class="btn btn-sm btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
     `;
-    branchEditContainer.appendChild(formWrap);
 
     document.getElementById('cancelBranchEdit').addEventListener('click', ()=>{
       branchEditContainer.innerHTML = '';
-      branchEditContainer.scrollIntoView({behavior:'smooth'});
     });
 
-    branchEditContainer.scrollIntoView({behavior:'smooth', block:'center'});
+    branchEditContainer.scrollIntoView({behavior:"smooth"});
   });
 
-  // Helper to escape inserted values in JS context
-  function safeHtml(s){
-    if (s === null || s === undefined) return '';
-    return String(s)
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'",'&#039;');
-  }
 
-  // Links filtering logic for the select list
-  function applyCourseFilters(){
-    const scheme = (filterScheme ? filterScheme.value : '').toLowerCase();
-    const branch = (filterBranch ? filterBranch.value : '').toLowerCase();
-    const sem = (filterSem ? filterSem.value : '');
-    const search = (filterSearch ? filterSearch.value.trim().toLowerCase() : '');
+  /* -------------------------
+       LINKS FILTER LOGIC
+  -------------------------- */
+  const filterScheme = document.getElementById("filter_scheme");
+  const filterBranch = document.getElementById("filter_branch");
+  const filterSem = document.getElementById("filter_sem");
+  const filterSearch = document.getElementById("filter_search");
+  const courseSelect = document.getElementById("course_select_for_links");
 
-    if (!courseSelectForLinks) return;
-    const options = Array.from(courseSelectForLinks.options);
-    // keep first option (placeholder)
-    options.forEach((opt, idx) => {
-      if (idx === 0) return; // skip placeholder
-      const dScheme = (opt.dataset.scheme || '').toLowerCase();
-      const dBranch = (opt.dataset.branch || '').toLowerCase();
-      const dSem = (opt.dataset.sem || '');
-      const dName = (opt.dataset.name || '').toLowerCase();
+  function applyFilters(){
+    const fs = (filterScheme.value || "").toLowerCase();
+    const fb = (filterBranch.value || "").toLowerCase();
+    const fsem = (filterSem.value || "");
+    const fsearch = (filterSearch.value || "").toLowerCase();
 
-      const matches =
-        (scheme === '' || dScheme === scheme) &&
-        (branch === '' || dBranch === branch) &&
-        (sem === '' || dSem === sem) &&
-        (search === '' || dName.indexOf(search) !== -1);
+    Array.from(courseSelect.options).forEach((opt, idx)=>{
+      if(idx === 0) return; // skip first placeholder
 
-      opt.hidden = !matches;
-      // also remove selected if it's hidden
-      if (opt.hidden && opt.selected) opt.selected = false;
+      const os = opt.dataset.scheme;
+      const ob = opt.dataset.branch;
+      const osem = opt.dataset.sem;
+      const oname = opt.dataset.name;
+
+      let show = true;
+      if(fs && fs !== os) show = false;
+      if(fb && fb !== ob) show = false;
+      if(fsem && fsem !== osem) show = false;
+      if(fsearch && !oname.includes(fsearch)) show = false;
+
+      opt.hidden = !show;
+      if(opt.hidden && opt.selected) opt.selected = false;
     });
-
-    // If after filtering, no non-hidden options (other than placeholder), keep placeholder selected
-    const anyVisible = Array.from(courseSelectForLinks.options).some((o, idx) => idx !== 0 && !o.hidden);
-    if (!anyVisible) courseSelectForLinks.selectedIndex = 0;
   }
 
-  [filterScheme, filterBranch, filterSem].forEach(el => {
-    if (!el) return;
-    el.addEventListener('change', applyCourseFilters);
+  [filterScheme, filterBranch, filterSem].forEach(x=>{
+    if(x) x.addEventListener('change', applyFilters);
   });
-  if (filterSearch) {
-    filterSearch.addEventListener('input', applyCourseFilters);
-  }
-  // run on load
-  applyCourseFilters();
+  if(filterSearch) filterSearch.addEventListener('input', applyFilters);
 
-  // Links add/remove buttons (update area)
-  let linkCountUpdate = <?= !empty($links) ? count($links) : 1 ?>;
+  applyFilters(); // first load
+
+
+  /* -------------------------
+      ADD / REMOVE LINK ROWS
+  -------------------------- */
+  let linkUpdateCount = <?= !empty($links) ? count($links) : 1 ?>;
   const addLinkUpdateBtn = document.getElementById('addLinkUpdateBtn');
   const linksListUpdate = document.getElementById('links-list-update');
 
-  if (addLinkUpdateBtn && linksListUpdate) {
-    addLinkUpdateBtn.addEventListener('click', ()=> {
-      const idx = linkCountUpdate++;
+  if(addLinkUpdateBtn){
+    addLinkUpdateBtn.addEventListener('click', ()=>{
+      const idx = linkUpdateCount++;
       const row = document.createElement('div');
-      row.className = 'row link-row g-2 mb-2';
+      row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
         <div class="col">
           <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
@@ -903,51 +895,32 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
         </div>
       `;
       linksListUpdate.appendChild(row);
-      row.querySelector('.btn-remove-link').addEventListener('click', ()=> row.remove());
     });
   }
 
-  // Remove link buttons (delegation)
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('.btn-remove-link');
-    if (!btn) return;
-    const row = btn.closest('.link-row');
-    row && row.remove();
+  // Delegate remove buttons
+  document.addEventListener("click", function(e){
+    const btn = e.target.closest(".btn-remove-link");
+    if(!btn) return;
+
+    const row = btn.closest(".link-row");
+    if(row) row.remove();
   });
 
-  // Add link for Add Course form
-  let linkCountCourse = 1;
-  const addLinkCourseBtn = document.getElementById('addLinkCourseBtn');
-  const linksListCourse = document.getElementById('links-list-course');
-  if (addLinkCourseBtn && linksListCourse) {
-    addLinkCourseBtn.addEventListener('click', ()=> {
-      const idx = linkCountCourse++;
-      const row = document.createElement('div');
-      row.className = 'row link-row g-2 mb-2';
-      row.innerHTML = `
-        <div class="col">
-          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
-        </div>
-        <div class="col">
-          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
-        </div>
-        <div class="col-auto">
-          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
-        </div>
-      `;
-      linksListCourse.appendChild(row);
-      row.querySelector('.btn-remove-link').addEventListener('click', ()=> row.remove());
-    });
-  }
 
-  // Course edit modal handling (if edit buttons exist)
-  const courseEditModalEl = document.getElementById('courseEditModal');
+  /* -------------------------
+      EDIT COURSE MODAL
+  -------------------------- */
+  const courseEditModalEl = document.getElementById("courseEditModal");
   const courseEditModal = new bootstrap.Modal(courseEditModalEl);
-  document.querySelectorAll('.btn-edit-course').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.getElementById('modal_course_id').value = btn.dataset.id || '';
-      document.getElementById('modal_course_name').value = btn.dataset.name || '';
-      document.getElementById('modal_course_sem').value = btn.dataset.sem || '';
+
+  document.querySelectorAll(".btn-edit-course").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+
+      document.getElementById("modal_course_id").value = btn.dataset.id;
+      document.getElementById("modal_course_name").value = btn.dataset.name;
+      document.getElementById("modal_course_sem").value = btn.dataset.sem;
+
       courseEditModal.show();
     });
   });
@@ -957,3 +930,5 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
 
 </body>
 </html>
+
+
