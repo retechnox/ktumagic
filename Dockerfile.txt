@@ -1,35 +1,33 @@
 FROM php:8.1-apache
 
-# Install system dependencies and PHP extensions
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl
+    zip unzip git curl
 
-# Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
+# PHP extensions
 RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd
 
-# Enable Apache modules
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set working directory
+# Configure Apache DocumentRoot if needed (optional)
+# RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+
+# Set working dir
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy code
 COPY . /var/www/html/
 
-# Set permissions
+# Permissions (important for Render)
 RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 775 /var/www/html
 
-# Expose port 80
 EXPOSE 80
 
-# Start Apache server
 CMD ["apache2-foreground"]
