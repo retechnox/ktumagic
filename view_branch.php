@@ -1,170 +1,92 @@
 <?php
 include 'db.php';
+function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 
-$branch_id = intval($_GET['branch_id'] ?? 0);
-$branch = $pdo->prepare("SELECT * FROM branches WHERE id = ?");
-$branch->execute([$branch_id]);
-$branch = $branch->fetch();
-$scheme_id = $branch['scheme_id'];
+$scheme_id = intval($_GET['scheme_id'] ?? 0);
+$semester = intval($_GET['semester'] ?? 0);
+if (!$scheme_id || !$semester) { header('Location: view_scheme.php'); exit; }
 
-// Use DB image or fallback aesthetic banner
-$branch_image = $branch['image_path'] ?: 
-  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&q=80";
+// fetch scheme
+$sq = $pdo->prepare('SELECT * FROM schemes WHERE id = ?');
+$sq->execute([$scheme_id]);
+$scheme = $sq->fetch();
+if (!$scheme) { header('Location: view_scheme.php'); exit; }
+
+// Get branches
+$q = $pdo->prepare('
+  SELECT DISTINCT b.*
+  FROM branches b
+  JOIN courses c ON c.branch_id = b.id
+  WHERE b.scheme_id = ? AND c.scheme_id = ? AND c.semester = ?
+  ORDER BY b.name
+');
+$q->execute([$scheme_id, $scheme_id, $semester]);
+$branches = $q->fetchAll();
+
+// fallback image used everywhere
+$DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80";
 ?>
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Select Semester</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Tailwind Config -->
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      animation: {
-        gradient: "gradientBG 6s ease infinite",
-        fadeIn: "fadeIn 1s ease forwards",
-      },
-      keyframes: {
-        gradientBG: {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" }
-        },
-        fadeIn: {
-          "0%": { opacity: 0, transform: "translateY(10px)" },
-          "100%": { opacity: 1, transform: "translateY(0)" }
-        }
-      }
-    }
-  }
-}
-
-function toggleTheme(){
-  document.documentElement.classList.toggle('dark');
-  localStorage.setItem("theme",
-    document.documentElement.classList.contains('dark') ? "dark" : "light"
-  );
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("theme") === "dark") {
-    document.documentElement.classList.add('dark');
-  }
-});
-</script>
-
-<!-- Glass effect -->
-<style>
-.glass {
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-</style>
+  <meta charset="utf-8">
+  <title>Branches — <?= safe($scheme['name']) ?> — Sem <?= $semester ?></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+<?php include 'nav.php'; ?>
 
-<body class="bg-gray-100 dark:bg-gray-900">
+<div class="max-w-6xl mx-auto px-4 py-6">
 
-<!-- NAV -->
-<nav class="bg-white dark:bg-gray-800 shadow-md p-4 mb-6">
-  <div class="max-w-5xl mx-auto flex justify-between items-center">
-    <h1 class="text-xl font-bold dark:text-white">KTU Magic</h1>
-    <button onclick="toggleTheme()" 
-      class="px-3 py-1 rounded-lg border dark:border-gray-600 text-sm dark:text-gray-300">
-      🌙 / ☀️
-    </button>
+  <!-- Breadcrumbs -->
+  <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+    <a href="view_scheme.php" class="hover:underline">Home</a> &rsaquo;
+    <a href="view_semesters.php?scheme_id=<?= $scheme_id ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
+    <span class="font-semibold">Sem <?= $semester ?></span>
   </div>
-</nav>
 
-<div class="max-w-5xl mx-auto px-4">
-
-  <!-- 🔥 NEW MODERN ANIMATED BANNER -->
-  <div class="relative rounded-3xl overflow-hidden shadow-2xl mb-10 animate-fadeIn">
-
-    <!-- Background Image -->
-    <img src="<?= htmlspecialchars($branch_image) ?>"
-      onerror="this.src='https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&q=80'"
-      class="w-full h-60 md:h-72 object-cover opacity-70">
-
-    <!-- Animated Gradient Border -->
-    <div class="absolute inset-0 border-4 border-transparent 
-                rounded-3xl bg-gradient-to-r from-purple-500 via-pink-400 to-blue-500
-                bg-[length:300%_300%] animate-gradient opacity-40">
-    </div>
-
-    <!-- Glass Overlay -->
-    <div class="absolute inset-0 glass bg-black/30 flex flex-col justify-center px-8 md:px-12">
-
-      <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-xl mb-2">
-        <?= htmlspecialchars($branch['name']) ?>
-      </h2>
-
-      <p class="text-white/80 text-lg tracking-wide font-light">
-        Explore subjects and notes by semester
-      </p>
-
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Branches — Sem <?= $semester ?></h1>
+    <div class="flex items-center gap-2">
+      <a href="view_semesters.php?scheme_id=<?= $scheme_id ?>" class="text-sm px-3 py-1 border rounded text-gray-700 dark:text-gray-200">Change Semester</a>
+      <a href="view_scheme.php" class="text-sm px-3 py-1 border rounded text-gray-700 dark:text-gray-200">Change Scheme</a>
     </div>
   </div>
 
+  <?php if (empty($branches)): ?>
+    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow text-gray-600 dark:text-gray-300">
+      No branches found for Sem <?= $semester ?> under this scheme.
+    </div>
+  <?php else: ?>
+  
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-  <!-- Back -->
-  <a href="view_branch.php?scheme_id=<?= $scheme_id ?>" 
-     class="text-blue-600 dark:text-blue-400">← Back</a>
+      <?php foreach ($branches as $b): 
+        $img = !empty($b['image_path']) ? $b['image_path'] : $DEFAULT_IMG;
+      ?>
 
-  <!-- Section Title -->
-  <h2 class="text-3xl font-bold mt-4 mb-6 dark:text-white">Select Semester</h2>
+        <a href="view_courses.php?branch_id=<?= $b['id'] ?>&semester=<?= $semester ?>"
+           class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
+          <img src="<?= safe($img) ?>" 
+               class="w-full h-36 object-cover rounded-lg mb-3"
+               onerror="this.src='<?= $DEFAULT_IMG ?>'">
 
-  <!-- 🔥 PREMIUM SEMESTER GRID -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pb-14">
+          <div class="text-lg font-semibold"><?= safe($b['name']) ?></div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Open courses for sem <?= $semester ?>
+          </div>
 
-    <?php
-      // Beautiful icons for semesters
-      $icons = [
-        1 => "📘",
-        2 => "🧪",
-        3 => "📙",
-        4 => "📐",
-        5 => "🛠️",
-        6 => "🧠",
-        7 => "💡",
-        8 => "🎓",
-      ];
+        </a>
 
-      for ($i=1; $i<=8; $i++):
-    ?>
+      <?php endforeach; ?>
 
-    <a href="view_courses.php?branch_id=<?= $branch_id ?>&semester=<?= $i ?>"
-       class="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg border 
-              dark:border-gray-700 text-center p-8 transition 
-              hover:-translate-y-2 hover:shadow-2xl hover:border-blue-500
-              dark:hover:border-blue-500 relative overflow-hidden">
+    </div>
 
-      <!-- Card glow effect -->
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 
-                  group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition">
-      </div>
-
-      <div class="text-5xl mb-4"><?= $icons[$i] ?></div>
-
-      <h3 class="text-xl font-semibold dark:text-white">
-        Semester <?= $i ?>
-      </h3>
-
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
-        View all subjects →
-      </p>
-    </a>
-
-    <?php endfor; ?>
-
-  </div>
-
+  <?php endif; ?>
 </div>
 
+<?php include 'footer.php'; ?>
 </body>
 </html>
