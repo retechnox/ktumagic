@@ -561,7 +561,81 @@ $flashes = flash();
         <div id="branchEditContainer" class="mt-4"></div>
       </section>
 
+          <!-- Links Section -->
+        <section id="linksSection" class="page-section" style="display:none">
+          <div class="card card-rounded p-3">
+            <h6 class="mb-3">Update Course Links</h6>
+
+            <form method="GET" id="selectCourseForLinksForm" class="mb-3">
+              <label class="form-label small">Select course</label>
+              <select name="course_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Select a course</option>
+                <?php foreach ($courses as $course): ?>
+                  <option value="<?= $course['id'] ?>" <?= (isset($_GET['course_id']) && intval($_GET['course_id']) === $course['id']) ? 'selected' : '' ?>>
+                    <?= safe($course['name']) ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </form>
+
+            <?php if ($selected_course): ?>
+              <form method="POST">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="save_links">
+                <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
+
+                <div class="mb-2">
+                  <label class="form-label small">Course</label>
+                  <input type="text" class="form-control form-control-sm" readonly value="<?= safe($selected_course['name']) ?>">
+                </div>
+
+                <div id="links-list-update">
+                  <?php if (!empty($links)): ?>
+                    <?php foreach ($links as $idx => $lnk): ?>
+                      <div class="row link-row g-2 mb-2">
+                        <div class="col">
+                          <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>" required>
+                        </div>
+                        <div class="col">
+                          <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>" required>
+                        </div>
+                        <div class="col-auto">
+                          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <div class="row link-row g-2 mb-2">
+                      <div class="col">
+                        <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+                      </div>
+                      <div class="col">
+                        <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+                      </div>
+                      <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+                </div>
+
+                <div class="mt-2">
+                  <button type="button" class="btn btn-sm btn-secondary" id="addLinkUpdateBtn">Add link</button>
+                </div>
+
+                <div class="mt-3">
+                  <button class="btn btn-primary btn-sm">Save Links</button>
+                </div>
+
+              </form>
+            <?php endif; ?>
+
+          </div>
+        </section>
+
       <!-- Courses Section -->
+
+
       <section id="coursesSection" class="page-section" style="display:none">
 
         <div class="card card-rounded p-4 mb-4">
@@ -644,77 +718,7 @@ $flashes = flash();
         </div>
 
 
-        <!-- Links Section -->
-        <section id="linksSection" class="page-section" style="display:none">
-          <div class="card card-rounded p-3">
-            <h6 class="mb-3">Update Course Links</h6>
-
-            <form method="GET" id="selectCourseForLinksForm" class="mb-3">
-              <label class="form-label small">Select course</label>
-              <select name="course_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="">Select a course</option>
-                <?php foreach ($courses as $course): ?>
-                  <option value="<?= $course['id'] ?>" <?= (isset($_GET['course_id']) && intval($_GET['course_id']) === $course['id']) ? 'selected' : '' ?>>
-                    <?= safe($course['name']) ?>
-                  </option>
-                <?php endforeach; ?>
-              </select>
-            </form>
-
-            <?php if ($selected_course): ?>
-              <form method="POST">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="save_links">
-                <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
-
-                <div class="mb-2">
-                  <label class="form-label small">Course</label>
-                  <input type="text" class="form-control form-control-sm" readonly value="<?= safe($selected_course['name']) ?>">
-                </div>
-
-                <div id="links-list-update">
-                  <?php if (!empty($links)): ?>
-                    <?php foreach ($links as $idx => $lnk): ?>
-                      <div class="row link-row g-2 mb-2">
-                        <div class="col">
-                          <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>" required>
-                        </div>
-                        <div class="col">
-                          <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>" required>
-                        </div>
-                        <div class="col-auto">
-                          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
-                        </div>
-                      </div>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <div class="row link-row g-2 mb-2">
-                      <div class="col">
-                        <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
-                      </div>
-                      <div class="col">
-                        <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
-                      </div>
-                      <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
-                      </div>
-                    </div>
-                  <?php endif; ?>
-                </div>
-
-                <div class="mt-2">
-                  <button type="button" class="btn btn-sm btn-secondary" id="addLinkUpdateBtn">Add link</button>
-                </div>
-
-                <div class="mt-3">
-                  <button class="btn btn-primary btn-sm">Save Links</button>
-                </div>
-
-              </form>
-            <?php endif; ?>
-
-          </div>
-        </section>
+      </section>
 
     </main>
   </div>
