@@ -47,7 +47,6 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
   </div>
 
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold">Branches — Sem <?= $semester ?></h1>
     <div class="flex items-center gap-2">
       <a href="view_semesters.php?scheme_id=<?= $scheme_id ?>" class="text-sm px-3 py-1 border rounded text-gray-700 dark:text-gray-200">Change Semester</a>
       <a href="view_scheme.php" class="text-sm px-3 py-1 border rounded text-gray-700 dark:text-gray-200">Change Scheme</a>
