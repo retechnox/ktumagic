@@ -3,15 +3,9 @@
 include __DIR__ . '/db.php';
 session_start();
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-
     header("Location: login.php");
     exit();
 }
-
-define('UPLOAD_DIR', __DIR__ . '/../uploads/');
-define('MAX_UPLOAD_SIZE', 2 * 1024 * 1024); // 2 MB
-$allowedImageExt = ['png','jpg','jpeg','gif','webp'];
-$allowedMime = ['image/png','image/jpeg','image/gif','image/webp'];
 
 // Start session for flash and CSRF
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -41,62 +35,36 @@ function check_csrf() {
     }
 }
 
-// -----------------------------
-// Utilities
-// -----------------------------
 function safe($v) { return htmlspecialchars((string)$v, ENT_QUOTES); }
 
-function makeUploadDir() {
-    if (!is_dir(UPLOAD_DIR)) {
-        mkdir(UPLOAD_DIR, 0755, true);
-    }
-}
+// -----------------------------
+// Drive link conversion helper (Option B)
+// Convert various Google Drive share URLs into a direct image URL:
+// - https://drive.google.com/file/d/FILE_ID/view?usp=sharing  => https://drive.google.com/uc?id=FILE_ID
+// - https://drive.google.com/open?id=FILE_ID                 => https://drive.google.com/uc?id=FILE_ID
+// - https://drive.google.com/uc?id=FILE_ID                   => unchanged
+function convertDriveLink(?string $url) : ?string {
+    $url = trim((string)$url);
+    if ($url === '') return null;
 
-// Secure image upload: returns relative path (web path), or null
-function uploadImageFile($fieldName, $allowedExt, $allowedMime, $maxSize) {
-    if (empty($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) return null;
-
-    $file = $_FILES[$fieldName];
-
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        throw new Exception('File upload error: ' . $file['error']);
-    }
-
-    if ($file['size'] > $maxSize) {
-        throw new Exception('File is too large. Max ' . ($maxSize / (1024*1024)) . ' MB.');
+    // If already in uc format, return as is
+    if (preg_match('#https?://drive\.google\.com/uc\?id=([a-zA-Z0-9_-]+)#', $url)) {
+        return $url;
     }
 
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mime = $finfo->file($file['tmp_name']);
-    if (!in_array($mime, $allowedMime)) {
-        throw new Exception('Unsupported file type.');
+    // /file/d/FILE_ID/...
+    if (preg_match('#/file/d/([a-zA-Z0-9_-]+)#', $url, $m)) {
+        return 'https://drive.google.com/uc?id=' . $m[1];
     }
 
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowedExt)) {
-        throw new Exception('Unsupported file extension.');
+    // open?id=FILE_ID or ?id=FILE_ID
+    if (preg_match('#[?&]id=([a-zA-Z0-9_-]+)#', $url, $m)) {
+        return 'https://drive.google.com/uc?id=' . $m[1];
     }
 
-    makeUploadDir();
-    $newName = uniqid('img_', true) . '.' . $ext;
-    $dest = UPLOAD_DIR . $newName;
-
-    if (!move_uploaded_file($file['tmp_name'], $dest)) {
-        throw new Exception('Failed to move uploaded file.');
-    }
-
-    // return web path relative to project root (assumes uploads folder is accessible at /uploads/)
-    // adjust if your uploads path is different
-    $rel = '/uploads/' . $newName;
-    return $rel;
-}
-
-// Delete image by relative path
-function deleteImageIfExists($relPath) {
-    if (!$relPath) return;
-    // convert to absolute
-    $abs = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR . ltrim($relPath, '/\\');
-    if ($abs && file_exists($abs)) @unlink($abs);
+    // share link like https://drive.google.com/drive/folders/FOLDER_ID -> not convertible to image; return as-is
+    // If nothing matched, return the original trimmed URL (admins may paste direct img URLs)
+    return $url;
 }
 
 // -----------------------------
@@ -142,10 +110,9 @@ try {
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
-            $image = null;
-            if (!empty($_FILES['branch_image']) && $_FILES['branch_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-                $image = uploadImageFile('branch_image', $allowedImageExt, $allowedMime, MAX_UPLOAD_SIZE);
-            }
+            // Expecting Drive link input now
+            $rawImage = trim($_POST['branch_image'] ?? '');
+            $image = convertDriveLink($rawImage);
 
             $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path) VALUES (?, ?, ?)');
             $stmt->execute([$scheme_id, $name, $image]);
@@ -158,17 +125,11 @@ try {
             if (!$branch_id) throw new Exception('Invalid branch id.');
             if ($branch_name === '') throw new Exception('Branch name required.');
 
-            $image = null;
-            if (!empty($_FILES['branch_image_edit']) && $_FILES['branch_image_edit']['error'] !== UPLOAD_ERR_NO_FILE) {
-                // delete old first
-                $old = $pdo->prepare('SELECT image_path FROM branches WHERE id = ?');
-                $old->execute([$branch_id]);
-                $oldp = $old->fetchColumn();
-                $image = uploadImageFile('branch_image_edit', $allowedImageExt, $allowedMime, MAX_UPLOAD_SIZE);
-                if ($oldp) deleteImageIfExists($oldp);
-            }
+            // If a new Drive link was provided, update it; otherwise only update name
+            $rawImage = trim($_POST['branch_image_edit'] ?? '');
+            $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
-            if ($image) {
+            if ($image !== null) {
                 $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ? WHERE id = ?');
                 $stmt->execute([$branch_name, $image, $branch_id]);
             } else {
@@ -181,16 +142,11 @@ try {
         elseif ($action === 'delete_branch') {
             $branch_id = intval($_POST['branch_id'] ?? 0);
             if (!$branch_id) throw new Exception('Invalid branch id.');
-            // delete branch images and optionally cascade delete courses
-            $old = $pdo->prepare('SELECT image_path FROM branches WHERE id = ?');
-            $old->execute([$branch_id]);
-            $oldp = $old->fetchColumn();
+            // delete branch (image is just a URL stored in DB, nothing to unlink)
             $del = $pdo->prepare('DELETE FROM branches WHERE id = ?');
             $del->execute([$branch_id]);
-            if ($oldp) deleteImageIfExists($oldp);
             flash('Branch deleted.', 'success');
         }
-
         elseif ($action === 'add_course') {
             $scheme_id = intval($_POST['scheme_id'] ?? 0);
             $branch_id = intval($_POST['branch_id'] ?? 0);
@@ -208,10 +164,9 @@ try {
                 if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
             }
 
-            $image = null;
-            if (!empty($_FILES['course_image']) && $_FILES['course_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-                $image = uploadImageFile('course_image', $allowedImageExt, $allowedMime, MAX_UPLOAD_SIZE);
-            }
+            // Expecting Drive link input now
+            $rawImage = trim($_POST['course_image'] ?? '');
+            $image = convertDriveLink($rawImage);
 
             $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, links, image_path, semester) VALUES (?, ?, ?, ?, ?, ?)');
             $stmt->execute([$branch_id, $scheme_id, $course_name, json_encode($validLinks), $image, $semester]);
@@ -225,17 +180,11 @@ try {
             if (!$course_id) throw new Exception('Invalid course id.');
             if ($course_name === '') throw new Exception('Course name required.');
 
-            $image = null;
-            if (!empty($_FILES['course_image_edit']) && $_FILES['course_image_edit']['error'] !== UPLOAD_ERR_NO_FILE) {
-                // delete old
-                $old = $pdo->prepare('SELECT image_path FROM courses WHERE id = ?');
-                $old->execute([$course_id]);
-                $oldp = $old->fetchColumn();
-                $image = uploadImageFile('course_image_edit', $allowedImageExt, $allowedMime, MAX_UPLOAD_SIZE);
-                if ($oldp) deleteImageIfExists($oldp);
-            }
+            // If admin provided a new Drive link, update it; otherwise leave existing image_path unchanged
+            $rawImage = trim($_POST['course_image_edit'] ?? '');
+            $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
-            if ($image) {
+            if ($image !== null) {
                 $stmt = $pdo->prepare('UPDATE courses SET name = ?, semester = ?, image_path = ? WHERE id = ?');
                 $stmt->execute([$course_name, $semester, $image, $course_id]);
             } else {
@@ -248,12 +197,9 @@ try {
         elseif ($action === 'delete_course') {
             $course_id = intval($_POST['course_id'] ?? 0);
             if (!$course_id) throw new Exception('Invalid course id.');
-            $old = $pdo->prepare('SELECT image_path FROM courses WHERE id = ?');
-            $old->execute([$course_id]);
-            $oldp = $old->fetchColumn();
+            // delete course (image_path is only a URL stored in DB)
             $del = $pdo->prepare('DELETE FROM courses WHERE id = ?');
             $del->execute([$course_id]);
-            if ($oldp) deleteImageIfExists($oldp);
             flash('Course deleted.', 'success');
         }
 
@@ -424,7 +370,6 @@ $flashes = flash(); // get flashes
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
-
       <!-- Sections -->
       <!-- Dashboard (default visible) -->
       <section id="dashboardSection" class="page-section">
@@ -477,7 +422,20 @@ $flashes = flash(); // get flashes
                     <td><?= safe($c['branch_name']) ?></td>
                     <td><?= safe($c['semester']) ?></td>
                     <td><?= safe($c['name']) ?></td>
-                    <td><?= !empty($c['image_path']) ? "<img src='" . safe($c['image_path']) . "' class='table-image' />" : '—' ?></td>
+                    <td>
+                      <?php if (!empty($c['image_path'])): ?>
+                        <?php
+                          // If image_path is a drive link that can't be embedded as <img> (e.g., folder), it may still break.
+                          // We attempt to render the URL as an <img> tag; if not an image, admin can provide a direct image URL.
+                        ?>
+                        <img src="<?= safe($c['image_path']) ?>" class="table-image" onerror="this.style.display='none'"/>
+                        <div class="small text-muted mt-1" style="max-width:160px;word-break:break-all;">
+                          <a href="<?= safe($c['image_path']) ?>" target="_blank" rel="noopener noreferrer">Open link</a>
+                        </div>
+                      <?php else: ?>
+                        —
+                      <?php endif; ?>
+                    </td>
                     <td class="text-end">
                       <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-edit-course" data-id="<?= $c['id'] ?>" data-name="<?= safe($c['name']) ?>" data-sem="<?= safe($c['semester']) ?>">Edit</button>
 
@@ -558,7 +516,7 @@ $flashes = flash(); // get flashes
           <div class="col-lg-4">
             <div class="card card-rounded p-3">
               <h6 class="mb-3">Add Branch</h6>
-              <form method="POST" action="" enctype="multipart/form-data">
+              <form method="POST" action="">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_branch">
                 <div class="mb-2">
@@ -575,8 +533,8 @@ $flashes = flash(); // get flashes
                   <input type="text" name="branch_name" class="form-control form-control-sm" required>
                 </div>
                 <div class="mb-2">
-                  <label class="form-label small">Image (optional)</label>
-                  <input type="file" name="branch_image" accept="image/*" class="form-control form-control-sm">
+                  <label class="form-label small">Drive image link (optional)</label>
+                  <input type="text" name="branch_image" placeholder="Drive image link" class="form-control form-control-sm">
                 </div>
                 <div class="d-grid"><button class="btn btn-success btn-sm">Add Branch</button></div>
               </form>
@@ -592,7 +550,7 @@ $flashes = flash(); // get flashes
                     <div class="col-md-4">
                       <div class="card h-100">
                         <?php if (!empty($b['image_path'])): ?>
-                          <img src="<?= safe($b['image_path']) ?>" class="branch-img" alt="">
+                          <img src="<?= safe($b['image_path']) ?>" class="branch-img" alt="" onerror="this.style.display='none'">
                         <?php endif; ?>
                         <div class="card-body text-center">
                           <h6 class="mb-1"><?= safe($b['name']) ?></h6>
@@ -627,7 +585,7 @@ $flashes = flash(); // get flashes
       <section id="coursesSection" class="page-section" style="display:none">
         <div class="card card-rounded p-4 mb-4">
           <h5 class="mb-3">Add Course</h5>
-          <form method="POST" action="" enctype="multipart/form-data" id="addCourseForm">
+          <form method="POST" action="" id="addCourseForm">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_course">
 
@@ -669,8 +627,8 @@ $flashes = flash(); // get flashes
                 <input type="text" name="course_name" class="form-control form-control-sm" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label small">Course image (optional)</label>
-                <input type="file" name="course_image" accept="image/*" class="form-control form-control-sm">
+                <label class="form-label small">Drive image link (optional)</label>
+                <input type="text" name="course_image" placeholder="Drive image link" class="form-control form-control-sm">
               </div>
             </div>
 
@@ -698,15 +656,43 @@ $flashes = flash(); // get flashes
           </form>
         </div>
 
-        <!-- <div class="card card-rounded p-3">
-          <h6 class="mb-2">Semesters</h6>
-          <div class="mb-2 d-flex flex-wrap">
-            <?php for ($s=1;$s<=8;$s++): ?>
-              <div class="semester-pill" data-sem="<?= $s ?>">Sem <?= $s ?></div>
-            <?php endfor; ?>
+        <!-- Edit course modal (Bootstrap 5) -->
+        <div class="modal fade" id="courseEditModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form id="courseEditForm" method="POST" action="">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="edit_course">
+                <input type="hidden" name="course_id" id="modal_course_id">
+                <div class="modal-header">
+                  <h5 class="modal-title">Edit Course</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-2">
+                    <label class="form-label small">Course name</label>
+                    <input type="text" name="course_name_edit" id="modal_course_name" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Semester</label>
+                    <select name="semester_edit" id="modal_course_sem" class="form-select form-select-sm" required>
+                      <?php for ($i=1;$i<=8;$i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?>
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Drive image link (optional)</label>
+                    <input type="text" name="course_image_edit" class="form-control form-control-sm" placeholder="Drive image link">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-primary btn-sm">Save</button>
+                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <small class="text-muted">Click a semester to set it while adding a course above</small>
-        </div> -->
+        </div>
+
       </section>
 
       <!-- Links (update) -->
@@ -777,43 +763,6 @@ $flashes = flash(); // get flashes
       </section>
 
     </main>
-  </div>
-</div>
-
-<!-- Edit course modal (Bootstrap 5) -->
-<div class="modal fade" id="courseEditModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form id="courseEditForm" method="POST" action="" enctype="multipart/form-data">
-        <?= csrf_field() ?>
-        <input type="hidden" name="action" value="edit_course">
-        <input type="hidden" name="course_id" id="modal_course_id">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Course</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-2">
-            <label class="form-label small">Course name</label>
-            <input type="text" name="course_name_edit" id="modal_course_name" class="form-control form-control-sm" required>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Semester</label>
-            <select name="semester_edit" id="modal_course_sem" class="form-select form-select-sm" required>
-              <?php for ($i=1;$i<=8;$i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Replace image (optional)</label>
-            <input type="file" name="course_image_edit" class="form-control form-control-sm">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary btn-sm">Save</button>
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-        </div>
-      </form>
-    </div>
   </div>
 </div>
 
@@ -961,7 +910,7 @@ $flashes = flash(); // get flashes
       branchEditContainer.innerHTML = '';
       const formHtml = `
         <div class="card card-rounded p-3 mb-3">
-          <form method="POST" action="" enctype="multipart/form-data">
+          <form method="POST" action="">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="edit_branch">
             <input type="hidden" name="branch_id" value="${escapeHtml(id)}">
@@ -970,8 +919,8 @@ $flashes = flash(); // get flashes
               <input type="text" name="branch_name" class="form-control form-control-sm" value="${escapeHtml(name)}" required>
             </div>
             <div class="mb-2">
-              <label class="form-label small">Replace image (optional)</label>
-              <input type="file" name="branch_image_edit" accept="image/*" class="form-control form-control-sm">
+              <label class="form-label small">Drive image link (optional)</label>
+              <input type="text" name="branch_image_edit" placeholder="Drive image link" class="form-control form-control-sm">
             </div>
             <div class="d-flex justify-content-end gap-2">
               <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
