@@ -38,32 +38,24 @@ function check_csrf() {
 function safe($v) { return htmlspecialchars((string)$v, ENT_QUOTES); }
 
 // -----------------------------
-// Drive link conversion helper (Option B)
-// Convert various Google Drive share URLs into a direct image URL:
-// - https://drive.google.com/file/d/FILE_ID/view?usp=sharing  => https://drive.google.com/uc?id=FILE_ID
-// - https://drive.google.com/open?id=FILE_ID                 => https://drive.google.com/uc?id=FILE_ID
-// - https://drive.google.com/uc?id=FILE_ID                   => unchanged
+// Drive link conversion helper
+// -----------------------------
 function convertDriveLink(?string $url) : ?string {
     $url = trim((string)$url);
     if ($url === '') return null;
 
-    // If already in uc format, return as is
     if (preg_match('#https?://drive\.google\.com/uc\?id=([a-zA-Z0-9_-]+)#', $url)) {
         return $url;
     }
 
-    // /file/d/FILE_ID/...
     if (preg_match('#/file/d/([a-zA-Z0-9_-]+)#', $url, $m)) {
         return 'https://drive.google.com/uc?id=' . $m[1];
     }
 
-    // open?id=FILE_ID or ?id=FILE_ID
     if (preg_match('#[?&]id=([a-zA-Z0-9_-]+)#', $url, $m)) {
         return 'https://drive.google.com/uc?id=' . $m[1];
     }
 
-    // share link like https://drive.google.com/drive/folders/FOLDER_ID -> not convertible to image; return as-is
-    // If nothing matched, return the original trimmed URL (admins may paste direct img URLs)
     return $url;
 }
 
@@ -72,9 +64,7 @@ function convertDriveLink(?string $url) : ?string {
 // -----------------------------
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Validate CSRF for all POST actions
         check_csrf();
-
         $action = $_POST['action'] ?? '';
 
         if ($action === 'add_scheme') {
@@ -98,7 +88,6 @@ try {
         elseif ($action === 'delete_scheme') {
             $id = intval($_POST['scheme_id'] ?? 0);
             if (!$id) throw new Exception('Invalid scheme id.');
-            // optionally check dependent branches/courses
             $stmt = $pdo->prepare('DELETE FROM schemes WHERE id = ?');
             $stmt->execute([$id]);
             flash('Scheme deleted.', 'success');
@@ -110,7 +99,6 @@ try {
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
-            // Expecting Drive link input now
             $rawImage = trim($_POST['branch_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
@@ -125,7 +113,6 @@ try {
             if (!$branch_id) throw new Exception('Invalid branch id.');
             if ($branch_name === '') throw new Exception('Branch name required.');
 
-            // If a new Drive link was provided, update it; otherwise only update name
             $rawImage = trim($_POST['branch_image_edit'] ?? '');
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
@@ -142,11 +129,11 @@ try {
         elseif ($action === 'delete_branch') {
             $branch_id = intval($_POST['branch_id'] ?? 0);
             if (!$branch_id) throw new Exception('Invalid branch id.');
-            // delete branch (image is just a URL stored in DB, nothing to unlink)
             $del = $pdo->prepare('DELETE FROM branches WHERE id = ?');
             $del->execute([$branch_id]);
             flash('Branch deleted.', 'success');
         }
+
         elseif ($action === 'add_course') {
             $scheme_id = intval($_POST['scheme_id'] ?? 0);
             $branch_id = intval($_POST['branch_id'] ?? 0);
@@ -156,7 +143,6 @@ try {
             if ($course_name === '') throw new Exception('Course name required.');
 
             $links = $_POST['links'] ?? [];
-            // sanitize link array: only keep entries where url and name exist
             $validLinks = [];
             foreach ($links as $l) {
                 $ln = trim($l['link_name'] ?? '');
@@ -164,11 +150,11 @@ try {
                 if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
             }
 
-            // Expecting Drive link input now
             $rawImage = trim($_POST['course_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
             $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, links, image_path, semester) VALUES (?, ?, ?, ?, ?, ?)');
+
             $stmt->execute([$branch_id, $scheme_id, $course_name, json_encode($validLinks), $image, $semester]);
             flash('Course added.', 'success');
         }
@@ -177,10 +163,10 @@ try {
             $course_id = intval($_POST['course_id'] ?? 0);
             $course_name = trim($_POST['course_name_edit'] ?? '');
             $semester = intval($_POST['semester_edit'] ?? 0) ?: null;
+
             if (!$course_id) throw new Exception('Invalid course id.');
             if ($course_name === '') throw new Exception('Course name required.');
 
-            // If admin provided a new Drive link, update it; otherwise leave existing image_path unchanged
             $rawImage = trim($_POST['course_image_edit'] ?? '');
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
@@ -197,7 +183,6 @@ try {
         elseif ($action === 'delete_course') {
             $course_id = intval($_POST['course_id'] ?? 0);
             if (!$course_id) throw new Exception('Invalid course id.');
-            // delete course (image_path is only a URL stored in DB)
             $del = $pdo->prepare('DELETE FROM courses WHERE id = ?');
             $del->execute([$course_id]);
             flash('Course deleted.', 'success');
@@ -218,19 +203,14 @@ try {
             flash('Links saved.', 'success');
         }
 
-        // After any POST action, redirect to avoid form resubmission
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
     }
+
 } catch (Exception $e) {
-    // Catch exceptions thrown during actions
     flash('Error: ' . $e->getMessage(), 'danger');
-    // Do NOT exit: allow page to render with flash messages
 }
 
-// -----------------------------
-// Fetch data for rendering (safe reads)
-// -----------------------------
 $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
 $branches = $pdo->query('SELECT * FROM branches ORDER BY name')->fetchAll();
 $courses = $pdo->query("
@@ -241,7 +221,6 @@ $courses = $pdo->query("
     ORDER BY c.id DESC
 ")->fetchAll();
 
-// For selected course links
 $selected_course = null;
 $links = [];
 if (isset($_GET['course_id'])) {
@@ -249,16 +228,10 @@ if (isset($_GET['course_id'])) {
     $q = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
     $q->execute([$course_id]);
     $selected_course = $q->fetch();
-    if ($selected_course) {
-        $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
-    }
+    if ($selected_course) $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
 }
 
-// -----------------------------
-// Render
-// -----------------------------
-$flashes = flash(); // get flashes
-
+$flashes = flash();
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -304,7 +277,7 @@ $flashes = flash(); // get flashes
       padding-left:0.5rem;
       padding-right:0.5rem;
     }
-    /* small screens: sidebar hidden by default and slides in */
+
     @media (max-width: 991px){
       .sidebar{
         position:fixed;
@@ -370,8 +343,8 @@ $flashes = flash(); // get flashes
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
-      <!-- Sections -->
-      <!-- Dashboard (default visible) -->
+
+      <!-- Dashboard -->
       <section id="dashboardSection" class="page-section">
         <div id="tableMode" class="card card-rounded p-3 mb-4">
           <div class="d-flex align-items-center justify-content-between mb-3">
@@ -424,20 +397,19 @@ $flashes = flash(); // get flashes
                     <td><?= safe($c['name']) ?></td>
                     <td>
                       <?php if (!empty($c['image_path'])): ?>
-                        <?php
-                          // If image_path is a drive link that can't be embedded as <img> (e.g., folder), it may still break.
-                          // We attempt to render the URL as an <img> tag; if not an image, admin can provide a direct image URL.
-                        ?>
-                        <img src="<?= safe($c['image_path']) ?>" class="table-image" onerror="this.style.display='none'"/>
-                        <div class="small text-muted mt-1" style="max-width:160px;word-break:break-all;">
-                          <a href="<?= safe($c['image_path']) ?>" target="_blank" rel="noopener noreferrer">Open link</a>
+                        <img src="<?= safe($c['image_path']) ?>" class="table-image" onerror="this.style.display='none'" />
+                        <div class="small text-muted mt-1" style="max-width:160px; word-break:break-all;">
+                          <a href="<?= safe($c['image_path']) ?>" target="_blank">Open link</a>
                         </div>
-                      <?php else: ?>
-                        —
-                      <?php endif; ?>
+                      <?php else: ?>—<?php endif; ?>
                     </td>
                     <td class="text-end">
-                      <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-edit-course" data-id="<?= $c['id'] ?>" data-name="<?= safe($c['name']) ?>" data-sem="<?= safe($c['semester']) ?>">Edit</button>
+                      <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-edit-course"
+                              data-id="<?= $c['id'] ?>"
+                              data-name="<?= safe($c['name']) ?>"
+                              data-sem="<?= safe($c['semester']) ?>">
+                        Edit
+                      </button>
 
                       <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete course?');">
                         <?= csrf_field() ?>
@@ -457,13 +429,14 @@ $flashes = flash(); // get flashes
         </div>
       </section>
 
-      <!-- Schemes -->
+      <!-- Schemes Section -->
       <section id="schemesSection" class="page-section" style="display:none">
         <div class="card card-rounded p-3 mb-3">
           <h5 class="mb-3">Add / Manage Schemes</h5>
+
           <div class="row">
             <div class="col-md-4">
-              <form method="POST" action="">
+              <form method="POST">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_scheme">
                 <div class="mb-2">
@@ -483,7 +456,6 @@ $flashes = flash(); // get flashes
                       <td><?= $s['id'] ?></td>
                       <td><?= safe($s['name']) ?></td>
                       <td class="text-end">
-                        <!-- edit (simple inline form) -->
                         <form method="POST" class="d-inline-block" style="max-width:240px">
                           <?= csrf_field() ?>
                           <input type="hidden" name="action" value="edit_scheme">
@@ -506,19 +478,23 @@ $flashes = flash(); // get flashes
                 </tbody>
               </table>
             </div>
+
           </div>
         </div>
       </section>
 
-      <!-- Branches -->
+      <!-- Branches Section -->
       <section id="branchesSection" class="page-section" style="display:none">
         <div class="row g-3">
+
           <div class="col-lg-4">
             <div class="card card-rounded p-3">
               <h6 class="mb-3">Add Branch</h6>
-              <form method="POST" action="">
+
+              <form method="POST">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_branch">
+
                 <div class="mb-2">
                   <label class="form-label small">Select scheme</label>
                   <select name="scheme_id" class="form-select form-select-sm" required>
@@ -528,19 +504,22 @@ $flashes = flash(); // get flashes
                     <?php endforeach; ?>
                   </select>
                 </div>
+
                 <div class="mb-2">
                   <label class="form-label small">Branch name</label>
                   <input type="text" name="branch_name" class="form-control form-control-sm" required>
                 </div>
+
                 <div class="mb-2">
                   <label class="form-label small">Drive image link (optional)</label>
-                  <input type="text" name="branch_image" placeholder="Drive image link" class="form-control form-control-sm">
+                  <input type="text" name="branch_image" class="form-control form-control-sm">
                 </div>
+
                 <div class="d-grid"><button class="btn btn-success btn-sm">Add Branch</button></div>
               </form>
+
             </div>
           </div>
-
           <div class="col-lg-8">
             <div class="card card-rounded p-3">
               <h6 class="mb-3">Branches</h6>
@@ -556,7 +535,9 @@ $flashes = flash(); // get flashes
                           <h6 class="mb-1"><?= safe($b['name']) ?></h6>
                           <small class="text-muted">ID: <?= $b['id'] ?></small>
                           <div class="mt-3 d-flex justify-content-center gap-2">
-                            <button class="btn btn-sm btn-outline-warning btn-branch-edit" data-id="<?= $b['id'] ?>" data-name="<?= safe($b['name']) ?>">Edit</button>
+                            <button class="btn btn-sm btn-outline-warning btn-branch-edit"
+                              data-id="<?= $b['id'] ?>"
+                              data-name="<?= safe($b['name']) ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
                               <?= csrf_field() ?>
@@ -577,15 +558,16 @@ $flashes = flash(); // get flashes
           </div>
         </div>
 
-        <!-- Branch edit insertion area (JS will insert) -->
         <div id="branchEditContainer" class="mt-4"></div>
       </section>
 
-      <!-- Courses (Add course + semester quick select) -->
+      <!-- Courses Section -->
       <section id="coursesSection" class="page-section" style="display:none">
+
         <div class="card card-rounded p-4 mb-4">
           <h5 class="mb-3">Add Course</h5>
-          <form method="POST" action="" id="addCourseForm">
+
+          <form method="POST" id="addCourseForm">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_course">
 
@@ -626,9 +608,10 @@ $flashes = flash(); // get flashes
                 <label class="form-label small">Course name</label>
                 <input type="text" name="course_name" class="form-control form-control-sm" required>
               </div>
+
               <div class="col-md-4">
                 <label class="form-label small">Drive image link (optional)</label>
-                <input type="text" name="course_image" placeholder="Drive image link" class="form-control form-control-sm">
+                <input type="text" name="course_image" class="form-control form-control-sm">
               </div>
             </div>
 
@@ -647,213 +630,211 @@ $flashes = flash(); // get flashes
                   </div>
                 </div>
               </div>
+
               <div class="mt-2">
                 <button type="button" class="btn btn-sm btn-secondary" id="addLinkCourseBtn">Add link</button>
               </div>
             </div>
 
-            <div class="mt-3 d-grid"><button class="btn btn-primary btn-sm">Add Course</button></div>
-          </form>
-        </div>
-
-        <!-- Edit course modal (Bootstrap 5) -->
-        <div class="modal fade" id="courseEditModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <form id="courseEditForm" method="POST" action="">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="edit_course">
-                <input type="hidden" name="course_id" id="modal_course_id">
-                <div class="modal-header">
-                  <h5 class="modal-title">Edit Course</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <div class="mb-2">
-                    <label class="form-label small">Course name</label>
-                    <input type="text" name="course_name_edit" id="modal_course_name" class="form-control form-control-sm" required>
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label small">Semester</label>
-                    <select name="semester_edit" id="modal_course_sem" class="form-select form-select-sm" required>
-                      <?php for ($i=1;$i<=8;$i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?>
-                    </select>
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label small">Drive image link (optional)</label>
-                    <input type="text" name="course_image_edit" class="form-control form-control-sm" placeholder="Drive image link">
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn btn-primary btn-sm">Save</button>
-                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                </div>
-              </form>
+            <div class="mt-3 d-grid">
+              <button class="btn btn-primary btn-sm">Add Course</button>
             </div>
-          </div>
+
+          </form>
         </div>
 
-      </section>
 
-      <!-- Links (update) -->
-      <section id="linksSection" class="page-section" style="display:none">
-        <div class="card card-rounded p-3">
-          <h6 class="mb-3">Update Course Links</h6>
-          <form method="GET" action="" id="selectCourseForLinksForm" class="mb-3">
-            <label class="form-label small">Select course</label>
-            <select name="course_id" class="form-select form-select-sm" onchange="document.getElementById('selectCourseForLinksForm').submit()">
-              <option value="">Select a course</option>
-              <?php foreach ($courses as $course): ?>
-                <option value="<?= $course['id'] ?>" <?= (isset($_GET['course_id']) && intval($_GET['course_id']) === $course['id']) ? 'selected' : '' ?>>
-                  <?= safe($course['name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </form>
+        <!-- Links Section -->
+        <section id="linksSection" class="page-section" style="display:none">
+          <div class="card card-rounded p-3">
+            <h6 class="mb-3">Update Course Links</h6>
 
-          <?php if ($selected_course): ?>
-            <form method="POST" action="">
-              <?= csrf_field() ?>
-              <input type="hidden" name="action" value="save_links">
-              <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
+            <form method="GET" id="selectCourseForLinksForm" class="mb-3">
+              <label class="form-label small">Select course</label>
+              <select name="course_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Select a course</option>
+                <?php foreach ($courses as $course): ?>
+                  <option value="<?= $course['id'] ?>" <?= (isset($_GET['course_id']) && intval($_GET['course_id']) === $course['id']) ? 'selected' : '' ?>>
+                    <?= safe($course['name']) ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </form>
 
-              <div class="mb-2">
-                <label class="form-label small">Course</label>
-                <input type="text" class="form-control form-control-sm" value="<?= safe($selected_course['name']) ?>" readonly>
-              </div>
+            <?php if ($selected_course): ?>
+              <form method="POST">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="save_links">
+                <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
 
-              <div id="links-list-update">
-                <?php if (!empty($links)): ?>
-                  <?php foreach ($links as $idx => $lnk): ?>
+                <div class="mb-2">
+                  <label class="form-label small">Course</label>
+                  <input type="text" class="form-control form-control-sm" readonly value="<?= safe($selected_course['name']) ?>">
+                </div>
+
+                <div id="links-list-update">
+                  <?php if (!empty($links)): ?>
+                    <?php foreach ($links as $idx => $lnk): ?>
+                      <div class="row link-row g-2 mb-2">
+                        <div class="col">
+                          <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>" required>
+                        </div>
+                        <div class="col">
+                          <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>" required>
+                        </div>
+                        <div class="col-auto">
+                          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php else: ?>
                     <div class="row link-row g-2 mb-2">
                       <div class="col">
-                        <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name'] ?? '') ?>" required>
+                        <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
                       </div>
                       <div class="col">
-                        <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url'] ?? '') ?>" required>
+                        <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
                       </div>
                       <div class="col-auto">
                         <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
                       </div>
                     </div>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <div class="row link-row g-2 mb-2">
-                    <div class="col">
-                      <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
-                    </div>
-                    <div class="col">
-                      <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
-                    </div>
-                    <div class="col-auto">
-                      <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
-                    </div>
-                  </div>
-                <?php endif; ?>
-              </div>
+                  <?php endif; ?>
+                </div>
 
-              <div class="mt-2">
-                <button type="button" class="btn btn-sm btn-secondary" id="addLinkUpdateBtn">Add link</button>
-              </div>
+                <div class="mt-2">
+                  <button type="button" class="btn btn-sm btn-secondary" id="addLinkUpdateBtn">Add link</button>
+                </div>
 
-              <div class="mt-3"><button class="btn btn-primary btn-sm">Save Links</button></div>
-            </form>
-          <?php endif; ?>
-        </div>
-      </section>
+                <div class="mt-3">
+                  <button class="btn btn-primary btn-sm">Save Links</button>
+                </div>
+
+              </form>
+            <?php endif; ?>
+
+          </div>
+        </section>
 
     </main>
   </div>
 </div>
 
-<!-- Bootstrap JS (no jQuery) -->
+<!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- EDIT COURSE MODAL — MOVED OUT OF HIDDEN SECTIONS -->
+<div class="modal fade" id="courseEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form id="courseEditForm" method="POST">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="edit_course">
+        <input type="hidden" name="course_id" id="modal_course_id">
+
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="mb-2">
+            <label class="form-label small">Course name</label>
+            <input type="text" name="course_name_edit" id="modal_course_name" class="form-control form-control-sm" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Semester</label>
+            <select name="semester_edit" id="modal_course_sem" class="form-select form-select-sm" required>
+              <?php for ($i=1;$i<=8;$i++): ?>
+                <option value="<?= $i ?>"><?= $i ?></option>
+              <?php endfor; ?>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Drive image link (optional)</label>
+            <input type="text" name="course_image_edit" class="form-control form-control-sm">
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary btn-sm">Save</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- JS Logic -->
 <script>
 (function(){
-  // Elements
   const btnTableMode = document.getElementById('btnTableMode');
   const btnCardMode = document.getElementById('btnCardMode');
-  const tableMode = document.getElementById('tableMode');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const mobileCloseSidebarBtn = document.getElementById('mobileCloseSidebarBtn');
   const sidebar = document.getElementById('sidebar');
   const collapseSidebarBtn = document.getElementById('collapseSidebarBtn');
 
-  // Section elements
   const sections = document.querySelectorAll('.page-section');
+
   const dashboardSection = document.getElementById('dashboardSection');
   const schemesSection = document.getElementById('schemesSection');
   const branchesSection = document.getElementById('branchesSection');
   const coursesSection = document.getElementById('coursesSection');
   const linksSection = document.getElementById('linksSection');
 
-  // Table filters
   const tmFilterScheme = document.getElementById('tm_filter_scheme');
   const tmFilterBranch = document.getElementById('tm_filter_branch');
   const tmFilterSem = document.getElementById('tm_filter_semester');
   const tmSearch = document.getElementById('tm_search');
   const tmTable = document.getElementById('tm_table');
 
-  // Link management counters
-  let linkCountCourse = 1;
-  let linkCountUpdate = <?= !empty($links) ? count($links) : 1 ?>;
-
-  // Utility: show only one section by id
   function showSection(id){
     sections.forEach(s => s.style.display = (s.id === id ? '' : 'none'));
-    // Update active nav-link
     document.querySelectorAll('.nav-link[data-target]').forEach(a => {
-      if (a.getAttribute('data-target') === id) a.classList.add('active'); else a.classList.remove('active');
+      if (a.getAttribute('data-target') === id) a.classList.add('active');
+      else a.classList.remove('active');
     });
-    // collapse mobile sidebar after navigation
     if (window.innerWidth < 992) sidebar.classList.remove('show');
   }
 
-  // Default: show dashboard
   showSection('dashboardSection');
 
-  // Sidebar nav links
   document.querySelectorAll('.nav-link[data-target]').forEach(a=>{
     a.addEventListener('click', function(e){
       e.preventDefault();
-      const target = this.getAttribute('data-target');
-      if (target) showSection(target);
+      showSection(this.getAttribute('data-target'));
     });
   });
 
-  // Toggle modes (Table shows dashboard, Card shows courses section)
-  function showTableMode(){
+  btnTableMode.addEventListener('click', ()=>{
     showSection('dashboardSection');
-    btnTableMode.classList.remove('btn-outline-secondary');
     btnTableMode.classList.add('btn-primary');
+    btnTableMode.classList.remove('btn-outline-secondary');
     btnCardMode.classList.remove('btn-primary');
     btnCardMode.classList.add('btn-outline-secondary');
-  }
-  function showCardMode(){
+  });
+
+  btnCardMode.addEventListener('click', ()=>{
     showSection('coursesSection');
-    btnCardMode.classList.remove('btn-outline-secondary');
     btnCardMode.classList.add('btn-primary');
+    btnCardMode.classList.remove('btn-outline-secondary');
     btnTableMode.classList.remove('btn-primary');
     btnTableMode.classList.add('btn-outline-secondary');
-  }
-  btnTableMode && btnTableMode.addEventListener('click', showTableMode);
-  btnCardMode && btnCardMode.addEventListener('click', showCardMode);
-
-  // Mobile sidebar toggle
-  mobileMenuBtn && mobileMenuBtn.addEventListener('click', function(){
-    sidebar.classList.add('show');
-  });
-  mobileCloseSidebarBtn && mobileCloseSidebarBtn.addEventListener('click', function(){
-    sidebar.classList.remove('show');
   });
 
-  // Sidebar collapse toggle (desktop)
-  collapseSidebarBtn && collapseSidebarBtn.addEventListener('click', () => {
-    document.body.classList.toggle('sidebar-collapsed');
-  });
+  mobileMenuBtn.addEventListener('click', ()=> sidebar.classList.add('show'));
+  mobileCloseSidebarBtn.addEventListener('click', ()=> sidebar.classList.remove('show'));
 
-  // Close sidebar when clicking outside on mobile
+  collapseSidebarBtn.addEventListener('click', ()=> document.body.classList.toggle('sidebar-collapsed'));
+
   document.addEventListener('click', function(e){
     if(window.innerWidth < 992){
       if(!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)){
@@ -862,160 +843,44 @@ $flashes = flash(); // get flashes
     }
   });
 
-  // Table filter function
   function applyFilters(){
     const scheme = (tmFilterScheme.value || '').toLowerCase();
     const branch = (tmFilterBranch.value || '').toLowerCase();
     const sem = (tmFilterSem.value || '').toLowerCase();
     const search = (tmSearch.value || '').toLowerCase();
+
     Array.from(tmTable.tBodies[0].rows).forEach(row=>{
-      const rowScheme = (row.getAttribute('data-scheme') || '').toLowerCase();
-      const rowBranch = (row.getAttribute('data-branch') || '').toLowerCase();
-      const rowSem = (row.getAttribute('data-semester') || '').toLowerCase();
-      const rowName = (row.getAttribute('data-name') || '').toLowerCase();
-      const matches = (scheme === '' || rowScheme === scheme)
-                    && (branch === '' || rowBranch === branch)
-                    && (sem === '' || rowSem === sem)
-                    && (search === '' || rowName.indexOf(search) !== -1);
+      const matches =
+        (scheme === '' || row.dataset.scheme === scheme) &&
+        (branch === '' || row.dataset.branch === branch) &&
+        (sem === '' || row.dataset.semester === sem) &&
+        (search === '' || row.dataset.name.includes(search));
+
       row.style.display = matches ? '' : 'none';
     });
   }
+
   [tmFilterScheme, tmFilterBranch, tmFilterSem, tmSearch].forEach(el=>{
-    el && el.addEventListener('change', applyFilters);
-    el && el.addEventListener('keyup', applyFilters);
+    if (!el) return;
+    el.addEventListener('change', applyFilters);
+    el.addEventListener('keyup', applyFilters);
   });
 
-  // Edit course modal (Bootstrap)
-  const courseEditModalEl = document.getElementById('courseEditModal');
-  const courseEditModal = new bootstrap.Modal(courseEditModalEl);
+  const courseEditModal = new bootstrap.Modal(document.getElementById('courseEditModal'));
+
   document.querySelectorAll('.btn-edit-course').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-id');
-      const name = btn.getAttribute('data-name');
-      const sem = btn.getAttribute('data-sem');
-      document.getElementById('modal_course_id').value = id;
-      document.getElementById('modal_course_name').value = name;
-      document.getElementById('modal_course_sem').value = sem;
+      document.getElementById('modal_course_id').value = btn.dataset.id;
+      document.getElementById('modal_course_name').value = btn.dataset.name;
+      document.getElementById('modal_course_sem').value = btn.dataset.sem;
+
       courseEditModal.show();
     });
   });
 
-  // Inline branch edit insertion
-  const branchEditContainer = document.getElementById('branchEditContainer');
-  document.querySelectorAll('.btn-branch-edit').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-id');
-      const name = btn.getAttribute('data-name');
-      // remove existing
-      branchEditContainer.innerHTML = '';
-      const formHtml = `
-        <div class="card card-rounded p-3 mb-3">
-          <form method="POST" action="">
-            <?= csrf_field() ?>
-            <input type="hidden" name="action" value="edit_branch">
-            <input type="hidden" name="branch_id" value="${escapeHtml(id)}">
-            <div class="mb-2">
-              <label class="form-label small">Branch name</label>
-              <input type="text" name="branch_name" class="form-control form-control-sm" value="${escapeHtml(name)}" required>
-            </div>
-            <div class="mb-2">
-              <label class="form-label small">Drive image link (optional)</label>
-              <input type="text" name="branch_image_edit" placeholder="Drive image link" class="form-control form-control-sm">
-            </div>
-            <div class="d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
-              <button class="btn btn-sm btn-primary">Save</button>
-            </div>
-          </form>
-        </div>
-      `;
-      branchEditContainer.innerHTML = formHtml;
-      document.getElementById('cancelBranchEdit').addEventListener('click', ()=>{
-        branchEditContainer.innerHTML = '';
-        branchEditContainer.scrollIntoView({behavior:'smooth'});
-      });
-      branchEditContainer.scrollIntoView({behavior:'smooth', block:'center'});
-    });
-  });
-
-  // Semester quick select behavior
-  document.querySelectorAll('.semester-pill').forEach(pill=>{
-    pill.addEventListener('click', ()=>{
-      document.querySelectorAll('.semester-pill').forEach(x=>x.classList.remove('active'));
-      pill.classList.add('active');
-      const sem = pill.getAttribute('data-sem');
-      const semSelect = document.getElementById('semester_select');
-      if(semSelect){
-        semSelect.value = sem;
-        semSelect.scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    });
-  });
-
-  // Links: add/remove for Add Course
-  const linksListCourse = document.getElementById('links-list-course');
-  const addLinkCourseBtn = document.getElementById('addLinkCourseBtn');
-  addLinkCourseBtn && addLinkCourseBtn.addEventListener('click', ()=>{
-    const idx = linkCountCourse++;
-    const row = document.createElement('div');
-    row.className = 'row link-row g-2 mb-2';
-    row.innerHTML = `
-      <div class="col">
-        <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
-      </div>
-      <div class="col">
-        <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
-      </div>
-      <div class="col-auto">
-        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
-      </div>
-    `;
-    linksListCourse.appendChild(row);
-    row.querySelector('.btn-remove-link').addEventListener('click', ()=>row.remove());
-  });
-
-  // Links for update
-  const linksListUpdate = document.getElementById('links-list-update');
-  const addLinkUpdateBtn = document.getElementById('addLinkUpdateBtn');
-  addLinkUpdateBtn && addLinkUpdateBtn.addEventListener('click', ()=>{
-    const idx = linkCountUpdate++;
-    const row = document.createElement('div');
-    row.className = 'row link-row g-2 mb-2';
-    row.innerHTML = `
-      <div class="col">
-        <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
-      </div>
-      <div class="col">
-        <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
-      </div>
-      <div class="col-auto">
-        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
-      </div>
-    `;
-    linksListUpdate && linksListUpdate.appendChild(row);
-    row.querySelector('.btn-remove-link').addEventListener('click', ()=>row.remove());
-  });
-
-  // Attach remove listeners for any existing remove buttons (hidden by default)
-  document.querySelectorAll('.btn-remove-link').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const row = btn.closest('.link-row');
-      row && row.remove();
-    });
-  });
-
-  // Utility escape for inserted values
-  function escapeHtml(unsafe) {
-    if (!unsafe) return '';
-    return String(unsafe)
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'",'&#039;');
-  }
-
 })();
 </script>
+
 </body>
 </html>
+
