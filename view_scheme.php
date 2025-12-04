@@ -20,10 +20,11 @@ $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
 
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
     <?php if (!empty($schemes)): foreach ($schemes as $s): ?>
-      <a href="view_semesters.php?scheme_id=<?= $s['id'] ?>"
+      <!-- FIX: Removed link to semesters. Now goes to branches -->
+      <a href="view_branch.php?scheme_id=<?= $s['id'] ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-lg transition">
         <div class="text-2xl font-semibold"><?= safe($s['name']) ?></div>
-        <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">View semesters & branches</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">View branches</div>
       </a>
     <?php endforeach; else: ?>
       <div class="col-span-full text-center text-gray-500">No schemes found.</div>
