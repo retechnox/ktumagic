@@ -6,80 +6,90 @@ header("Content-Encoding: none");
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>KTU Magic – Notes & Resources</title>
 
-<!-- TailwindCSS + GSAP -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<!-- Google Font: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        primary: "#2563EB",
-        darkBg: "#1A1A1A",
-        darkCard: "#242424",
-        darkText: "#EAEAEA"
-      }
-    }
-  }
-};
-</script>
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <style>
 
-/* ======================== Marquee ========================= */
-@keyframes marquee {
-  0% {transform: translateX(100%);}
-  100% {transform: translateX(-100%);}
-}
-.animate-marquee {animation: marquee 18s linear infinite;}
-
-/* ======================== Card UI ========================= */
-.uni-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
+/* ======================= GLOBAL ======================= */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f7f8fa;
+  color: #1a1a1a;
+  margin: 0;
   padding: 0;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  transition: .3s ease;
-}
-.dark .uni-card { background: #242424; }
-
-.uni-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.25);
 }
 
-.uni-card img {
+.container {
+  width: min(1200px, 90%);
+  margin: auto;
+}
+
+/* ======================= NAVBAR ======================= */
+nav {
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 16px 0;
+  position: fixed;
+  top: 0;
   width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  display: block;
+  z-index: 50;
 }
 
-/* FIX: Scheme cards collapsing bug */
-.scheme-card {
-  min-height: 330px; /* ensures schemes always show */
+.nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Sponsored Card */
-.gradient-card {
-  background: linear-gradient(to bottom right, #eef4ff, #dce3ff);
-}
-.dark .gradient-card {
-  background: linear-gradient(to bottom right, #2d2d2d, #1a1a1a);
-}
-.sticky-ad {
-  position: sticky;
-  top: 90px;
+/* ======================= ALERT ======================= */
+.alert-bar {
+  margin-top: 80px;
+  background: #2563EB;
+  color: white;
+  padding: 10px 0;
 }
 
-/* ======================== Slider ========================= */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: marquee 18s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ======================= HERO ======================= */
+.hero {
+  text-align: center;
+  padding: 80px 0 40px;
+}
+
+.hero h1 {
+  font-size: 58px;
+  font-weight: 800;
+  background: linear-gradient(to right, #2563EB, #9333EA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  max-width: 600px;
+  margin: 10px auto;
+  font-size: 18px;
+  color: #555;
+}
+
+/* ======================= SLIDER ======================= */
 .slider {
   position: relative;
   width: 100%;
@@ -96,228 +106,309 @@ tailwind.config = {
   transition: opacity 1s ease;
 }
 
+.slide.active { opacity: 1; }
 .slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.slide.active {
-  opacity: 1;
+/* ======================= ICON GRID ======================= */
+.icon-grid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 16px;
 }
 
-/* ======================== Icons Grid ========================= */
 .icon-grid img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 12px;
-  transition: .25s;
+  transition: 0.25s;
 }
+
 .icon-grid img:hover {
   transform: translateY(-4px);
 }
 
-/* Modal */
-.modal-bg { backdrop-filter: blur(6px); }
+/* ======================= CONTENT WRAPPER ======================= */
+.main-flex {
+  margin-top: 60px;
+  display: flex;
+  gap: 30px;
+}
 
+/* LEFT = 80% */
+.left {
+  width: 80%;
+}
+
+/* RIGHT = 20% */
+.right {
+  width: 20%;
+  position: sticky;
+  top: 100px;
+  height: max-content;
+}
+
+/* ======================= SPONSORED CARD ======================= */
+.sponsor-card {
+  background: linear-gradient(to bottom right,#eef4ff,#dce3ff);
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.sponsor-card img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+.sponsor-button {
+  background: #2563EB;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+  display: block;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ======================= CARD UI ======================= */
+.card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 18px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-right: 6px;
+}
+
+/* ======================= GRID ======================= */
+.course-grid, .scheme-grid {
+  display: grid;
+  gap: 22px;
+}
+
+.course-grid {
+  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+}
+
+.scheme-grid {
+  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+}
+
+/* ======================= SCHEME FIX ======================= */
+.scheme-card {
+  min-height: 330px;
+}
+
+/* ======================= MODAL ======================= */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  z-index: 999;
+}
+
+.modal-box {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  width: 320px;
+  text-align: center;
+}
+
+/* ======================= RESPONSIVE ======================= */
+@media (max-width: 1024px) {
+  .main-flex { flex-direction: column; }
+  .left, .right { width: 100%; }
+  .right { position: static; }
+}
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 40px; }
+  .icon-grid { grid-template-columns: repeat(2,1fr); }
+}
 </style>
 
 </head>
 
-<body class="bg-gray-50 dark:bg-darkBg text-gray-900 dark:text-darkText">
+<body>
 
-<!-- NAVBAR -->
-<nav class="fixed top-0 left-0 w-full z-50 bg-white dark:bg-darkBg shadow">
-  <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="/" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-600">
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="container nav-inner">
+    <div style="font-size:24px;font-weight:700;background:linear-gradient(to right,#2563EB,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
       KTU Magic
-    </a>
-
-    <div class="flex items-center gap-6 text-sm">
-      <a href="view_scheme.php" class="hover:text-primary transition">View Notes</a>
-      <a href="#courses" class="hover:text-primary transition">Courses</a>
-      <button onclick="toggleTheme()" class="p-2 rounded-full bg-gray-200 dark:bg-darkCard">
-        <span class="dark:hidden">🌙</span>
-        <span class="hidden dark:inline">☀️</span>
-      </button>
+    </div>
+    <div>
+      <a href="view_scheme.php">View Notes</a> |
+      <a href="#courses">Courses</a>
     </div>
   </div>
 </nav>
 
-<!-- ALERT BAR -->
-<div class="mt-16 w-full bg-blue-600 text-white py-2 shadow">
-  <div class="container mx-auto px-6 flex gap-3">
-    <span class="bg-white text-blue-700 px-3 py-1 text-xs rounded-full font-semibold">Alerts</span>
-    <div class="overflow-hidden whitespace-nowrap w-full">
-      <div class="animate-marquee text-sm">
-        2024 Scheme Updated • New Courses Added • Notes Uploading Weekly • Question Banks Refreshed
-      </div>
-    </div>
+<!-- ================= ALERT ================= -->
+<div class="alert-bar">
+  <div class="container">
+    <span style="background:white;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Alerts</span>
+    <div class="marquee">2024 Scheme Updated • New Courses Added • Notes Uploading Weekly • Question Banks Refreshed</div>
   </div>
 </div>
 
-<!-- HERO -->
-<section class="pt-20 pb-10 container mx-auto px-6 text-center fade-up">
-  <h1 class="text-6xl md:text-7xl font-extrabold">
-    Welcome to <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">KTU Magic</span>
-  </h1>
-  <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mt-4">
-      Your one-stop destination for <strong>KTU notes, branches, courses & schemes</strong>.
-  </p>
+<!-- ================= HERO ================= -->
+<section class="hero fade-up">
+  <h1>Welcome to KTU Magic</h1>
+  <p>Your one-stop destination for <strong>KTU notes, branches, courses & schemes</strong>.</p>
 </section>
 
-<!-- =================== FULL-WIDTH SLIDER =================== -->
-<div class="container mx-auto px-6">
+<!-- ================= SLIDER ================= -->
+<div class="container">
   <div class="slider" id="slider">
-    <div class="slide active"><img src="assets/slider1.jpg"></div>
-    <div class="slide"><img src="assets/slider2.jpg"></div>
+    <div class="slide active"><img src="assets/slider1.jpg" /></div>
+    <div class="slide"><img src="assets/slider2.jpg" /></div>
   </div>
 </div>
 
-<!-- =================== ICON GRID =================== -->
-<div class="container mx-auto px-6 mt-10 icon-grid">
-  <div class="grid grid-cols-4 gap-4">
+<!-- ================= ICON GRID ================= -->
+<div class="container">
+  <div class="icon-grid">
     <?php for($i=1;$i<=8;$i++): ?>
-      <img src="assets/<?= $i ?>.jpg" class="shadow rounded-xl">
+      <img src="assets/<?= $i ?>.jpg" />
     <?php endfor; ?>
   </div>
 </div>
 
-<!-- GIVE SPACE SO SCHEMES DON'T COLLAPSE -->
-<div class="mt-16"></div>
+<!-- SPACE FIX -->
+<div style="margin-top:50px;"></div>
 
-<!-- =================== MAIN + SPONSORED (80 / 20) =================== -->
-<div class="container mx-auto px-6 flex flex-col lg:flex-row gap-10">
+<!-- ================= MAIN + SIDEBAR ================= -->
+<div class="container main-flex">
 
-    <!-- MAIN CONTENT (80%) -->
-    <div class="flex-1 lg:w-[80%]">
+  <!-- LEFT 80% -->
+  <div class="left">
 
-        <?php
-        $courses = $pdo->query("SELECT * FROM courses ORDER BY id DESC LIMIT 12")->fetchAll();
-        $DEFAULT_IMG = "assets/default_course.jpg";
-        ?>
+    <!-- COURSES -->
+    <h2 id="courses" style="font-size:32px;font-weight:700;margin-bottom:20px;">Latest Courses</h2>
 
-        <h2 id="courses" class="text-3xl font-bold mb-6">Latest Courses</h2>
+    <div class="course-grid">
+      <?php
+      $courses = $pdo->query("SELECT * FROM courses ORDER BY id DESC LIMIT 12")->fetchAll();
+      $DEFAULT_IMG = "assets/default_course.jpg";
+      foreach ($courses as $c):
+        $img = (!empty($c['image_path'])) ? $c['image_path'] : $DEFAULT_IMG;
+      ?>
+      <a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
+        <img src="<?= $img ?>" />
+        <div class="card-body">
+          <h3 style="font-size:20px;font-weight:600;"><?= htmlspecialchars($c['name']) ?></h3>
+          <p style="font-size:14px;color:#555;margin-top:6px;">Semester <?= $c['semester'] ?></p>
 
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <?php foreach ($courses as $c):
-            $img = (!empty($c['image_path'])) ? $c['image_path'] : $DEFAULT_IMG;
-        ?>
-          <a href="view_link.php?course_id=<?= $c['id'] ?>" class="uni-card fade-el">
-            <img src="<?= $img ?>">
-            <div class="p-4">
-              <h3 class="text-lg font-semibold"><?= htmlspecialchars($c['name']) ?></h3>
-              <p class="text-sm text-gray-500 dark:text-gray-300 mt-1">Semester <?= $c['semester'] ?></p>
-              <div class="mt-3 flex flex-wrap gap-2">
-                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Branch <?= $c['branch_id'] ?></span>
-                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Scheme <?= $c['scheme_id'] ?></span>
-              </div>
-              <p class="text-primary mt-3 text-sm">Open Course →</p>
-            </div>
-          </a>
-        <?php endforeach; ?>
+          <div style="margin-top:10px;">
+            <span class="badge">Branch <?= $c['branch_id'] ?></span>
+            <span class="badge" style="background:#f3e8ff;color:#7e22ce;">Scheme <?= $c['scheme_id'] ?></span>
+          </div>
+
+          <p style="color:#2563EB;margin-top:12px;font-size:14px;">Open Course →</p>
         </div>
-
-        <!-- =================== SCHEMES =================== -->
-        <h2 class="text-3xl font-bold mb-6 mt-12">Schemes</h2>
-
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-            <a href="view_branch.php?scheme_id=3" class="uni-card fade-el scheme-card">
-              <img src="assets/2019/1.jpg">
-              <div class="p-4">
-                <h3 class="text-xl font-semibold">2019 Scheme</h3>
-                <p class="text-gray-500 dark:text-gray-300 mt-1">Browse Branches →</p>
-              </div>
-            </a>
-
-            <a href="view_branch.php?scheme_id=4" class="uni-card fade-el scheme-card">
-              <img src="assets/2025/1.jpg">
-              <div class="p-4">
-                <h3 class="text-xl font-semibold">2025 Scheme</h3>
-                <p class="text-gray-500 dark:text-gray-300 mt-1">Browse Branches →</p>
-              </div>
-            </a>
-
-        </div>
-
+      </a>
+      <?php endforeach; ?>
     </div>
 
-    <!-- SPONSORED AD RIGHT (20%) -->
-    <aside class="w-full lg:w-[20%] sticky-ad fade-el">
-      <div class="gradient-card rounded-2xl shadow-xl p-5">
+    <!-- SCHEMES -->
+    <h2 style="font-size:32px;font-weight:700;margin:40px 0 20px;">Schemes</h2>
 
-        <h3 class="font-bold text-lg text-primary">📢 Sponsored</h3>
+    <div class="scheme-grid">
 
-        <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">
-          Promote your course or notes here and reach thousands of students.
-        </p>
+      <a href="view_branch.php?scheme_id=3" class="card scheme-card fade-el">
+        <img src="assets/2019/1.jpg">
+        <div class="card-body">
+          <h3 style="font-size:22px;font-weight:600;">2019 Scheme</h3>
+          <p style="color:#555;margin-top:5px;">Browse Branches →</p>
+        </div>
+      </a>
 
-        <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60"
-             class="rounded-xl mt-4">
+      <a href="view_branch.php?scheme_id=4" class="card scheme-card fade-el">
+        <img src="assets/2025/1.jpg">
+        <div class="card-body">
+          <h3 style="font-size:22px;font-weight:600;">2025 Scheme</h3>
+          <p style="color:#555;margin-top:5px;">Browse Branches →</p>
+        </div>
+      </a>
 
-        <a href="#"
-           class="mt-4 block text-center bg-primary text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-          Advertise Here
-        </a>
+    </div>
+  </div>
 
-      </div>
-    </aside>
+  <!-- RIGHT 20% (SPONSORED) -->
+  <div class="right fade-el">
+    <div class="sponsor-card">
+      <h3 style="font-size:20px;font-weight:700;color:#2563EB;">📢 Sponsored</h3>
+      <p style="font-size:14px;margin-top:6px;color:#555;">Promote your course or notes here and reach thousands of students.</p>
+      <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60" />
+      <a href="#" class="sponsor-button">Advertise Here</a>
+    </div>
+  </div>
 
 </div>
 
-<!-- =================== POPUP MODAL =================== -->
-<div id="socialModal" class="fixed inset-0 hidden items-center justify-center modal-bg bg-black bg-opacity-40 z-[999]">
-  <div class="bg-white dark:bg-darkCard p-6 rounded-xl w-80 shadow-xl text-center">
-    <h2 class="font-bold text-xl mb-4">Connect With Us</h2>
-
-    <div class="flex flex-col gap-3">
-      <a href="#" class="p-3 bg-pink-600 text-white rounded-lg shadow">Instagram</a>
-      <a href="#" class="p-3 bg-green-600 text-white rounded-lg shadow">WhatsApp</a>
-      <a href="#" class="p-3 bg-sky-600 text-white rounded-lg shadow">Telegram</a>
-      <a href="#" class="p-3 bg-blue-700 text-white rounded-lg shadow">Facebook</a>
+<!-- ================= MODAL ================= -->
+<div id="socialModal" class="modal-bg">
+  <div class="modal-box">
+    <h2 style="font-size:22px;font-weight:700;">Connect With Us</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:15px;">
+      <a class="sponsor-button" style="background:#d946ef;">Instagram</a>
+      <a class="sponsor-button" style="background:#16a34a;">WhatsApp</a>
+      <a class="sponsor-button" style="background:#0ea5e9;">Telegram</a>
+      <a class="sponsor-button" style="background:#1d4ed8;">Facebook</a>
     </div>
-
-    <button onclick="closeModal()" class="mt-5 text-sm text-gray-500">Close</button>
+    <button onclick="closeModal()" style="margin-top:15px;background:none;border:none;color:#777;cursor:pointer;">Close</button>
   </div>
 </div>
 
-<!-- =================== JS =================== -->
+<!-- ================= JAVASCRIPT ================= -->
 <script>
 
-/* ======================== Theme ========================= */
-function toggleTheme() {
-  const dark = document.documentElement.classList.toggle("dark");
-  localStorage.setItem("theme", dark ? "dark" : "light");
-}
-
-/* ======================== GSAP FIXED ========================= */
+// ================== GSAP ==================
 document.addEventListener("DOMContentLoaded", () => {
-  const imgs = document.images;
-  let loaded = 0;
-
-  function runAnimations() {
-    gsap.from(".fade-up", {opacity:0, duration:1});
-    gsap.from(".fade-el", {opacity:0, duration:1, stagger:0.15});
-  }
-
-  if (imgs.length === 0) runAnimations();
-
-  [...imgs].forEach(img => {
-    if (img.complete) {
-      loaded++;
-      if (loaded === imgs.length) runAnimations();
-    } else {
-      img.addEventListener("load", () => {
-        loaded++;
-        if (loaded === imgs.length) runAnimations();
-      });
-    }
-  });
+  gsap.from(".fade-up", { opacity: 0, duration: 1 });
+  gsap.from(".fade-el", { opacity: 0, duration: 1, stagger: 0.12 });
 });
 
-/* ======================== AUTO SLIDER ========================= */
+// ================== SLIDER ==================
 let index = 0;
 setInterval(() => {
   const slides = document.querySelectorAll("#slider .slide");
@@ -326,18 +417,18 @@ setInterval(() => {
   index = (index + 1) % slides.length;
 }, 3000);
 
-/* =================== Social Modal Once =================== */
-if (!localStorage.getItem("socialPopupShown")) {
-  setTimeout(() => {
-    document.getElementById("socialModal").classList.remove("hidden");
-    document.getElementById("socialModal").classList.add("flex");
-  }, 1500);
-  localStorage.setItem("socialPopupShown", "true");
+// ================== MODAL ==================
+function closeModal() {
+  document.getElementById("socialModal").style.display = "none";
 }
 
-function closeModal() {
-  document.getElementById("socialModal").classList.add("hidden");
+if (!localStorage.getItem("socialShown")) {
+  setTimeout(() => {
+    document.getElementById("socialModal").style.display = "flex";
+  }, 1500);
+  localStorage.setItem("socialShown", "true");
 }
+
 </script>
 
 </body>
