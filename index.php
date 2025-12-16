@@ -1,7 +1,8 @@
-<?php include 'db.php'; ?>
 <?php
+ob_start(); // FIX: prevents header warning even if db.php has output
 header("Cache-Control: no-transform");
 header("Content-Encoding: none");
+include 'db.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,10 +14,27 @@ header("Content-Encoding: none");
 <!-- Google Font: Inter -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- GSAP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
 <style>
+
+/* ======================= ANIMATIONS (GSAP REPLACEMENT) ======================= */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+.fade-el {
+  opacity: 0;
+}
 
 /* ======================= GLOBAL ======================= */
 body {
@@ -64,8 +82,8 @@ nav {
 }
 
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
 }
 
 /* ======================= HERO ======================= */
@@ -100,13 +118,13 @@ nav {
 
 .slide {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   opacity: 0;
   transition: opacity 1s ease;
 }
 
 .slide.active { opacity: 1; }
+
 .slide img {
   width: 100%;
   height: 100%;
@@ -140,12 +158,8 @@ nav {
   gap: 30px;
 }
 
-/* LEFT = 80% */
-.left {
-  width: 80%;
-}
+.left { width: 80%; }
 
-/* RIGHT = 20% */
 .right {
   width: 20%;
   position: sticky;
@@ -223,11 +237,6 @@ nav {
   grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
 }
 
-.scheme-grid {
-  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
-}
-
-/* ======================= SCHEME FIX ======================= */
 .scheme-card {
   min-height: 330px;
 }
@@ -252,6 +261,35 @@ nav {
   text-align: center;
 }
 
+ /* ======================= REFINED SCHEME CARDS ======================= */
+
+.scheme-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.scheme-card {
+  min-height: unset;
+}
+
+.scheme-card img {
+  aspect-ratio: 16 / 8;
+  object-fit: cover;
+}
+
+.scheme-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.scheme-sub {
+  font-size: 13px;
+  color: #2563EB;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+
 /* ======================= RESPONSIVE ======================= */
 @media (max-width: 1024px) {
   .main-flex { flex-direction: column; }
@@ -264,7 +302,6 @@ nav {
   .icon-grid { grid-template-columns: repeat(2,1fr); }
 }
 </style>
-
 </head>
 
 <body>
@@ -299,8 +336,8 @@ nav {
 <!-- ================= SLIDER ================= -->
 <div class="container">
   <div class="slider" id="slider">
-    <div class="slide active"><img src="assets/slider1.jpg" /></div>
-    <div class="slide"><img src="assets/slider2.jpg" /></div>
+    <div class="slide active"><img src="assets/slider1.jpg"></div>
+    <div class="slide"><img src="assets/slider2.jpg"></div>
   </div>
 </div>
 
@@ -308,107 +345,99 @@ nav {
 <div class="container">
   <div class="icon-grid">
     <?php for($i=1;$i<=8;$i++): ?>
-      <img src="assets/<?= $i ?>.jpg" />
+      <img src="assets/<?= $i ?>.jpg">
     <?php endfor; ?>
   </div>
 </div>
 
-<!-- SPACE FIX -->
 <div style="margin-top:50px;"></div>
 
-<!-- ================= MAIN + SIDEBAR ================= -->
+<!-- ================= MAIN ================= -->
 <div class="container main-flex">
 
-  <!-- LEFT 80% -->
-  <div class="left">
+<div class="left">
+<h2 id="courses" style="font-size:32px;font-weight:700;">Latest Courses</h2>
 
-    <!-- COURSES -->
-    <h2 id="courses" style="font-size:32px;font-weight:700;margin-bottom:20px;">Latest Courses</h2>
+<div class="course-grid">
+<?php
+$courses = $pdo->query("SELECT * FROM courses ORDER BY id DESC LIMIT 12")->fetchAll();
+$DEFAULT_IMG = "assets/default_course.jpg";
+foreach ($courses as $c):
+$img = $c['image_path'] ?: $DEFAULT_IMG;
+?>
+<a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
+<img src="<?= $img ?>">
+<div class="card-body">
+<h3><?= htmlspecialchars($c['name']) ?></h3>
+<p>Semester <?= $c['semester'] ?></p>
+<div>
+<span class="badge">Branch <?= $c['branch_id'] ?></span>
+<span class="badge" style="background:#f3e8ff;color:#7e22ce;">Scheme <?= $c['scheme_id'] ?></span>
+</div>
+<p style="color:#2563EB;margin-top:12px;">Open Course →</p>
+</div>
+</a>
+<?php endforeach; ?>
+</div>
 
-    <div class="course-grid">
-      <?php
-      $courses = $pdo->query("SELECT * FROM courses ORDER BY id DESC LIMIT 12")->fetchAll();
-      $DEFAULT_IMG = "assets/default_course.jpg";
-      foreach ($courses as $c):
-        $img = (!empty($c['image_path'])) ? $c['image_path'] : $DEFAULT_IMG;
-      ?>
-      <a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
-        <img src="<?= $img ?>" />
-        <div class="card-body">
-          <h3 style="font-size:20px;font-weight:600;"><?= htmlspecialchars($c['name']) ?></h3>
-          <p style="font-size:14px;color:#555;margin-top:6px;">Semester <?= $c['semester'] ?></p>
+<!-- ================= SCHEMES ================= -->
+<h2 style="font-size:28px;font-weight:700;margin:36px 0 18px;">Schemes</h2>
 
-          <div style="margin-top:10px;">
-            <span class="badge">Branch <?= $c['branch_id'] ?></span>
-            <span class="badge" style="background:#f3e8ff;color:#7e22ce;">Scheme <?= $c['scheme_id'] ?></span>
-          </div>
+<div class="scheme-grid">
 
-          <p style="color:#2563EB;margin-top:12px;font-size:14px;">Open Course →</p>
-        </div>
-      </a>
-      <?php endforeach; ?>
+  <a href="view_branch.php?scheme_id=3" class="card scheme-card fade-el">
+    <img src="assets/2019/1.jpg" alt="2019 Scheme">
+    <div class="card-body">
+      <h3 class="scheme-title">2019 Scheme</h3>
+      <p class="scheme-sub">Browse branches →</p>
     </div>
+  </a>
 
-    <!-- SCHEMES -->
-    <h2 style="font-size:32px;font-weight:700;margin:40px 0 20px;">Schemes</h2>
-
-    <div class="scheme-grid">
-
-      <a href="view_branch.php?scheme_id=3" class="card scheme-card fade-el">
-        <img src="assets/2019/1.jpg">
-        <div class="card-body">
-          <h3 style="font-size:22px;font-weight:600;">2019 Scheme</h3>
-          <p style="color:#555;margin-top:5px;">Browse Branches →</p>
-        </div>
-      </a>
-
-      <a href="view_branch.php?scheme_id=4" class="card scheme-card fade-el">
-        <img src="assets/2025/1.jpg">
-        <div class="card-body">
-          <h3 style="font-size:22px;font-weight:600;">2025 Scheme</h3>
-          <p style="color:#555;margin-top:5px;">Browse Branches →</p>
-        </div>
-      </a>
-
+  <a href="view_branch.php?scheme_id=4" class="card scheme-card fade-el">
+    <img src="assets/2025/1.jpg" alt="2025 Scheme">
+    <div class="card-body">
+      <h3 class="scheme-title">2025 Scheme</h3>
+      <p class="scheme-sub">Browse branches →</p>
     </div>
-  </div>
+  </a>
 
-  <!-- RIGHT 20% (SPONSORED) -->
-  <div class="right fade-el">
-    <div class="sponsor-card">
-      <h3 style="font-size:20px;font-weight:700;color:#2563EB;">📢 Sponsored</h3>
-      <p style="font-size:14px;margin-top:6px;color:#555;">Promote your course or notes here and reach thousands of students.</p>
-      <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60" />
-      <a href="#" class="sponsor-button">Advertise Here</a>
-    </div>
-  </div>
+</div>
+
+</div>
+
+<div class="right fade-el">
+<div class="sponsor-card">
+<h3 style="color:#2563EB;">📢 Sponsored</h3>
+<p>Promote your course or notes here and reach thousands of students.</p>
+<img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60">
+<a class="sponsor-button">Advertise Here</a>
+</div>
+</div>
 
 </div>
 
 <!-- ================= MODAL ================= -->
 <div id="socialModal" class="modal-bg">
   <div class="modal-box">
-    <h2 style="font-size:22px;font-weight:700;">Connect With Us</h2>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:15px;">
-      <a class="sponsor-button" style="background:#d946ef;">Instagram</a>
-      <a class="sponsor-button" style="background:#16a34a;">WhatsApp</a>
-      <a class="sponsor-button" style="background:#0ea5e9;">Telegram</a>
-      <a class="sponsor-button" style="background:#1d4ed8;">Facebook</a>
-    </div>
-    <button onclick="closeModal()" style="margin-top:15px;background:none;border:none;color:#777;cursor:pointer;">Close</button>
+    <h2>Connect With Us</h2>
+    <a class="sponsor-button" style="background:#d946ef;">Instagram</a>
+    <a class="sponsor-button" style="background:#16a34a;">WhatsApp</a>
+    <a class="sponsor-button" style="background:#0ea5e9;">Telegram</a>
+    <a class="sponsor-button" style="background:#1d4ed8;">Facebook</a>
+    <button onclick="closeModal()" style="margin-top:15px;border:none;background:none;">Close</button>
   </div>
 </div>
 
-<!-- ================= JAVASCRIPT ================= -->
 <script>
-
-// ================== GSAP ==================
+// Fade stagger (GSAP replacement)
 document.addEventListener("DOMContentLoaded", () => {
-  gsap.from(".fade-up", { opacity: 0, duration: 1 });
-  gsap.from(".fade-el", { opacity: 0, duration: 1, stagger: 0.12 });
+  document.querySelectorAll(".fade-el").forEach((el,i)=>{
+    el.style.animation = "fadeIn .7s ease forwards";
+    el.style.animationDelay = `${i*120}ms`;
+  });
 });
 
-// ================== SLIDER ==================
+// Slider
 let index = 0;
 setInterval(() => {
   const slides = document.querySelectorAll("#slider .slide");
@@ -417,7 +446,7 @@ setInterval(() => {
   index = (index + 1) % slides.length;
 }, 3000);
 
-// ================== MODAL ==================
+// Modal
 function closeModal() {
   document.getElementById("socialModal").style.display = "none";
 }
@@ -426,10 +455,10 @@ if (!localStorage.getItem("socialShown")) {
   setTimeout(() => {
     document.getElementById("socialModal").style.display = "flex";
   }, 1500);
-  localStorage.setItem("socialShown", "true");
+  localStorage.setItem("socialShown","1");
 }
-
 </script>
 
 </body>
 </html>
+<?php ob_end_flush(); ?>
