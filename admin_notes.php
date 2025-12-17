@@ -36,24 +36,43 @@ function safe($v) { return htmlspecialchars((string)$v, ENT_QUOTES); }
 // -----------------------------
 // Drive link conversion helper
 // -----------------------------
-function convertDriveLink(?string $url) : ?string {
-    $url = trim((string)$url);
-    if ($url === '') return null;
+function convertDriveLink(?string $url): ?string
+{
+    if (!$url) return null;
 
-    if (preg_match('#https?://drive\.google\.com/uc\?id=([a-zA-Z0-9_-]+)#', $url)) {
+    $url = trim($url);
+
+    // If already a direct image (non-drive), return as-is
+    if (!str_contains($url, 'drive.google.com')) {
         return $url;
     }
 
-    if (preg_match('#/file/d/([a-zA-Z0-9_-]+)#', $url, $m)) {
-        return 'https://drive.google.com/uc?id=' . $m[1];
+    $fileId = null;
+
+    // Format: https://drive.google.com/file/d/FILE_ID/view
+    if (preg_match('~/file/d/([a-zA-Z0-9_-]+)~', $url, $m)) {
+        $fileId = $m[1];
     }
 
-    if (preg_match('#[?&]id=([a-zA-Z0-9_-]+)#', $url, $m)) {
-        return 'https://drive.google.com/uc?id=' . $m[1];
+    // Format: https://drive.google.com/open?id=FILE_ID
+    elseif (preg_match('~[?&]id=([a-zA-Z0-9_-]+)~', $url, $m)) {
+        $fileId = $m[1];
     }
 
+    // Format: https://drive.google.com/uc?id=FILE_ID
+    elseif (preg_match('~/uc\?id=([a-zA-Z0-9_-]+)~', $url, $m)) {
+        $fileId = $m[1];
+    }
+
+    // If file ID found → return thumbnail
+    if ($fileId) {
+        return "https://drive.google.com/thumbnail?id={$fileId}&sz=w1000";
+    }
+
+    // Fallback (return original if not matched)
     return $url;
 }
+
 
 // -----------------------------
 // Actions (POST)
@@ -474,7 +493,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                     <div class="col-md-4">
                       <div class="card h-100">
                         <?php if (!empty($b['image_path'])): ?>
-                          <img src="<?= safe($b['image_path']) ?>" class="branch-img" alt="" onerror="this.style.display='none'">
+                          <img referrerpolicy="no-referrer" src="<?= safe($b['image_path'])  ?>" class="branch-img" alt="" onerror="this.style.display='none'">
                         <?php endif; ?>
                         <div class="card-body text-center">
                           <h6 class="mb-1"><?= safe($b['name']) ?></h6>

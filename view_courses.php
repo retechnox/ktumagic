@@ -76,7 +76,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
       <a href="view_link.php?course_id=<?= $c['id'] ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
-        <img src="<?= safe($img) ?>"
+        <img   referrerpolicy="no-referrer" src="<?= safe($img) ?>"
              class="w-full h-36 object-cover rounded-lg mb-3"
              onerror="this.src='<?= $DEFAULT_IMG ?>'">
 

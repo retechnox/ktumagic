@@ -44,7 +44,7 @@ $branch_image = $branch['image_path'] ?:
 
   <!-- Header banner -->
   <div class="relative rounded-2xl overflow-hidden shadow-lg mb-6">
-    <img src="<?= safe($branch_image) ?>"
+    <img   referrerpolicy="no-referrer" src="<?= safe($branch_image) ?>"
          class="w-full h-52 object-cover"
          onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80'">
 

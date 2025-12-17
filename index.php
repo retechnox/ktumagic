@@ -200,6 +200,7 @@ nav {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   transition: 0.3s;
+  text-decoration: none;
 }
 
 .card:hover {
@@ -211,10 +212,12 @@ nav {
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
+  text-decoration: none;
 }
 
 .card-body {
   padding: 18px;
+  text-decoration: none;
 }
 
 .badge {
@@ -261,8 +264,7 @@ nav {
   text-align: center;
 }
 
- /* ======================= REFINED SCHEME CARDS ======================= */
-
+/* ======================= REFINED SCHEME CARDS ======================= */
 .scheme-grid {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
@@ -288,7 +290,6 @@ nav {
   margin-top: 6px;
   font-weight: 500;
 }
-
 
 /* ======================= RESPONSIVE ======================= */
 @media (max-width: 1024px) {
@@ -322,7 +323,7 @@ nav {
 <!-- ================= ALERT ================= -->
 <div class="alert-bar">
   <div class="container">
-    <span style="background:white;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Alerts</span>
+    <span style="background:white; margin-top:10px;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Alerts</span>
     <div class="marquee">2024 Scheme Updated • New Courses Added • Notes Uploading Weekly • Question Banks Refreshed</div>
   </div>
 </div>
@@ -336,7 +337,7 @@ nav {
 <!-- ================= SLIDER ================= -->
 <div class="container">
   <div class="slider" id="slider">
-    <div class="slide active"><img src="assets/slider1.jpg"></div>
+    <div class="slide active"><img referrerpolicy="no-referrer" src="assets/slider1.jpg"></div>
     <div class="slide"><img src="assets/slider2.jpg"></div>
   </div>
 </div>
@@ -359,25 +360,53 @@ nav {
 <h2 id="courses" style="font-size:32px;font-weight:700;">Latest Courses</h2>
 
 <div class="course-grid">
+
 <?php
-$courses = $pdo->query("SELECT * FROM courses ORDER BY id DESC LIMIT 12")->fetchAll();
+$sql = "
+  SELECT 
+    c.*,
+    b.name AS branch_name,
+    s.name AS scheme_name
+  FROM courses c
+  LEFT JOIN branches b ON c.branch_id = b.id
+  LEFT JOIN schemes s ON c.scheme_id = s.id
+  ORDER BY c.id DESC
+  LIMIT 12
+";
+
+$courses = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 $DEFAULT_IMG = "assets/default_course.jpg";
+
 foreach ($courses as $c):
-$img = $c['image_path'] ?: $DEFAULT_IMG;
+  $img = !empty($c['image_path']) ? $c['image_path'] : $DEFAULT_IMG;
 ?>
 <a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
-<img src="<?= $img ?>">
-<div class="card-body">
-<h3><?= htmlspecialchars($c['name']) ?></h3>
-<p>Semester <?= $c['semester'] ?></p>
-<div>
-<span class="badge">Branch <?= $c['branch_id'] ?></span>
-<span class="badge" style="background:#f3e8ff;color:#7e22ce;">Scheme <?= $c['scheme_id'] ?></span>
-</div>
-<p style="color:#2563EB;margin-top:12px;">Open Course →</p>
-</div>
+<img 
+  src="<?= htmlspecialchars($img) ?>" 
+  alt="Course image"
+  referrerpolicy="no-referrer"
+>
+
+  <div class="card-body">
+    <h3><?= htmlspecialchars($c['name']) ?></h3>
+    <p>Semester <?= htmlspecialchars($c['semester']) ?></p>
+
+    <div style="margin-top:8px;">
+      <span class="badge">
+        <?= htmlspecialchars($c['branch_name'] ?? 'Unknown Branch') ?>
+      </span>
+
+      <span class="badge" style="background:#f3e8ff;color:#7e22ce;">
+        <?= htmlspecialchars($c['scheme_name'] ?? 'Unknown Scheme') ?>
+      </span>
+    </div>
+
+    <p style="color:#2563EB;margin-top:12px;">Open Course →</p>
+  </div>
 </a>
 <?php endforeach; ?>
+
+
 </div>
 
 <!-- ================= SCHEMES ================= -->
@@ -394,9 +423,9 @@ $img = $c['image_path'] ?: $DEFAULT_IMG;
   </a>
 
   <a href="view_branch.php?scheme_id=4" class="card scheme-card fade-el">
-    <img src="assets/2025/1.jpg" alt="2025 Scheme">
+    <img src="assets/2025/1.jpg" alt="2024 Scheme">
     <div class="card-body">
-      <h3 class="scheme-title">2025 Scheme</h3>
+      <h3 class="scheme-title">2024 Scheme</h3>
       <p class="scheme-sub">Browse branches →</p>
     </div>
   </a>
@@ -407,10 +436,8 @@ $img = $c['image_path'] ?: $DEFAULT_IMG;
 
 <div class="right fade-el">
 <div class="sponsor-card">
-<h3 style="color:#2563EB;">📢 Sponsored</h3>
-<p>Promote your course or notes here and reach thousands of students.</p>
+<h3 style="color:#2563EB;">Sponsored</h3>
 <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60">
-<a class="sponsor-button">Advertise Here</a>
 </div>
 </div>
 

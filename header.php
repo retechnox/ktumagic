@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- HERO SECTION -->
 <section class="relative w-full h-[65vh] flex items-center justify-center text-center">
 
-  <img src="assets/header.jpg" class="absolute inset-0 w-full h-full object-cover opacity-80">
+  <img referrerpolicy="no-referrer" src="assets/header.jpg" class="absolute inset-0 w-full h-full object-cover opacity-80">
 
   <div class="absolute inset-0 bg-gradient-to-r from-blue-700/60 to-purple-700/60"></div>
 
