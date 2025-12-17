@@ -414,7 +414,7 @@ foreach ($courses as $c):
 
 <div class="scheme-grid">
 
-  <a href="view_branch.php?scheme_id=3" class="card scheme-card fade-el">
+  <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
     <img src="assets/2019/1.jpg" alt="2019 Scheme">
     <div class="card-body">
       <h3 class="scheme-title">2019 Scheme</h3>
@@ -422,7 +422,7 @@ foreach ($courses as $c):
     </div>
   </a>
 
-  <a href="view_branch.php?scheme_id=4" class="card scheme-card fade-el">
+  <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
     <img src="assets/2025/1.jpg" alt="2024 Scheme">
     <div class="card-body">
       <h3 class="scheme-title">2024 Scheme</h3>
