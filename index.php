@@ -1,5 +1,5 @@
 <?php
-ob_start(); // FIX: prevents header warning even if db.php has output
+ob_start(); 
 header("Cache-Control: no-transform");
 header("Content-Encoding: none");
 include 'db.php';
@@ -11,479 +11,451 @@ include 'db.php';
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>KTU Magic – Notes & Resources</title>
 
-<!-- Google Font: Inter -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
-
-/* ======================= ANIMATIONS (GSAP REPLACEMENT) ======================= */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+:root {
+  --neon-purple: #8b5cf6;
+  --neon-pink: #ec4899;
+  --primary-blue: #2563EB;
+  --soft-bg: #f8fafc;
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
-.fade-up {
-  opacity: 0;
-  animation: fadeUp 0.8s ease-out forwards;
-}
-
-.fade-el {
-  opacity: 0;
-}
-
-/* ======================= GLOBAL ======================= */
 body {
   font-family: 'Inter', sans-serif;
-  background: #f7f8fa;
-  color: #1a1a1a;
+  background: var(--soft-bg);
+  color: #1e293b;
   margin: 0;
   padding: 0;
+  line-height: 1.5;
 }
 
-.container {
-  width: min(1200px, 90%);
-  margin: auto;
-}
+.container { width: min(1400px, 95%); margin: auto; }
 
-/* ======================= NAVBAR ======================= */
+/* ======================= NAVBAR (Added Upload CTA) ======================= */
 nav {
-  background: #ffffff;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  padding: 16px 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 0;
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 50;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.nav-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.nav-inner { display: flex; justify-content: space-between; align-items: center; }
+
+.logo {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
 }
 
-/* ======================= ALERT ======================= */
+.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links a { text-decoration: none; color: #475569; font-weight: 600; font-size: 14px; }
+.nav-links a:hover { color: var(--primary-blue); }
+
+.upload-cta {
+  background: var(--primary-blue);
+  color: white !important;
+  padding: 8px 18px;
+  border-radius: 50px;
+  transition: 0.3s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.upload-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
+
+/* ======================= ALERT BAR ======================= */
 .alert-bar {
-  margin-top: 80px;
-  background: #2563EB;
+  margin-top: 65px;
+  background: #0f172a;
   color: white;
   padding: 10px 0;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .marquee {
   overflow: hidden;
   white-space: nowrap;
-  animation: marquee 18s linear infinite;
+  animation: marquee 25s linear infinite;
 }
 
 @keyframes marquee {
-  from { transform: translateX(100%); }
+  from { transform: translateX(50%); }
   to   { transform: translateX(-100%); }
 }
 
 /* ======================= HERO ======================= */
-.hero {
-  text-align: center;
-  padding: 80px 0 40px;
-}
-
+.hero { text-align: center; padding: 80px 0 40px; }
 .hero h1 {
-  font-size: 58px;
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 800;
-  background: linear-gradient(to right, #2563EB, #9333EA);
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 15px;
+}
+.hero h1 span {
+  background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.hero p { max-width: 600px; margin: 0 auto 30px; color: #64748b; font-size: 1.1rem; }
 
-.hero p {
-  max-width: 600px;
-  margin: 10px auto;
-  font-size: 18px;
-  color: #555;
+.badge-main {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--neon-purple);
+  margin-bottom: 15px;
+  text-transform: uppercase;
 }
 
-/* ======================= SLIDER ======================= */
+/* ======================= SLIDER (Contain Fixed) ======================= */
+.slider-container { padding: 20px 0; }
 .slider {
   position: relative;
-  width: 100%;
-  height: 350px;
+  width: 100vw;
+  aspect-ratio: 16 / 9;
+  max-height: 650px;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: var(--card-shadow);
 }
 
 .slide {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 1s ease;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slide.active { opacity: 1; }
-
-.slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.slide img { width: 100%; height: 100%; object-fit: contain; }
 
 /* ======================= ICON GRID ======================= */
 .icon-grid {
-  margin-top: 30px;
+  margin: 40px auto;
+  justify-content: center;  /* center items horizontally */
   display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 16px;
+  grid-auto-flow: column;          /* fill columns, not rows */
+  grid-template-rows: repeat(2, 150px); /* EXACTLY 2 rows */
+  grid-auto-columns: 150px;        /* width of each item */
+  gap: 20px;
+  overflow-x: auto;                /* horizontal scroll if needed */
+  padding-bottom: 10px;
 }
 
 .icon-grid img {
   width: 100%;
-  aspect-ratio: 1/1;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  transition: 0.25s;
+  border-radius: 20px;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 4px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .icon-grid img:hover {
-  transform: translateY(-4px);
+  transform: scale(1.08) rotate(2deg);
 }
 
-/* ======================= CONTENT WRAPPER ======================= */
-.main-flex {
-  margin-top: 60px;
-  display: flex;
-  gap: 30px;
-}
-
-.left { width: 80%; }
-
-.right {
-  width: 20%;
-  position: sticky;
-  top: 100px;
-  height: max-content;
-}
-
-/* ======================= SPONSORED CARD ======================= */
-.sponsor-card {
-  background: linear-gradient(to bottom right,#eef4ff,#dce3ff);
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-
-.sponsor-card img {
-  width: 100%;
-  border-radius: 12px;
-  margin-top: 10px;
-}
-
-.sponsor-button {
-  background: #2563EB;
-  color: white;
-  text-align: center;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 15px;
-  display: block;
-  font-weight: 600;
-  text-decoration: none;
-}
+/* ======================= MAIN LAYOUT ======================= */
+.main-flex { margin-top: 60px; display: flex; gap: 40px; }
+.left { flex: 1; }
+.right { width: 280px; position: sticky; top: 100px; height: max-content; }
 
 /* ======================= CARD UI ======================= */
 .card {
   background: white;
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  transition: 0.3s;
+  box-shadow: var(--card-shadow);
+  transition: 0.3s ease;
   text-decoration: none;
+  border: 1px solid rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
 }
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-
-.card img {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  text-decoration: none;
-}
-
-.card-body {
-  padding: 18px;
-  text-decoration: none;
-}
+.card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+.card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+.card-body { padding: 20px; flex-grow: 1; }
+.card-body h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; color: #0f172a; }
 
 .badge {
   display: inline-block;
-  font-size: 12px;
-  background: #dbeafe;
-  color: #1e40af;
-  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 10px;
   border-radius: 6px;
-  margin-right: 6px;
+  margin: 0 4px 4px 0;
 }
 
-/* ======================= GRID ======================= */
-.course-grid, .scheme-grid {
-  display: grid;
-  gap: 22px;
-}
+/* ======================= GRID REFINEMENT ======================= */
+.course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
+.scheme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 50px; }
 
-.course-grid {
-  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
-}
-
-.scheme-card {
-  min-height: 330px;
-}
-
-/* ======================= MODAL ======================= */
-.modal-bg {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(5px);
-  z-index: 999;
-}
-
-.modal-box {
-  background: white;
-  padding: 25px;
-  border-radius: 14px;
-  width: 320px;
-  text-align: center;
-}
-
-/* ======================= REFINED SCHEME CARDS ======================= */
-.scheme-grid {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-
-.scheme-card {
-  min-height: unset;
-}
-
-.scheme-card img {
-  aspect-ratio: 16 / 8;
-  object-fit: cover;
-}
-
-.scheme-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.scheme-sub {
-  font-size: 13px;
-  color: #2563EB;
-  margin-top: 6px;
-  font-weight: 500;
-}
+/* ======================= ANIMATIONS ======================= */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-el { opacity: 0; animation: fadeIn 0.6s ease forwards; }
 
 /* ======================= RESPONSIVE ======================= */
 @media (max-width: 1024px) {
   .main-flex { flex-direction: column; }
-  .left, .right { width: 100%; }
-  .right { position: static; }
+  .right { width: 100%; position: static; }
+  .hero h1 { font-size: 3rem; }
 }
 
-@media (max-width: 700px) {
-  .hero h1 { font-size: 40px; }
-  .icon-grid { grid-template-columns: repeat(2,1fr); }
+@media (max-width: 600px) {
+  .nav-links a:not(.upload-cta) { display: none; }
+  .icon-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero { padding: 40px 0; }
 }
+
+
+/* ======================= CTA MODAL ======================= */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-box {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 28px;
+  width: min(380px, 90%);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.modal-box h2 {
+  margin: 0 0 8px;
+  font-family: 'Sora';
+}
+
+.modal-box p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.social-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.social-btn {
+  width: calc(50% - 7px); /* 2 items per row */
+  border-radius: 16px;
+  padding: 16px 10px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: 0.25s;
+}
+
+.social-btn span {
+  font-size: 22px;
+}
+
+.social-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  margin-top: 18px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+  color: #94a3b8;
+  text-decoration: underline;
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= NAV ================= -->
 <nav>
   <div class="container nav-inner">
-    <div style="font-size:24px;font-weight:700;background:linear-gradient(to right,#2563EB,#9333EA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-      KTU Magic
-    </div>
-    <div>
-      <a href="view_scheme.php">View Notes</a> |
-      <a href="#courses">Courses</a>
+    <a href="index.php" class="logo">KTU Magic</a>
+    <div class="nav-links">
+      <a href="#">Upload Notes</a>
+      <a href="#">Courses</a>
+      <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
     </div>
   </div>
 </nav>
 
-<!-- ================= ALERT ================= -->
 <div class="alert-bar">
   <div class="container">
-    <span style="background:white; margin-top:10px;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Alerts</span>
-    <div class="marquee">2024 Scheme Updated • New Courses Added • Notes Uploading Weekly • Question Banks Refreshed</div>
+    <div class="marquee">✨ 2024 Scheme Updated • New Courses Added Weekly • Download Verified Question Banks • Join our WhatsApp Community for Instant Alerts ✨</div>
   </div>
 </div>
 
-<!-- ================= HERO ================= -->
-<section class="hero fade-up">
-  <h1>Welcome to KTU Magic</h1>
-  <p>Your one-stop destination for <strong>KTU notes, branches, courses & schemes</strong>.</p>
+<section class="hero container">
+  <div class="badge-main">The Ultimate Resource Hub ⚡️</div>
+  <h1 class="fade-el">The KTU <span>Plug.</span></h1>
+  <p class="fade-el">Stop hunting through 100 WhatsApp groups. We’ve got your <strong>notes, schemes, and courses</strong> highkey sorted for you.</p>
 </section>
 
-<!-- ================= SLIDER ================= -->
-<div class="container">
+<div class="container slider-container">
   <div class="slider" id="slider">
     <div class="slide active"><img referrerpolicy="no-referrer" src="assets/slider1.jpg"></div>
     <div class="slide"><img src="assets/slider2.jpg"></div>
   </div>
 </div>
 
-<!-- ================= ICON GRID ================= -->
 <div class="container">
   <div class="icon-grid">
     <?php for($i=1;$i<=8;$i++): ?>
-      <img src="assets/<?= $i ?>.jpg">
+      <img src="assets/<?= $i ?>.jpg" class="fade-el" style="animation-delay: <?= $i * 50 ?>ms">
     <?php endfor; ?>
   </div>
 </div>
 
-<div style="margin-top:50px;"></div>
-
-<!-- ================= MAIN ================= -->
 <div class="container main-flex">
+  <div class="left">
+    <h2 id="courses" style="font-family:'Sora'; font-size:28px; margin-bottom:25px;">Latest Courses</h2>
+    <div class="course-grid">
+    <?php
+    $sql = "SELECT c.*, b.name AS branch_name, s.name AS scheme_name FROM courses c LEFT JOIN branches b ON c.branch_id = b.id LEFT JOIN schemes s ON c.scheme_id = s.id ORDER BY c.id DESC LIMIT 12";
+    $courses = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    $DEFAULT_IMG = "assets/default_course.jpg";
 
-<div class="left">
-<h2 id="courses" style="font-size:32px;font-weight:700;">Latest Courses</h2>
-
-<div class="course-grid">
-
-<?php
-$sql = "
-  SELECT 
-    c.*,
-    b.name AS branch_name,
-    s.name AS scheme_name
-  FROM courses c
-  LEFT JOIN branches b ON c.branch_id = b.id
-  LEFT JOIN schemes s ON c.scheme_id = s.id
-  ORDER BY c.id DESC
-  LIMIT 12
-";
-
-$courses = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-$DEFAULT_IMG = "assets/default_course.jpg";
-
-foreach ($courses as $c):
-  $img = !empty($c['image_path']) ? $c['image_path'] : $DEFAULT_IMG;
-?>
-<a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
-<img 
-  src="<?= htmlspecialchars($img) ?>" 
-  alt="Course image"
-  referrerpolicy="no-referrer"
->
-
-  <div class="card-body">
-    <h3><?= htmlspecialchars($c['name']) ?></h3>
-    <p>Semester <?= htmlspecialchars($c['semester']) ?></p>
-
-    <div style="margin-top:8px;">
-      <span class="badge">
-        <?= htmlspecialchars($c['branch_name'] ?? 'Unknown Branch') ?>
-      </span>
-
-      <span class="badge" style="background:#f3e8ff;color:#7e22ce;">
-        <?= htmlspecialchars($c['scheme_name'] ?? 'Unknown Scheme') ?>
-      </span>
+    foreach ($courses as $c):
+      $img = !empty($c['image_path']) ? $c['image_path'] : $DEFAULT_IMG;
+    ?>
+    <a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
+      <img src="<?= htmlspecialchars($img) ?>" alt="Course" referrerpolicy="no-referrer">
+      <div class="card-body">
+        <h3><?= htmlspecialchars($c['name']) ?></h3>
+        <div style="margin-bottom: 12px;">
+            <span class="badge">S<?= htmlspecialchars($c['semester']) ?></span>
+            <span class="badge"><?= htmlspecialchars($c['branch_name'] ?? 'Gen Ed') ?></span>
+            <span class="badge" style="background:#f3e8ff; color:#7e22ce;"><?= htmlspecialchars($c['scheme_name'] ?? '2019') ?></span>
+        </div>
+        <p style="color:var(--primary-blue); font-weight:700; font-size:14px;">Open Course →</p>
+      </div>
+    </a>
+    <?php endforeach; ?>
     </div>
 
-    <p style="color:#2563EB;margin-top:12px;">Open Course →</p>
+    <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">Available Schemes</h2>
+    <div class="scheme-grid">
+      <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
+        <img src="assets/2019/1.jpg" alt="2019">
+        <div class="card-body">
+          <h3 style="margin:0;">2019 Scheme</h3>
+          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">Browse Branches →</p>
+        </div>
+      </a>
+      <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
+        <img src="assets/2025/1.jpg" alt="2024">
+        <div class="card-body">
+          <h3 style="margin:0;">2024 Scheme</h3>
+          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">Browse Branches →</p>
+        </div>
+      </a>
+    </div>
   </div>
-</a>
-<?php endforeach; ?>
 
-
-</div>
-
-<!-- ================= SCHEMES ================= -->
-<h2 style="font-size:28px;font-weight:700;margin:36px 0 18px;">Schemes</h2>
-
-<div class="scheme-grid">
-
-  <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
-    <img src="assets/2019/1.jpg" alt="2019 Scheme">
-    <div class="card-body">
-      <h3 class="scheme-title">2019 Scheme</h3>
-      <p class="scheme-sub">Browse branches →</p>
+  <div class="right">
+    <div class="sponsor-card fade-el">
+      <h3 style="color:var(--primary-blue); font-size:1.1rem; margin-top:0;">Sponsored</h3>
+      <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=400" style="width:100%; border-radius:12px; margin-bottom:10px;">
+      <p style="font-size:13px; color:#64748b;">Support our platform to keep resources free for everyone.</p>
     </div>
-  </a>
-
-  <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
-    <img src="assets/2025/1.jpg" alt="2024 Scheme">
-    <div class="card-body">
-      <h3 class="scheme-title">2024 Scheme</h3>
-      <p class="scheme-sub">Browse branches →</p>
-    </div>
-  </a>
-
+  </div>
 </div>
 
-</div>
-
-<div class="right fade-el">
-<div class="sponsor-card">
-<h3 style="color:#2563EB;">Sponsored</h3>
-<img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=900&q=60">
-</div>
-</div>
-
-</div>
-
-<!-- ================= MODAL ================= -->
 <div id="socialModal" class="modal-bg">
-  <div class="modal-box">
-    <h2>Connect With Us</h2>
-    <a class="sponsor-button" style="background:#d946ef;">Instagram</a>
-    <a class="sponsor-button" style="background:#16a34a;">WhatsApp</a>
-    <a class="sponsor-button" style="background:#0ea5e9;">Telegram</a>
-    <a class="sponsor-button" style="background:#1d4ed8;">Facebook</a>
-    <button onclick="closeModal()" style="margin-top:15px;border:none;background:none;">Close</button>
+  <div class="modal-box fade-el">
+    <h2>Join the Squad</h2>
+    <p>Get instant updates when new notes are uploaded.</p>
+
+    <div class="social-grid">
+      <a href="#" class="social-btn" style="background:#E1306C;">
+        <span>📸</span>
+        Instagram
+      </a>
+
+      <a href="#" class="social-btn" style="background:#25D366;">
+        <span>💬</span>
+        WhatsApp
+      </a>
+
+      <a href="#" class="social-btn" style="background:#0088cc;">
+        <span>✈️</span>
+        Telegram
+      </a>
+
+      <a href="#" class="social-btn" style="background:#6366f1;">
+        <span>⭐</span>
+        Updates
+      </a>
+    </div>
+
+    <button class="modal-close" onclick="closeModal()">Close</button>
   </div>
 </div>
+
 
 <script>
-// Fade stagger (GSAP replacement)
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".fade-el").forEach((el,i)=>{
-    el.style.animation = "fadeIn .7s ease forwards";
-    el.style.animationDelay = `${i*120}ms`;
-  });
-});
-
-// Slider
+// Slider Fix
 let index = 0;
-setInterval(() => {
-  const slides = document.querySelectorAll("#slider .slide");
-  slides.forEach(s => s.classList.remove("active"));
-  slides[index].classList.add("active");
-  index = (index + 1) % slides.length;
-}, 3000);
-
-// Modal
-function closeModal() {
-  document.getElementById("socialModal").style.display = "none";
+const slides = document.querySelectorAll(".slide");
+if(slides.length > 0) {
+    setInterval(() => {
+      slides.forEach(s => s.classList.remove("active"));
+      index = (index + 1) % slides.length;
+      slides[index].classList.add("active");
+    }, 4000);
 }
 
-if (!localStorage.getItem("socialShown")) {
-  setTimeout(() => {
-    document.getElementById("socialModal").style.display = "flex";
-  }, 1500);
-  localStorage.setItem("socialShown","1");
-}
+// Modal logic
+function closeModal() { document.getElementById("socialModal").style.display = "none"; }
+
+window.onload = () => {
+  if (!localStorage.getItem("socialShown")) {
+    setTimeout(() => { document.getElementById("socialModal").style.display = "flex"; }, 2000);
+    localStorage.setItem("socialShown","1");
+  }
+};
 </script>
 
 </body>
