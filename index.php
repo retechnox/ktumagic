@@ -320,7 +320,7 @@ html, body {
   <div class="badge-main">The Ultimate Resource Hub ⚡️</div>
   <h1 class="fade-el">The KTU <span>Plug.</span></h1>
   <p class="fade-el">Stop hunting through 100 WhatsApp groups. We’ve got your <strong>notes, schemes, and courses</strong> highkey sorted for you.</p>
-  <a href="#courses" class="hero-cta-btn">Start Studying ⚡️</a>
+  <a href="view_scheme.php" class="hero-cta-btn">Start Studying ⚡️</a>
 </section>
 
 <div class="container slider-container">
