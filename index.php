@@ -31,9 +31,11 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.5;
+  overflow-x: hidden;
+  
 }
 
-.container { width: min(1400px, 95%); margin: auto; }
+.container { width: min(1300px, 95vw); margin: auto; }
 
 /* ======================= NAVBAR (Added Upload CTA) ======================= */
 nav {
@@ -124,12 +126,18 @@ nav {
   margin-bottom: 15px;
   text-transform: uppercase;
 }
+.hero-cta-btn {
+  display: inline-block; background: var(--primary-blue); color: white;
+  padding: 10px 24px; border-radius: 50px; font-weight: 700; text-decoration: none;
+  font-size: 14px; box-shadow: 0 10px 15px rgba(37, 99, 235, 0.2); transition: 0.3s;
+}
 
 /* ======================= SLIDER (Contain Fixed) ======================= */
 .slider-container { padding: 20px 0; }
 .slider {
   position: relative;
-  width: 100vw;
+ width: 100%;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
   max-height: 650px;
   overflow: hidden;
@@ -160,9 +168,14 @@ nav {
   grid-template-rows: repeat(2, 150px); /* EXACTLY 2 rows */
   grid-auto-columns: 150px;        /* width of each item */
   gap: 20px;
-  overflow-x: auto;                /* horizontal scroll if needed */
+  max-width: 100%;
   padding-bottom: 10px;
 }
+
+.icon-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
 
 .icon-grid img {
   width: 100%;
@@ -228,7 +241,11 @@ nav {
 
 @media (max-width: 600px) {
   .nav-links a:not(.upload-cta) { display: none; }
-  .icon-grid { grid-template-columns: repeat(2, 1fr); }
+.icon-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    grid-template-rows: repeat(4, auto);
+    gap: 10px;
+  }
   .hero { padding: 40px 0; }
 }
 
@@ -243,15 +260,8 @@ nav {
   align-items: center;
   justify-content: center;
   z-index: 2000;
-}
-
-.modal-box {
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 28px;
-  width: min(380px, 90%);
-  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-  text-align: center;
+    width: 100vw;
+  max-width: 100%;
 }
 
 .modal-box h2 {
@@ -265,45 +275,24 @@ nav {
   margin-bottom: 20px;
 }
 
-.social-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+/* ======================= MODAL ======================= */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 5000;
+}
+.modal-box {
+  background: white; padding: 25px; border-radius: 20px; width: min(350px, 90%); text-align: center;
+}
+.social-link {
+  display: block; padding: 10px; margin: 6px 0; border-radius: 10px;
+  color: white; text-decoration: none; font-weight: 700; font-size: 14px;
 }
 
-.social-btn {
-  width: calc(50% - 7px); /* 2 items per row */
-  border-radius: 16px;
-  padding: 16px 10px;
-  text-decoration: none;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: 0.25s;
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.social-btn span {
-  font-size: 22px;
-}
-
-.social-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-.modal-close {
-  margin-top: 18px;
-  border: none;
-  background: none;
-  font-size: 13px;
-  cursor: pointer;
-  color: #94a3b8;
-  text-decoration: underline;
-}
 
 </style>
 </head>
@@ -331,12 +320,13 @@ nav {
   <div class="badge-main">The Ultimate Resource Hub ⚡️</div>
   <h1 class="fade-el">The KTU <span>Plug.</span></h1>
   <p class="fade-el">Stop hunting through 100 WhatsApp groups. We’ve got your <strong>notes, schemes, and courses</strong> highkey sorted for you.</p>
+  <a href="#courses" class="hero-cta-btn">Start Studying ⚡️</a>
 </section>
 
 <div class="container slider-container">
   <div class="slider" id="slider">
-    <div class="slide active"><img referrerpolicy="no-referrer" src="assets/slider1.jpg"></div>
-    <div class="slide"><img src="assets/slider2.jpg"></div>
+    <div class="slide active"><img referrerpolicy="no-referrer" src="assets/slider2.jpg"></div>
+    <div class="slide"><img src="assets/slider1.jpg"></div>
   </div>
 </div>
 
@@ -349,8 +339,11 @@ nav {
 </div>
 
 <div class="container main-flex">
+
+
   <div class="left">
-    <h2 id="courses" style="font-family:'Sora'; font-size:28px; margin-bottom:25px;">Latest Courses</h2>
+
+    <!-- <h2 id="courses" style="font-family:'Sora'; font-size:28px; margin-bottom:25px;">Latest Courses</h2>
     <div class="course-grid">
     <?php
     $sql = "SELECT c.*, b.name AS branch_name, s.name AS scheme_name FROM courses c LEFT JOIN branches b ON c.branch_id = b.id LEFT JOIN schemes s ON c.scheme_id = s.id ORDER BY c.id DESC LIMIT 12";
@@ -373,7 +366,7 @@ nav {
       </div>
     </a>
     <?php endforeach; ?>
-    </div>
+    </div> -->
 
     <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">Available Schemes</h2>
     <div class="scheme-grid">
@@ -392,6 +385,39 @@ nav {
         </div>
       </a>
     </div>
+
+
+    <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">
+  Latest Updates
+</h2>
+
+<?php
+$updates = [];
+for ($i = 1; $i <= 3; $i++) {
+  if (file_exists(__DIR__ . "/assets/updates/$i.png")) {
+    $updates[] = $i;
+  }
+}
+?>
+
+<?php if (count($updates) > 0): ?>
+  <div class="updates-grid">
+    <?php foreach ($updates as $i): ?>
+      <div class="update-card fade-el">
+        <img src="assets/updates/<?= $i ?>.png" alt="Update <?= $i ?>">
+        <div class="update-body">
+          <h3>Update <?= $i ?></h3>
+          <p>Latest KTU related announcement.</p>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+<?php else: ?>
+  <p style="color:#64748b; font-size:14px;">
+    No recent updates available.
+  </p>
+<?php endif; ?>
+
   </div>
 
   <div class="right">
@@ -404,33 +430,13 @@ nav {
 </div>
 
 <div id="socialModal" class="modal-bg">
-  <div class="modal-box fade-el">
-    <h2>Join the Squad</h2>
-    <p>Get instant updates when new notes are uploaded.</p>
-
-    <div class="social-grid">
-      <a href="#" class="social-btn" style="background:#E1306C;">
-        <span>📸</span>
-        Instagram
-      </a>
-
-      <a href="#" class="social-btn" style="background:#25D366;">
-        <span>💬</span>
-        WhatsApp
-      </a>
-
-      <a href="#" class="social-btn" style="background:#0088cc;">
-        <span>✈️</span>
-        Telegram
-      </a>
-
-      <a href="#" class="social-btn" style="background:#6366f1;">
-        <span>⭐</span>
-        Updates
-      </a>
-    </div>
-
-    <button class="modal-close" onclick="closeModal()">Close</button>
+  <div class="modal-box">
+    <h2 style="font-family:'Sora'; font-size:20px; margin:0 0 10px;">Join the Squad 🤝</h2>
+    <p style="color:#64748b; font-size:13px; margin-bottom:15px;">Get the fastest KTU alerts directly on your phone.</p>
+    <a class="social-link" style="background:#25D366;">WhatsApp Community</a>
+    <a class="social-link" style="background:#0088cc;">Telegram Channel</a>
+    <a class="social-link" style="background:#E1306C;">Instagram</a>
+    <button onclick="closeModal()" style="margin-top:10px; border:none; background:none; color:#94a3b8; cursor:pointer; font-size:12px;">Maybe Later</button>
   </div>
 </div>
 
@@ -447,15 +453,18 @@ if(slides.length > 0) {
     }, 4000);
 }
 
-// Modal logic
-function closeModal() { document.getElementById("socialModal").style.display = "none"; }
+function closeModal() {
+  document.getElementById("socialModal").style.display = "none";
+}
 
-window.onload = () => {
+window.addEventListener("load", () => {
   if (!localStorage.getItem("socialShown")) {
-    setTimeout(() => { document.getElementById("socialModal").style.display = "flex"; }, 2000);
-    localStorage.setItem("socialShown","1");
+    setTimeout(() => {
+      document.getElementById("socialModal").style.display = "flex";
+    }, 2000);
+    localStorage.setItem("socialShown", "1");
   }
-};
+});
 </script>
 
 </body>
