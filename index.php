@@ -400,13 +400,25 @@ html, body {
   <div class="container nav-inner">
     <a href="index.php" class="logo">KTU Magic</a>
 
+    <!-- DESKTOP LINKS -->
     <div class="nav-links">
-      <a href="#">Upload Notes</a>
-      <a href="#">Courses</a>
-      <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
+   <a href="#">Syllabus</a>
+    <a href="#">KTU Notes</a>
+    <a href="view_scheme.php">Question Papers</a>
+    <!-- <a href="#">Connect With Us</a> -->
+    <a href="#">Important Topics</a>
+    <a href="#">Internships</a>
+    <a href="view_scheme.php">KTU Tuitions</a>
+    <a href="#">Text Books</a>
+
+    <hr>
+
+    <a href="#">Upload Notes</a>
+    <a href="view_scheme.php">Courses</a>
+    <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
     </div>
 
-    <!-- HAMBURGER -->
+    <!-- HAMBURGER (MOBILE) -->
     <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
       <span></span>
       <span></span>
@@ -416,11 +428,22 @@ html, body {
 
   <!-- MOBILE NAV -->
   <div id="mobileNav" class="mobile-nav">
+    <a href="#">Syllabus</a>
+    <a href="#">KTU Notes</a>
+    <a href="view_scheme.php">Question Papers</a>
+    <!-- <a href="#">Connect With Us</a> -->
+    <a href="#">Important Topics</a>
+    <a href="#">Internships</a>
+    <a href="view_scheme.php">KTU Tuitions</a>
+    <a href="#">Text Books</a>
+    <hr>
+
     <a href="#">Upload Notes</a>
     <a href="#">Courses</a>
     <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
   </div>
 </nav>
+
 
 
 <div class="alert-bar">
