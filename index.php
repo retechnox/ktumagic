@@ -164,8 +164,8 @@ nav {
   margin: 40px auto;
   justify-content: center;  /* center items horizontally */
   display: grid;
-  grid-auto-flow: column;          /* fill columns, not rows */
-  grid-template-rows: repeat(2, 150px); /* EXACTLY 2 rows */
+  grid-auto-flow: row;          /* fill columns, not rows */
+  grid-template-columns: repeat(4, 150px); /* EXACTLY 2 rows */
   grid-auto-columns: 150px;        /* width of each item */
   gap: 20px;
   max-width: 100%;
@@ -368,20 +368,20 @@ html, body {
     <?php endforeach; ?>
     </div> -->
 
-    <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">Available Schemes</h2>
+    <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">ALL SCHEMES</h2>
     <div class="scheme-grid">
       <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
         <img src="assets/2019/1.jpg" alt="2019">
         <div class="card-body">
           <h3 style="margin:0;">2019 Scheme</h3>
-          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">Browse Branches →</p>
+          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →</p>
         </div>
       </a>
       <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
         <img src="assets/2025/1.jpg" alt="2024">
         <div class="card-body">
           <h3 style="margin:0;">2024 Scheme</h3>
-          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">Browse Branches →</p>
+          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE  →</p>
         </div>
       </a>
     </div>
