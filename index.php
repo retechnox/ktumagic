@@ -199,7 +199,7 @@ nav {
 /* ======================= CARD UI ======================= */
 .card {
   background: white;
-  border-radius: 20px;
+  border-radius: 5px;
   overflow: hidden;
   box-shadow: var(--card-shadow);
   transition: 0.3s ease;
@@ -209,7 +209,7 @@ nav {
   flex-direction: column;
 }
 .card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-.card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+.card img { width: 100%; object-fit: cover; }
 .card-body { padding: 20px; flex-grow: 1; }
 .card-body h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; color: #0f172a; }
 
