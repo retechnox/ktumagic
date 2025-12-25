@@ -275,18 +275,66 @@ nav {
   margin-bottom: 20px;
 }
 
-/* ======================= MODAL ======================= */
-.modal-bg {
-  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 5000;
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.8);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
-.modal-box {
-  background: white; padding: 25px; border-radius: 20px; width: min(350px, 90%); text-align: center;
+
+.modal-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 18px;
+  width: min(360px, 90%);
+  text-align: center;
 }
-.social-link {
-  display: block; padding: 10px; margin: 6px 0; border-radius: 10px;
-  color: white; text-decoration: none; font-weight: 700; font-size: 14px;
+
+.modal-card h3 {
+  margin-bottom: 16px;
+  font-family: 'Sora', sans-serif;
 }
+
+.social-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 14px;
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.social svg {
+  width: 28px;
+  height: 28px;
+}
+
+.whatsapp { background: #25D366; }
+.telegram { background: #229ED9; }
+.linkedin { background: #0A66C2; }
+.facebook { background: #1877F2; }
+
+.modal-card button {
+  margin-top: 14px;
+  border: none;
+  background: none;
+  color: #64748b;
+  cursor: pointer;
+}
+
 
 html, body {
   max-width: 100%;
@@ -429,16 +477,47 @@ for ($i = 1; $i <= 3; $i++) {
   </div>
 </div>
 
-<div id="socialModal" class="modal-bg">
-  <div class="modal-box">
-    <h2 style="font-family:'Sora'; font-size:20px; margin:0 0 10px;">Join the Squad 🤝</h2>
-    <p style="color:#64748b; font-size:13px; margin-bottom:15px;">Get the fastest KTU alerts directly on your phone.</p>
-    <a class="social-link" style="background:#25D366;">WhatsApp Community</a>
-    <a class="social-link" style="background:#0088cc;">Telegram Channel</a>
-    <a class="social-link" style="background:#E1306C;">Instagram</a>
-    <button onclick="closeModal()" style="margin-top:10px; border:none; background:none; color:#94a3b8; cursor:pointer; font-size:12px;">Maybe Later</button>
+<!-- SOCIAL MODAL -->
+<div id="socialModal" class="modal-backdrop">
+  <div class="modal-card">
+    <h3>Join Us</h3>
+
+    <div class="social-grid">
+      <a href="https://wa.me/XXXXXXXXXX" target="_blank" class="social whatsapp">
+        <!-- WhatsApp SVG -->
+        <svg viewBox="0 0 32 32"><path fill="currentColor" d="M19.11 17.56c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.35-.79-.7-1.33-1.56-1.49-1.83-.16-.27-.02-.41.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.97 2.63 1.11 2.81c.14.18 1.9 2.9 4.6 4.07.64.28 1.14.45 1.53.58.64.2 1.23.17 1.69.1.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32z"/></svg>
+        WhatsApp
+      </a>
+
+      <a href="https://t.me/XXXXXXX" target="_blank" class="social telegram">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.04 15.47l-.38 5.36c.54 0 .78-.23 1.06-.51l2.54-2.43 5.26 3.85c.97.53 1.67.25 1.93-.9l3.5-16.38h0c.31-1.45-.53-2.02-1.48-1.67L1.66 9.41c-1.42.55-1.4 1.33-.25 1.68l5.37 1.68L18.9 6.18c.57-.35 1.1-.16.67.19"/></svg>
+        Telegram
+      </a>
+
+      <a href="https://linkedin.com/company/XXXX" target="_blank" class="social linkedin">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.22 8h4.56v14H.22V8zM8.54 8h4.37v1.91h.06c.61-1.16 2.11-2.39 4.35-2.39 4.65 0 5.51 3.06 5.51 7.04V22h-4.56v-6.62c0-1.58-.03-3.62-2.21-3.62-2.21 0-2.55 1.72-2.55 3.5V22H8.54V8z"/></svg>
+        LinkedIn
+      </a>
+
+      <a href="https://facebook.com/XXXX" target="_blank" class="social facebook">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M22.68 0H1.32C.59 0 0 .59 0 1.32v21.36C0 23.41.59 24 1.32 24h11.5v-9.29H9.69V11.1h3.13V8.41c0-3.1 1.89-4.79 4.65-4.79 1.32 0 2.46.1 2.79.14v3.24h-1.91c-1.5 0-1.79.71-1.79 1.76v2.3h3.58l-.47 3.61h-3.11V24h6.09c.73 0 1.32-.59 1.32-1.32V1.32C24 .59 23.41 0 22.68 0z"/></svg>
+        Facebook
+      </a>
+    </div>
+
+    <button onclick="closeSocial()">Close</button>
   </div>
 </div>
+
+<div id="updateModal" class="modal-backdrop">
+  <div class="modal-card">
+    <h3 id="updateTitle"></h3>
+    <p id="updateContent"></p>
+    <button onclick="closeUpdate()">Close</button>
+  </div>
+</div>
+
+
 
 
 <script>
@@ -453,18 +532,28 @@ if(slides.length > 0) {
     }, 4000);
 }
 
-function closeModal() {
-  document.getElementById("socialModal").style.display = "none";
-}
+const socialModal = document.getElementById("socialModal");
 
 window.addEventListener("load", () => {
-  if (!localStorage.getItem("socialShown")) {
-    setTimeout(() => {
-      document.getElementById("socialModal").style.display = "flex";
-    }, 2000);
-    localStorage.setItem("socialShown", "1");
-  }
+  socialModal.style.display = "flex";
 });
+
+function closeSocial() {
+  socialModal.style.display = "none";
+}
+
+fetch("update.json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("updateTitle").textContent = data.title;
+    document.getElementById("updateContent").textContent = data.content;
+    document.getElementById("updateModal").style.display = "flex";
+  })
+  .catch(() => {});
+
+function closeUpdate() {
+  document.getElementById("updateModal").style.display = "none";
+}
 </script>
 
 </body>
