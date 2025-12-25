@@ -240,7 +240,6 @@ nav {
 }
 
 @media (max-width: 600px) {
-  .nav-links a:not(.upload-cta) { display: none; }
 .icon-grid { 
     grid-template-columns: repeat(2, 1fr); 
     grid-template-rows: repeat(4, auto);
@@ -342,6 +341,56 @@ html, body {
 }
 
 
+/* ---------- HAMBURGER ---------- */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  gap: 5px;
+  flex-direction: column;
+}
+
+.hamburger span {
+  width: 22px;
+  height: 2px;
+  background: #0f172a;
+  border-radius: 2px;
+}
+
+/* ---------- MOBILE NAV ---------- */
+.mobile-nav {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 100%;
+  background: white;
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  gap: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+  z-index: 999;
+}
+
+.mobile-nav a {
+  font-weight: 700;
+  text-decoration: none;
+  color: #0f172a;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+
+
 </style>
 </head>
 
@@ -350,13 +399,29 @@ html, body {
 <nav>
   <div class="container nav-inner">
     <a href="index.php" class="logo">KTU Magic</a>
+
     <div class="nav-links">
       <a href="#">Upload Notes</a>
       <a href="#">Courses</a>
       <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
     </div>
+
+    <!-- HAMBURGER -->
+    <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <!-- MOBILE NAV -->
+  <div id="mobileNav" class="mobile-nav">
+    <a href="#">Upload Notes</a>
+    <a href="#">Courses</a>
+    <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
   </div>
 </nav>
+
 
 <div class="alert-bar">
   <div class="container">
@@ -553,6 +618,11 @@ fetch("update.json")
 
 function closeUpdate() {
   document.getElementById("updateModal").style.display = "none";
+}
+
+function toggleMobileNav() {
+  const nav = document.getElementById("mobileNav");
+  nav.style.display = nav.style.display === "flex" ? "none" : "flex";
 }
 </script>
 
