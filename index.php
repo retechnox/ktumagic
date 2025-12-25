@@ -425,7 +425,7 @@ html, body {
 
 <div class="alert-bar">
   <div class="container">
-    <div class="marquee">✨ 2024 Scheme Updated • New Courses Added Weekly • Download Verified Question Banks • Join our WhatsApp Community for Instant Alerts ✨</div>
+    <div class="marquee" id="alertMarquee">  Loading updates…</div>
   </div>
 </div>
 
@@ -494,7 +494,7 @@ html, body {
         <img src="assets/2025/1.jpg" alt="2024">
         <div class="card-body">
           <h3 style="margin:0;">2024 Scheme</h3>
-          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE  →</p>
+          <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →</p>
         </div>
       </a>
     </div>
@@ -624,6 +624,18 @@ function toggleMobileNav() {
   const nav = document.getElementById("mobileNav");
   nav.style.display = nav.style.display === "flex" ? "none" : "flex";
 }
+
+fetch("updates_upperupdate.json", { cache: "no-store" })
+  .then(res => res.json())
+  .then(data => {
+    if (data.message) {
+      document.getElementById("alertMarquee").textContent = data.message;
+    }
+  })
+  .catch(() => {
+    document.getElementById("alertMarquee").textContent =
+      "✨ Stay tuned for the latest KTU updates ✨";
+  });
 </script>
 
 </body>
