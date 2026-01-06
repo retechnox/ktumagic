@@ -161,15 +161,21 @@ nav {
 
 /* ======================= ICON GRID ======================= */
 .icon-grid {
-  margin: 40px auto;
-  justify-content: center;  /* center items horizontally */
-  display: grid;
-  grid-auto-flow: row;          /* fill columns, not rows */
-  grid-template-columns: repeat(4, 150px); /* EXACTLY 2 rows */
-  grid-auto-columns: 150px;        /* width of each item */
-  gap: 20px;
-  max-width: 100%;
-  padding-bottom: 10px;
+    width: 80vw;             /* Specifically sets the width to 80% of the screen */
+    margin: 40px auto;       /* Keeps it centered horizontally */
+    display: grid;
+    gap: 20px;               /* Space between icons */
+    
+    /* This makes 4 equal columns that fill the 80vw space */
+    grid-template-columns: repeat(4, 1fr); 
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+/* Ensure the black icon containers fill their new space */
+.icon-grid div { 
+    width: 100%;
+    aspect-ratio: 1 / 1;    /* Keeps them perfectly square as they grow */
 }
 
 .icon-grid::-webkit-scrollbar {
@@ -226,7 +232,7 @@ nav {
 
 /* ======================= GRID REFINEMENT ======================= */
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
-.scheme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 50px; }
+.scheme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; margin-bottom: 50px; }
 
 /* ======================= ANIMATIONS ======================= */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -559,8 +565,7 @@ for ($i = 1; $i <= 3; $i++) {
   <div class="right">
     <div class="sponsor-card fade-el">
       <h3 style="color:var(--primary-blue); font-size:1.1rem; margin-top:0;">Sponsored</h3>
-      <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=400" style="width:100%; border-radius:12px; margin-bottom:10px;">
-      <p style="font-size:13px; color:#64748b;">Support our platform to keep resources free for everyone.</p>
+      <img src="assets/sponsered.jpeg" style="width:100%; border-radius:12px; margin-bottom:10px;">
     </div>
   </div>
 </div>
@@ -597,13 +602,13 @@ for ($i = 1; $i <= 3; $i++) {
   </div>
 </div>
 
-<div id="updateModal" class="modal-backdrop">
+<!-- <div id="updateModal" class="modal-backdrop">
   <div class="modal-card">
     <h3 id="updateTitle"></h3>
     <p id="updateContent"></p>
     <button onclick="closeUpdate()">Close</button>
   </div>
-</div>
+</div> -->
 
 
 
