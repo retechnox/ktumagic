@@ -1,0 +1,12 @@
+# Block access to sensitive files
+<FilesMatch "^\.env|db\.php|migrate_.*\.php$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
+
+# Generic error pages (customizing later if needed)
+ErrorDocument 403 /ktumagic/index.php
+ErrorDocument 404 /ktumagic/index.php

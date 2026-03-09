@@ -35,10 +35,14 @@ function toPreview($url) {
 <meta charset="UTF-8">
 <title><?= safe($course['name']) ?> — Notes</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="description" content="Access and download academic notes and resources for <?= safe($course['name']) ?> on KTU Magic.">
+<meta name="keywords" content="<?= safe($course['name']) ?> Notes, KTU Notes, KTU Magic">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
 <?php include 'nav.php'; ?>
 
 <div class="max-w-5xl mx-auto px-4 pb-10">
@@ -109,6 +113,26 @@ function toPreview($url) {
 
       <p class="text-gray-500 dark:text-gray-300">No notes found.</p>
 
+    <?php endif; ?>
+
+    <!-- PYQS SECTION -->
+    <?php 
+    $pyqs_data = json_decode($course['pyqs'] ?? '[]', true) ?: [];
+    if (!empty($pyqs_data)): ?>
+      <h2 class="text-2xl font-bold mt-10 mb-4 dark:text-white">
+        Previous Year Questions (PYQs)
+      </h2>
+      <div class="space-y-4">
+        <?php foreach ($pyqs_data as $p): ?>
+          <div class="bg-indigo-50 dark:bg-gray-800 p-4 rounded-xl border-l-4 border-indigo-500 shadow-sm">
+            <h3 class="font-semibold text-lg dark:text-white mb-2"><?= safe($p['link_name']) ?></h3>
+            <a href="<?= safe($p['url']) ?>" target="_blank"
+               class="text-indigo-600 dark:text-indigo-400 underline font-medium">
+               📄 View / Download PYQ
+            </a>
+          </div>
+        <?php endforeach; ?>
+      </div>
     <?php endif; ?>
 
   </div>

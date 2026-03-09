@@ -10,7 +10,10 @@ $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
   <meta charset="utf-8">
   <title>Schemes — KTU Magic</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse various KTU schemes and access academic resources for 2019, 2024, and more on KTU Magic.">
+  <meta name="keywords" content="KTU Schemes, KTU 2019 Scheme, KTU 2024 Scheme, KTU Magic">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
 <?php include 'nav.php'; ?>

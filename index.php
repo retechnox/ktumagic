@@ -9,9 +9,13 @@ include 'db.php';
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KTU Magic – Notes & Resources</title>
+<title>KTU Magic – All-in-One Academic Support for KTU Students</title>
+<meta name="description" content="KTU Magic is an all-in-one academic support platform for KTU students, providing easy access to notes, question papers, syllabus, textbooks, and the latest updates.">
+<meta name="keywords" content="KTU, KTU Notes, KTU Question Papers, KTU Syllabus, KTU Magic, KTU Results, KTU Academic Support">
+<meta name="author" content="KTU Magic">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<?php include 'theme.php'; ?>
 
 <style>
 :root {
@@ -26,8 +30,8 @@ include 'db.php';
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--soft-bg);
-  color: #1e293b;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   line-height: 1.5;
@@ -39,7 +43,7 @@ body {
 
 /* ======================= NAVBAR (Added Upload CTA) ======================= */
 nav {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-nav);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 12px 0;
@@ -47,7 +51,7 @@ nav {
   top: 0;
   width: 100%;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .nav-inner { display: flex; justify-content: space-between; align-items: center; }
@@ -63,7 +67,7 @@ nav {
 }
 
 .nav-links { display: flex; align-items: center; gap: 20px; }
-.nav-links a { text-decoration: none; color: #475569; font-weight: 600; font-size: 14px; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px; }
 .nav-links a:hover { color: var(--primary-blue); }
 
 .upload-cta {
@@ -78,24 +82,124 @@ nav {
 
 /* ======================= ALERT BAR ======================= */
 .alert-bar {
-  margin-top: 65px;
+  margin-top: 5px;
   background: #0f172a;
   color: white;
-  padding: 10px 0;
+  padding: 0;
   font-size: 13px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.alert-static {
+  background: #ef4444;
+  color: white;
+  padding: 10px 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 10;
+  position: relative;
+  box-shadow: 10px 0 20px rgba(0,0,0,0.3);
+}
+
+.marquee-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .marquee {
-  overflow: hidden;
   white-space: nowrap;
-  animation: marquee 25s linear infinite;
+  animation: marquee 20s linear infinite;
+  padding-left: 20px;
+}
+
+.blink-text {
+  animation: blink 1s step-end infinite;
+  color: #fbbf24;
+  font-weight: 700;
 }
 
 @keyframes marquee {
-  from { transform: translateX(50%); }
+  from { transform: translateX(100%); }
   to   { transform: translateX(-100%); }
 }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ======================= BANNER CAROUSEL ======================= */
+.banner-container {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+
+.banner-carousel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 5;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  background: var(--bg-card);
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  font-size: 20px;
+  transition: 0.3s;
+}
+
+.carousel-btn:hover {
+  background: rgba(255, 255, 255, 0.7);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-prev { left: 20px; }
+.carousel-next { right: 20px; }
 
 /* ======================= HERO ======================= */
 .hero { text-align: center; padding: 80px 0 40px; }
@@ -112,7 +216,7 @@ nav {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.hero p { max-width: 600px; margin: 0 auto 30px; color: #64748b; font-size: 1.1rem; }
+.hero p { max-width: 600px; margin: 0 auto 30px; color: var(--text-muted); font-size: 1.1rem; }
 
 .badge-main {
   display: inline-block;
@@ -142,7 +246,7 @@ nav {
   max-height: 650px;
   overflow: hidden;
   border-radius: 24px;
-  background: #ffffff;
+  background: var(--bg-card);
   box-shadow: var(--card-shadow);
 }
 
@@ -189,7 +293,7 @@ nav {
   object-fit: cover;
   border-radius: 20px;
   transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 4px solid white;
+  border: 4px solid var(--img-border);
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
@@ -204,27 +308,27 @@ nav {
 
 /* ======================= CARD UI ======================= */
 .card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 5px;
   overflow: hidden;
   box-shadow: var(--card-shadow);
   transition: 0.3s ease;
   text-decoration: none;
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 }
-.card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+.card:hover { transform: translateY(-8px); box-shadow: var(--card-hover-shadow); }
 .card img { width: 100%; object-fit: cover; }
 .card-body { padding: 20px; flex-grow: 1; }
-.card-body h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+.card-body h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 
 .badge {
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--badge-bg);
+  color: var(--badge-color);
   padding: 4px 10px;
   border-radius: 6px;
   margin: 0 4px 4px 0;
@@ -292,11 +396,12 @@ nav {
 }
 
 .modal-card {
-  background: #fff;
+  background: var(--modal-card-bg);
   padding: 24px;
   border-radius: 18px;
   width: min(360px, 90%);
   text-align: center;
+  color: var(--text-primary);
 }
 
 .modal-card h3 {
@@ -340,6 +445,287 @@ nav {
   cursor: pointer;
 }
 
+/* ======================= WHATSAPP COMMUNITY SECTION ======================= */
+.whatsapp-community-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  margin: 60px 0 30px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.whatsapp-community-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(37, 211, 102, 0.1) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.whatsapp-logo-wrapper {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.whatsapp-community-section h2 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+}
+
+.whatsapp-community-section p {
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+  font-size: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.community-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-badge {
+  background: var(--bg-primary);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.pulse-icon {
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid #22c55e;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.whatsapp-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.wa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.3s;
+  font-size: 15px;
+}
+
+.wa-btn-primary {
+  background: #25D366;
+  color: white;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.wa-btn-primary:hover {
+  background: #20ba59;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.wa-btn-outline {
+  background: transparent;
+  border: 2px solid #25D366;
+  color: #25D366;
+}
+
+.wa-btn-outline:hover {
+  background: rgba(37, 211, 102, 0.05);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .whatsapp-community-section { padding: 30px 20px; }
+}
+
+/* ======================= UNIFIED HERO SECTION ======================= */
+.unified-hero {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 32px;
+  padding: 60px;
+  margin: 60px auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.unified-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-text-side {
+  flex: 1.2;
+  text-align: left;
+}
+
+.hero-text-side h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.hero-text-side h1 span {
+  background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-text-side p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 90%;
+}
+
+.hero-action-buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.hero-community-side {
+  flex: 0.8;
+  display: flex;
+  justify-content: center;
+}
+
+/* Redesigning WhatsApp Card for Unified Side */
+.compact-wa-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.compact-wa-card .whatsapp-logo-wrapper {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.compact-wa-card h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.compact-wa-card p {
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.compact-wa-card .community-stats {
+  margin-bottom: 24px;
+  gap: 12px;
+}
+
+.compact-wa-card .stat-badge {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+@media (max-width: 1024px) {
+  .unified-hero {
+    flex-direction: column;
+    padding: 40px;
+    text-align: center;
+    gap: 48px;
+  }
+  .hero-text-side { text-align: center; }
+  .hero-text-side p { margin-left: auto; margin-right: auto; }
+  .hero-action-buttons { justify-content: center; }
+  .hero-community-side { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .unified-hero { padding: 32px 20px; border-radius: 24px; }
+  .hero-text-side h1 { font-size: 2.2rem; }
+  .hero-action-buttons { flex-direction: column; width: 100%; }
+  .hero-action-buttons a { width: 100%; text-align: center; justify-content: center; }
+}
+
 
 html, body {
   max-width: 100%;
@@ -360,7 +746,7 @@ html, body {
 .hamburger span {
   width: 22px;
   height: 2px;
-  background: #0f172a;
+  background: var(--hamburger-color);
   border-radius: 2px;
 }
 
@@ -370,7 +756,7 @@ html, body {
   top: 100px;
   left: 0;
   width: 100%;
-  background: white;
+  background: var(--bg-secondary);
   display: none;
   flex-direction: column;
   padding: 20px;
@@ -382,7 +768,7 @@ html, body {
 .mobile-nav a {
   font-weight: 700;
   text-decoration: none;
-  color: #0f172a;
+  color: var(--text-primary);
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -402,80 +788,57 @@ html, body {
 
 <body>
 
-<nav>
-  <div class="container nav-inner">
-    <a href="index.php" class="logo">KTU Magic</a>
+<?php include 'nav.php'; ?>
 
-    <!-- DESKTOP LINKS -->
-    <div class="nav-links">
-   <a href="#">Syllabus</a>
-    <a href="#">KTU Notes</a>
-    <a href="view_scheme.php">Question Papers</a>
-    <!-- <a href="#">Connect With Us</a> -->
-    <a href="#">Important Topics</a>
-    <a href="#">Internships</a>
-    <a href="view_scheme.php">KTU Tuitions</a>
-    <a href="#">Text Books</a>
 
-    <hr>
 
-    <a href="#">Upload Notes</a>
-    <a href="view_scheme.php">Courses</a>
-    <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
+<div class="container">
+  <div class="alert-bar">
+    <div class="alert-static">🔔 Alerts</div>
+    <div class="marquee-container">
+      <div class="marquee" id="alertMarquee">
+        <span class="blink-text">NEW:</span> 2024 Scheme Notes are now available! | KTU Result updates...
+      </div>
     </div>
-
-    <!-- HAMBURGER (MOBILE) -->
-    <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
-
-  <!-- MOBILE NAV -->
-  <div id="mobileNav" class="mobile-nav">
-    <a href="#">Syllabus</a>
-    <a href="#">KTU Notes</a>
-    <a href="view_scheme.php">Question Papers</a>
-    <!-- <a href="#">Connect With Us</a> -->
-    <a href="#">Important Topics</a>
-    <a href="#">Internships</a>
-    <a href="view_scheme.php">KTU Tuitions</a>
-    <a href="#">Text Books</a>
-    <hr>
-
-    <a href="#">Upload Notes</a>
-    <a href="#">Courses</a>
-    <a href="view_scheme.php" class="upload-cta">Explore Notes</a>
-  </div>
-</nav>
-
-
-
-<div class="alert-bar">
-  <div class="container">
-    <div class="marquee" id="alertMarquee">  Loading updates…</div>
   </div>
 </div>
 
-<section class="hero container">
-  <div class="badge-main">The Ultimate Resource Hub ⚡️</div>
-  <h1 class="fade-el">The KTU <span>Plug.</span></h1>
-  <p class="fade-el">Stop hunting through 100 WhatsApp groups. We’ve got your <strong>notes, schemes, and courses</strong> highkey sorted for you.</p>
-  <a href="view_scheme.php" class="hero-cta-btn">Start Studying ⚡️</a>
-</section>
 
-<div class="container slider-container">
-  <div class="slider" id="slider">
-    <div class="slide active"><img referrerpolicy="no-referrer" src="assets/slider2.jpg"></div>
-    <div class="slide"><img src="assets/slider1.jpg"></div>
+
+<div class="container banner-container">
+  <div class="banner-carousel" id="mainCarousel">
+    <div class="carousel-slide active">
+      <img src="https://placehold.co/1200x400/2563EB/FFF?text=Welcome+to+KTU+Magic+⚡️" alt="Banner 1">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://placehold.co/1200x400/8b5cf6/FFF?text=All+KTU+Notes+in+One+Place" alt="Banner 2">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://placehold.co/1200x400/ec4899/FFF?text=Previous+Year+Question+Papers" alt="Banner 3">
+    </div>
+    
+    <button class="carousel-btn carousel-prev" onclick="moveSlide(-1)">❮</button>
+    <button class="carousel-btn carousel-next" onclick="moveSlide(1)">❯</button>
   </div>
 </div>
 
 <div class="container">
   <div class="icon-grid">
-    <?php for($i=1;$i<=8;$i++): ?>
-      <img src="assets/<?= $i ?>.jpg" class="fade-el" style="animation-delay: <?= $i * 50 ?>ms">
+    <?php 
+    $grid_links = [
+      1 => "view_scheme.php", // Syllabus
+      2 => "view_scheme.php", // KTU Notes
+      3 => "pyq.php",          // Question Papers
+      4 => "contact.php",      // Connect With Us
+      5 => "#",               // Important Topics
+      6 => "#",               // Internships
+      7 => "view_scheme.php", // KTU Tuitions
+      8 => "#"                // Text Books
+    ];
+    for($i=1;$i<=8;$i++): ?>
+      <a href="<?= $grid_links[$i] ?>" class="fade-el" style="animation-delay: <?= $i * 50 ?>ms">
+        <img src="assets/<?= $i ?>.jpg" alt="Icon <?= $i ?>">
+      </a>
     <?php endfor; ?>
   </div>
 </div>
@@ -485,30 +848,41 @@ html, body {
 
   <div class="left">
 
-    <!-- <h2 id="courses" style="font-family:'Sora'; font-size:28px; margin-bottom:25px;">Latest Courses</h2>
-    <div class="course-grid">
-    <?php
-    $sql = "SELECT c.*, b.name AS branch_name, s.name AS scheme_name FROM courses c LEFT JOIN branches b ON c.branch_id = b.id LEFT JOIN schemes s ON c.scheme_id = s.id ORDER BY c.id DESC LIMIT 12";
-    $courses = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    $DEFAULT_IMG = "assets/default_course.jpg";
 
-    foreach ($courses as $c):
-      $img = !empty($c['image_path']) ? $c['image_path'] : $DEFAULT_IMG;
-    ?>
-    <a href="view_link.php?course_id=<?= $c['id'] ?>" class="card fade-el">
-      <img src="<?= htmlspecialchars($img) ?>" alt="Course" referrerpolicy="no-referrer">
-      <div class="card-body">
-        <h3><?= htmlspecialchars($c['name']) ?></h3>
-        <div style="margin-bottom: 12px;">
-            <span class="badge">S<?= htmlspecialchars($c['semester']) ?></span>
-            <span class="badge"><?= htmlspecialchars($c['branch_name'] ?? 'Gen Ed') ?></span>
-            <span class="badge" style="background:#f3e8ff; color:#7e22ce;"><?= htmlspecialchars($c['scheme_name'] ?? '2019') ?></span>
+
+    <div class="unified-hero fade-el">
+      <div class="hero-text-side">
+        <h1>The All-in-One <span>Academic Powerhouse</span> for KTU Students.</h1>
+        <p>
+          KTU Magic is an all-in-one academic support platform created to help KTU students make their academic journey easier, smarter, and more organized.
+          With a growing community of <strong>40k+ active users</strong>, we bring everything you need — from notes to internship updates — into one convenient place.
+        </p>
+        <div class="hero-action-buttons">
+          <a href="view_scheme.php" class="hero-cta-btn" style="padding: 14px 32px; font-size: 15px;">Browse Notes</a>
+          <a href="about.php" style="color: var(--text-primary); text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 15px;">Learn More →</a>
         </div>
-        <p style="color:var(--primary-blue); font-weight:700; font-size:14px;">Open Course →</p>
       </div>
-    </a>
-    <?php endforeach; ?>
-    </div> -->
+
+      <div class="hero-community-side">
+        <div class="compact-wa-card">
+          <div class="whatsapp-logo-wrapper">
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467"/></svg>
+          </div>
+          <h3>WhatsApp Community</h3>
+          <p>Get instant uploads of notes, solved papers, model answers, and exam alerts.</p>
+          
+          <div class="community-stats" style="justify-content: center; display: flex; gap: 10px; margin-bottom: 20px;">
+            <div class="stat-badge"><div class="pulse-icon"></div> Active</div>
+            <div class="stat-badge">10,243 members</div>
+          </div>
+
+          <div class="whatsapp-btn-group">
+            <a href="https://wa.me/XXXXXXXXXX" target="_blank" class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">Join Group</a>
+            <a href="https://wa.me/XXXXXXXXXX" target="_blank" class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px;">WhatsApp Channel</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">ALL SCHEMES</h2>
     <div class="scheme-grid">
@@ -562,12 +936,15 @@ for ($i = 1; $i <= 3; $i++) {
 
   </div>
 
-  <div class="right">
+
+
+  <!-- <div class="right">
     <div class="sponsor-card fade-el">
       <h3 style="color:var(--primary-blue); font-size:1.1rem; margin-top:0;">Sponsored</h3>
       <img src="assets/sponsered.jpeg" style="width:100%; border-radius:12px; margin-bottom:10px;">
     </div>
-  </div>
+  </div> -->
+  
 </div>
 
 <!-- SOCIAL MODAL -->
@@ -576,6 +953,11 @@ for ($i = 1; $i <= 3; $i++) {
     <h3>Join Us</h3>
 
     <div class="social-grid">
+      <a href="https://instagram.com/XXXX" target="_blank" class="social instagram" style="background:#E1306C; color:white;">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+
       <a href="https://wa.me/XXXXXXXXXX" target="_blank" class="social whatsapp">
         <!-- WhatsApp SVG -->
         <svg viewBox="0 0 32 32"><path fill="currentColor" d="M19.11 17.56c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.35-.79-.7-1.33-1.56-1.49-1.83-.16-.27-.02-.41.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.97 2.63 1.11 2.81c.14.18 1.9 2.9 4.6 4.07.64.28 1.14.45 1.53.58.64.2 1.23.17 1.69.1.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32z"/></svg>
@@ -590,11 +972,6 @@ for ($i = 1; $i <= 3; $i++) {
       <a href="https://linkedin.com/company/XXXX" target="_blank" class="social linkedin">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.22 8h4.56v14H.22V8zM8.54 8h4.37v1.91h.06c.61-1.16 2.11-2.39 4.35-2.39 4.65 0 5.51 3.06 5.51 7.04V22h-4.56v-6.62c0-1.58-.03-3.62-2.21-3.62-2.21 0-2.55 1.72-2.55 3.5V22H8.54V8z"/></svg>
         LinkedIn
-      </a>
-
-      <a href="https://facebook.com/XXXX" target="_blank" class="social facebook">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M22.68 0H1.32C.59 0 0 .59 0 1.32v21.36C0 23.41.59 24 1.32 24h11.5v-9.29H9.69V11.1h3.13V8.41c0-3.1 1.89-4.79 4.65-4.79 1.32 0 2.46.1 2.79.14v3.24h-1.91c-1.5 0-1.79.71-1.79 1.76v2.3h3.58l-.47 3.61h-3.11V24h6.09c.73 0 1.32-.59 1.32-1.32V1.32C24 .59 23.41 0 22.68 0z"/></svg>
-        Facebook
       </a>
     </div>
 
@@ -614,16 +991,30 @@ for ($i = 1; $i <= 3; $i++) {
 
 
 <script>
-// Slider Fix
-let index = 0;
-const slides = document.querySelectorAll(".slide");
-if(slides.length > 0) {
-    setInterval(() => {
-      slides.forEach(s => s.classList.remove("active"));
-      index = (index + 1) % slides.length;
-      slides[index].classList.add("active");
-    }, 4000);
+// Banner Carousel Logic
+let currentSlide = 0;
+const slides = document.querySelectorAll(".carousel-slide");
+
+function showSlide(n) {
+  slides.forEach(s => s.classList.remove("active"));
+  currentSlide = (n + slides.length) % slides.length;
+  slides[currentSlide].classList.add("active");
 }
+
+function moveSlide(n) {
+  showSlide(currentSlide + n);
+}
+
+// Auto-play
+let slideInterval = setInterval(() => moveSlide(1), 5000);
+
+// Reset interval on manual click
+document.querySelectorAll('.carousel-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => moveSlide(1), 5000);
+  });
+});
 
 const socialModal = document.getElementById("socialModal");
 
@@ -665,7 +1056,43 @@ fetch("updates_upperupdate.json", { cache: "no-store" })
       "✨ Stay tuned for the latest KTU updates ✨";
   });
 </script>
+<style>
+.floating-whatsapp {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #25D366;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 15px rgba(37, 211, 102, 0.4);
+  z-index: 1000;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.floating-whatsapp:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0px 6px 20px rgba(37, 211, 102, 0.6);
+  color: white;
+}
+@media (max-width: 768px) {
+  .floating-whatsapp {
+    bottom: 20px;
+    right: 20px;
+    width: 55px;
+    height: 55px;
+  }
+}
+</style>
 
+<a href="https://wa.me/XXXXXXXXXX" target="_blank" class="floating-whatsapp" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467"/></svg>
+</a>
+
+<?php include 'footer.php'; ?>
 </body>
 </html>
 <?php ob_end_flush(); ?>

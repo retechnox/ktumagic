@@ -25,10 +25,14 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
 <meta charset="UTF-8">
 <title><?= safe($scheme['name']) ?> — Branches</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="description" content="View various branches available for <?= safe($scheme['name']) ?> on KTU Magic. Access academic resources and notes for your specific branch.">
+<meta name="keywords" content="KTU Branches, <?= safe($scheme['name']) ?> Branches, KTU Magic">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
 <?php include 'nav.php'; ?>
 
 <div class="max-w-6xl mx-auto px-4 py-6">

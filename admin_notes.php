@@ -111,20 +111,24 @@ try {
         elseif ($action === 'add_branch') {
             $scheme_id = intval($_POST['scheme_id'] ?? 0);
             $name = trim($_POST['branch_name'] ?? '');
+            $syllabus = trim($_POST['syllabus_link'] ?? '');
+            $calendar = trim($_POST['calendar_link'] ?? '');
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
             $rawImage = trim($_POST['branch_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
-            $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path) VALUES (?, ?, ?)');
-            $stmt->execute([$scheme_id, $name, $image]);
+            $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar]);
             flash('Branch added.', 'success');
         }
 
         elseif ($action === 'edit_branch') {
             $branch_id = intval($_POST['branch_id'] ?? 0);
             $branch_name = trim($_POST['branch_name'] ?? '');
+            $syllabus = trim($_POST['syllabus_link'] ?? '');
+            $calendar = trim($_POST['calendar_link'] ?? '');
             if (!$branch_id) throw new Exception('Invalid branch id.');
             if ($branch_name === '') throw new Exception('Branch name required.');
 
@@ -132,11 +136,11 @@ try {
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
             if ($image !== null) {
-                $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ? WHERE id = ?');
-                $stmt->execute([$branch_name, $image, $branch_id]);
+                $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ? WHERE id = ?');
+                $stmt->execute([$branch_name, $image, $syllabus, $calendar, $branch_id]);
             } else {
-                $stmt = $pdo->prepare('UPDATE branches SET name = ? WHERE id = ?');
-                $stmt->execute([$branch_name, $branch_id]);
+                $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ? WHERE id = ?');
+                $stmt->execute([$branch_name, $syllabus, $calendar, $branch_id]);
             }
             flash('Branch updated.', 'success');
         }
@@ -165,11 +169,19 @@ try {
                 if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
             }
 
+            $validPyqs = [];
+            $pyq_links = $_POST['pyqs'] ?? [];
+            foreach ($pyq_links as $p) {
+                $pn = trim($p['link_name'] ?? '');
+                $url = trim($p['url'] ?? '');
+                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url];
+            }
+
             $rawImage = trim($_POST['course_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
-            $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, links, image_path, semester) VALUES (?, ?, ?, ?, ?, ?)');
-            $stmt->execute([$branch_id, $scheme_id, $course_name, json_encode($validLinks), $image, $semester]);
+            $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, links, pyqs, image_path, semester) VALUES (?, ?, ?, ?, ?, ?, ?)');
+            $stmt->execute([$branch_id, $scheme_id, $course_name, json_encode($validLinks), json_encode($validPyqs), $image, $semester]);
             flash('Course added.', 'success');
         }
 
@@ -221,9 +233,17 @@ try {
                 if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
             }
 
-            // Update links
-            $stmt = $pdo->prepare('UPDATE courses SET links = ? WHERE id = ?');
-            $stmt->execute([json_encode($validLinks), $course_id]);
+            $pyq_links = $_POST['pyqs'] ?? [];
+            $validPyqs = [];
+            foreach ($pyq_links as $p) {
+                $pn = trim($p['link_name'] ?? '');
+                $url = trim($p['url'] ?? '');
+                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url];
+            }
+
+            // Update links and pyqs
+            $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ? WHERE id = ?');
+            $stmt->execute([json_encode($validLinks), json_encode($validPyqs), $course_id]);
 
             // Update optional course metadata if provided (name/sem/image)
             if ($course_name !== '') {
@@ -277,7 +297,10 @@ if (isset($_GET['course_id'])) {
     $q = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
     $q->execute([$course_id]);
     $selected_course = $q->fetch();
-    if ($selected_course) $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
+    if ($selected_course) {
+        $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
+        $pyqs = json_decode($selected_course['pyqs'] ?: '[]', true) ?: [];
+    }
 }
 
 $flashes = flash();
@@ -479,6 +502,16 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                   <input type="text" name="branch_image" class="form-control form-control-sm">
                 </div>
 
+                <div class="mb-2">
+                  <label class="form-label small">Syllabus Link (optional)</label>
+                  <input type="url" name="syllabus_link" class="form-control form-control-sm">
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small">Academic Calendar Link (optional)</label>
+                  <input type="url" name="calendar_link" class="form-control form-control-sm">
+                </div>
+
                 <div class="d-grid"><button class="btn btn-success btn-sm">Add Branch</button></div>
               </form>
 
@@ -501,7 +534,9 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                           <div class="mt-3 d-flex justify-content-center gap-2">
                             <button class="btn btn-sm btn-outline-warning btn-branch-edit"
                               data-id="<?= $b['id'] ?>"
-                              data-name="<?= safe($b['name']) ?>">Edit</button>
+                              data-name="<?= safe($b['name']) ?>"
+                              data-syllabus="<?= safe($b['syllabus_link'] ?? '') ?>"
+                              data-calendar="<?= safe($b['calendar_link'] ?? '') ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
                               <?= csrf_field() ?>
@@ -622,7 +657,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                        name="course_image_edit"
                        class="form-control form-control-sm"
                        value="<?= safe($selected_course['image_path']) ?>"
-                       placeholder="Drive link (optional)">
+                          placeholder="Drive link (optional)">
               </div>
 
               <!-- Editable Links -->
@@ -659,6 +694,42 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
 
               <div class="mt-2">
                 <button type="button" class="btn btn-sm btn-secondary" id="addLinkUpdateBtn">Add link</button>
+              </div>
+
+              <!-- Editable PYQ Links -->
+              <label class="form-label small mt-4">PYQ Links (Previous Year Questions)</label>
+              <div id="pyqs-list-update">
+                <?php if (!empty($pyqs)): ?>
+                  <?php foreach ($pyqs as $idx => $p): ?>
+                    <div class="row link-row g-2 mb-2">
+                      <div class="col">
+                        <input type="text" name="pyqs[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($p['link_name']) ?>" required>
+                      </div>
+                      <div class="col">
+                        <input type="url" name="pyqs[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($p['url']) ?>" required>
+                      </div>
+                      <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <div class="row link-row g-2 mb-2">
+                    <div class="col">
+                      <input type="text" name="pyqs[0][link_name]" class="form-control form-control-sm" placeholder="PYQ Link name">
+                    </div>
+                    <div class="col">
+                      <input type="url" name="pyqs[0][url]" class="form-control form-control-sm" placeholder="PYQ URL">
+                    </div>
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+                    </div>
+                  </div>
+                <?php endif; ?>
+              </div>
+
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="addPyqUpdateBtn">Add PYQ</button>
               </div>
 
               <div class="mt-3">
@@ -745,6 +816,28 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
               </div>
             </div>
 
+            <!-- PYQ LINKS FOR ADD -->
+            <div class="mt-3">
+              <label class="form-label small">PYQ links (optional)</label>
+              <div id="pyqs-list-course">
+                <div class="row link-row g-2 mb-2">
+                  <div class="col">
+                    <input type="text" name="pyqs[0][link_name]" class="form-control form-control-sm" placeholder="PYQ name">
+                  </div>
+                  <div class="col">
+                    <input type="url" name="pyqs[0][url]" class="form-control form-control-sm" placeholder="PYQ URL">
+                  </div>
+                  <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="addPyqCourseBtn">Add PYQ</button>
+              </div>
+            </div>
+
             <div class="mt-3 d-grid">
               <button class="btn btn-primary btn-sm">Add Course</button>
             </div>
@@ -814,6 +907,8 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
 
     const id = btn.dataset.id;
     const name = btn.dataset.name;
+    const syllabus = btn.dataset.syllabus || '';
+    const calendar = btn.dataset.calendar || '';
 
     branchEditContainer.innerHTML = `
       <div class="card card-rounded p-3 mb-3">
@@ -830,6 +925,16 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
           <div class="mb-2">
             <label class="form-label small">Drive image link (optional)</label>
             <input type="text" name="branch_image_edit" class="form-control form-control-sm">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Syllabus Link (optional)</label>
+            <input type="url" name="syllabus_link" class="form-control form-control-sm" value="${syllabus}">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Academic Calendar Link (optional)</label>
+            <input type="url" name="calendar_link" class="form-control form-control-sm" value="${calendar}">
           </div>
 
           <div class="d-flex justify-content-end gap-2">
@@ -914,6 +1019,56 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
         </div>
       `;
       linksListUpdate.appendChild(row);
+    });
+  }
+
+  /* PYQ UPDATE ROWS */
+  let pyqUpdateCount = <?= !empty($pyqs) ? count($pyqs) : 1 ?>;
+  const addPyqUpdateBtn = document.getElementById('addPyqUpdateBtn');
+  const pyqsListUpdate = document.getElementById('pyqs-list-update');
+
+  if(addPyqUpdateBtn){
+    addPyqUpdateBtn.addEventListener('click', ()=>{
+      const idx = pyqUpdateCount++;
+      const row = document.createElement('div');
+      row.className = "row link-row g-2 mb-2";
+      row.innerHTML = `
+        <div class="col">
+          <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name" required>
+        </div>
+        <div class="col">
+          <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL" required>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+        </div>
+      `;
+      pyqsListUpdate.appendChild(row);
+    });
+  }
+
+  /* PYQ ADD FORM ROWS */
+  let pyqAddCount = 1;
+  const addPyqCourseBtn = document.getElementById('addPyqCourseBtn');
+  const pyqsListCourse = document.getElementById('pyqs-list-course');
+
+  if(addPyqCourseBtn){
+    addPyqCourseBtn.addEventListener('click', ()=>{
+      const idx = pyqAddCount++;
+      const row = document.createElement('div');
+      row.className = "row link-row g-2 mb-2";
+      row.innerHTML = `
+        <div class="col">
+          <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name" required>
+        </div>
+        <div class="col">
+          <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL" required>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+        </div>
+      `;
+      pyqsListCourse.appendChild(row);
     });
   }
 

@@ -1,0 +1,6 @@
+.env
+.DS_Store
+/vendor/
+/tmp/
+*.log
+migrate_pyq.php
