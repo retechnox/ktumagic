@@ -363,6 +363,11 @@ nav {
       </div>
     </div>
 
+    <!-- SEARCH ICON -->
+    <a href="search.php" class="p-2 mr-2 text-gray-500 hover:text-blue-600 transition" aria-label="Search">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    </a>
+
     <!-- THEME TOGGLE -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
       <span class="theme-icon-light">🌙</span>
@@ -497,3 +502,4 @@ function toggleTheme() {
 }
 </script>
 <div style="height: 60px;"></div> <!-- Spacer for fixed nav -->
+<main class="flex-grow">

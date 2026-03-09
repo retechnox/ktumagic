@@ -113,14 +113,15 @@ try {
             $name = trim($_POST['branch_name'] ?? '');
             $syllabus = trim($_POST['syllabus_link'] ?? '');
             $calendar = trim($_POST['calendar_link'] ?? '');
+            $timetable = trim($_POST['timetable_link'] ?? '');
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
             $rawImage = trim($_POST['branch_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
-            $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link) VALUES (?, ?, ?, ?, ?)');
-            $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar]);
+            $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link) VALUES (?, ?, ?, ?, ?, ?)');
+            $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable]);
             flash('Branch added.', 'success');
         }
 
@@ -129,6 +130,7 @@ try {
             $branch_name = trim($_POST['branch_name'] ?? '');
             $syllabus = trim($_POST['syllabus_link'] ?? '');
             $calendar = trim($_POST['calendar_link'] ?? '');
+            $timetable = trim($_POST['timetable_link'] ?? '');
             if (!$branch_id) throw new Exception('Invalid branch id.');
             if ($branch_name === '') throw new Exception('Branch name required.');
 
@@ -136,11 +138,11 @@ try {
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
             if ($image !== null) {
-                $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ? WHERE id = ?');
-                $stmt->execute([$branch_name, $image, $syllabus, $calendar, $branch_id]);
+                $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ? WHERE id = ?');
+                $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $branch_id]);
             } else {
-                $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ? WHERE id = ?');
-                $stmt->execute([$branch_name, $syllabus, $calendar, $branch_id]);
+                $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ? WHERE id = ?');
+                $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $branch_id]);
             }
             flash('Branch updated.', 'success');
         }
@@ -177,11 +179,12 @@ try {
                 if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url];
             }
 
+            $subject_code = strtoupper(trim($_POST['subject_code'] ?? ''));
             $rawImage = trim($_POST['course_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
-            $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, links, pyqs, image_path, semester) VALUES (?, ?, ?, ?, ?, ?, ?)');
-            $stmt->execute([$branch_id, $scheme_id, $course_name, json_encode($validLinks), json_encode($validPyqs), $image, $semester]);
+            $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+            $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester]);
             flash('Course added.', 'success');
         }
 
@@ -197,11 +200,11 @@ try {
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
             if ($image !== null) {
-                $stmt = $pdo->prepare('UPDATE courses SET name = ?, semester = ?, image_path = ? WHERE id = ?');
-                $stmt->execute([$course_name, $semester, $image, $course_id]);
+                $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ?, image_path = ? WHERE id = ?');
+                $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $image, $course_id]);
             } else {
-                $stmt = $pdo->prepare('UPDATE courses SET name = ?, semester = ? WHERE id = ?');
-                $stmt->execute([$course_name, $semester, $course_id]);
+                $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ? WHERE id = ?');
+                $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $course_id]);
             }
             flash('Course updated.', 'success');
         }
@@ -247,25 +250,53 @@ try {
 
             // Update optional course metadata if provided (name/sem/image)
             if ($course_name !== '') {
+                $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
+                $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
                 if ($image !== null) {
-                    $u = $pdo->prepare('UPDATE courses SET name = ?, semester = ?, image_path = ? WHERE id = ?');
-                    $u->execute([$course_name, $semester, $image, $course_id]);
+                    $u = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ?, image_path = ? WHERE id = ?');
+                    $u->execute([$course_name, $subject_code, $semester, $image, $course_id]);
                 } else {
-                    $u = $pdo->prepare('UPDATE courses SET name = ?, semester = ? WHERE id = ?');
-                    $u->execute([$course_name, $semester, $course_id]);
+                    $u = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ? WHERE id = ?');
+                    $u->execute([$course_name, $subject_code, $semester, $course_id]);
                 }
             } else {
-                // Even if course_name empty (shouldn't happen) still allow image/semester update
+                $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
+                $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
                 if ($image !== null) {
-                    $u = $pdo->prepare('UPDATE courses SET semester = ?, image_path = ? WHERE id = ?');
-                    $u->execute([$semester, $image, $course_id]);
+                    $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ?, image_path = ? WHERE id = ?');
+                    $u->execute([$subject_code, $semester, $image, $course_id]);
                 } else {
-                    $u = $pdo->prepare('UPDATE courses SET semester = ? WHERE id = ?');
-                    $u->execute([$semester, $course_id]);
+                    $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ? WHERE id = ?');
+                    $u->execute([$subject_code, $semester, $course_id]);
                 }
             }
 
             flash('Course links and metadata saved.', 'success');
+
+            // --- UPSERT Semester Resources ---
+            $sem_syllabus = trim($_POST['sem_syllabus'] ?? '');
+            $sem_timetable = trim($_POST['sem_timetable'] ?? '');
+            $sem_calendar = trim($_POST['sem_calendar'] ?? '');
+
+            // We need branch_id and semester to identify the resource set
+            $cQ = $pdo->prepare("SELECT branch_id, semester FROM courses WHERE id = ?");
+            $cQ->execute([$course_id]);
+            $cData = $cQ->fetch();
+            
+            if ($cData) {
+                $branch_id = $cData['branch_id'];
+                $curr_sem = $cData['semester'];
+                
+                $upsert = $pdo->prepare("
+                    INSERT INTO semester_resources (branch_id, semester, syllabus_link, timetable_link, calendar_link)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE 
+                    syllabus_link = VALUES(syllabus_link),
+                    timetable_link = VALUES(timetable_link),
+                    calendar_link = VALUES(calendar_link)
+                ");
+                $upsert->execute([$branch_id, $curr_sem, $sem_syllabus, $sem_timetable, $sem_calendar]);
+            }
         }
 
         // redirect after POST to avoid double submit
@@ -292,6 +323,9 @@ $courses = $pdo->query("
 
 $selected_course = null;
 $links = [];
+$pyqs = [];
+$sem_res = null;
+
 if (isset($_GET['course_id'])) {
     $course_id = intval($_GET['course_id']);
     $q = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
@@ -300,6 +334,11 @@ if (isset($_GET['course_id'])) {
     if ($selected_course) {
         $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
         $pyqs = json_decode($selected_course['pyqs'] ?: '[]', true) ?: [];
+        
+        // Fetch semester resources
+        $resQ = $pdo->prepare('SELECT * FROM semester_resources WHERE branch_id = ? AND semester = ?');
+        $resQ->execute([$selected_course['branch_id'], $selected_course['semester']]);
+        $sem_res = $resQ->fetch();
     }
 }
 
@@ -512,6 +551,11 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                   <input type="url" name="calendar_link" class="form-control form-control-sm">
                 </div>
 
+                <div class="mb-2">
+                  <label class="form-label small">Timetable Link (optional)</label>
+                  <input type="url" name="timetable_link" class="form-control form-control-sm">
+                </div>
+
                 <div class="d-grid"><button class="btn btn-success btn-sm">Add Branch</button></div>
               </form>
 
@@ -536,7 +580,8 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                               data-id="<?= $b['id'] ?>"
                               data-name="<?= safe($b['name']) ?>"
                               data-syllabus="<?= safe($b['syllabus_link'] ?? '') ?>"
-                              data-calendar="<?= safe($b['calendar_link'] ?? '') ?>">Edit</button>
+                              data-calendar="<?= safe($b['calendar_link'] ?? '') ?>"
+                              data-timetable="<?= safe($b['timetable_link'] ?? '') ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
                               <?= csrf_field() ?>
@@ -630,14 +675,16 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
               <input type="hidden" name="action" value="save_links">
               <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
 
-              <!-- Editable Course Name -->
-              <div class="mb-2">
-                <label class="form-label small">Course Name</label>
-                <input type="text"
-                       name="course_name_edit"
-                       class="form-control form-control-sm"
-                       value="<?= safe($selected_course['name']) ?>"
-                       required>
+              <!-- Editable Course Name & Code -->
+              <div class="row g-2 mb-2">
+                <div class="col-md-8">
+                  <label class="form-label small">Course Name</label>
+                  <input type="text" name="course_name_edit" class="form-control form-control-sm" value="<?= safe($selected_course['name']) ?>" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small">Subject Code</label>
+                  <input type="text" name="subject_code_edit" class="form-control form-control-sm" value="<?= safe($selected_course['subject_code']) ?>" placeholder="MAT101">
+                </div>
               </div>
 
               <!-- Editable Semester -->
@@ -658,6 +705,23 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                        class="form-control form-control-sm"
                        value="<?= safe($selected_course['image_path']) ?>"
                           placeholder="Drive link (optional)">
+              </div>
+
+              <!-- Semester Resources -->
+              <h6 class="mt-4 mb-2 small font-bold">Semester-wise Resources (Syllabus, Timetable, Calendar)</h6>
+              <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                  <label class="form-label small">Sem Syllabus</label>
+                  <input type="url" name="sem_syllabus" class="form-control form-control-sm" value="<?= safe($sem_res['syllabus_link'] ?? '') ?>" placeholder="URL">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small">Sem Timetable</label>
+                  <input type="url" name="sem_timetable" class="form-control form-control-sm" value="<?= safe($sem_res['timetable_link'] ?? '') ?>" placeholder="URL">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small">Sem Calendar</label>
+                  <input type="url" name="sem_calendar" class="form-control form-control-sm" value="<?= safe($sem_res['calendar_link'] ?? '') ?>" placeholder="URL">
+                </div>
               </div>
 
               <!-- Editable Links -->
@@ -784,9 +848,14 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
             </div>
 
             <div class="row g-2 mt-3">
-              <div class="col-md-8">
+              <div class="col-md-4">
                 <label class="form-label small">Course name</label>
-                <input type="text" name="course_name" class="form-control form-control-sm" required>
+                <input type="text" name="course_name" class="form-control form-control-sm" required placeholder="Calculus">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small">Subject Code</label>
+                <input type="text" name="subject_code" class="form-control form-control-sm" placeholder="e.g. MAT101">
               </div>
 
               <div class="col-md-4">
@@ -909,6 +978,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
     const name = btn.dataset.name;
     const syllabus = btn.dataset.syllabus || '';
     const calendar = btn.dataset.calendar || '';
+    const timetable = btn.dataset.timetable || '';
 
     branchEditContainer.innerHTML = `
       <div class="card card-rounded p-3 mb-3">
@@ -935,6 +1005,11 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
           <div class="mb-2">
             <label class="form-label small">Academic Calendar Link (optional)</label>
             <input type="url" name="calendar_link" class="form-control form-control-sm" value="${calendar}">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Timetable Link (optional)</label>
+            <input type="url" name="timetable_link" class="form-control form-control-sm" value="${timetable}">
           </div>
 
           <div class="d-flex justify-content-end gap-2">

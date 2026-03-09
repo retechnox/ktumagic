@@ -79,6 +79,12 @@ body {
   background: var(--bg-primary) !important;
   color: var(--text-primary) !important;
   transition: background 0.3s ease, color 0.3s ease;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+}
+main {
+  flex: 1 0 auto;
 }
 
 /* ---- THEME TOGGLE ---- */

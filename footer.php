@@ -3,11 +3,11 @@
 ?>
 <style>
 .premium-footer {
-    background: #0b0f19; /* Deeper, more professional navy */
-    color: #94a3b8;
+    background: var(--footer-bg);
+    color: var(--footer-text);
     padding: 80px 0 40px;
     margin-top: 100px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid var(--footer-border);
 }
 
 .premium-footer .container {
@@ -39,12 +39,12 @@
     font-size: 14px;
     line-height: 1.7;
     margin-bottom: 32px;
-    color: #64748b;
+    color: var(--text-muted);
     max-width: 320px;
 }
 
 .footer-heading {
-    color: #f1f5f9; /* Bright white for headings */
+    color: var(--footer-heading);
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 28px;
@@ -64,27 +64,29 @@
 }
 
 .footer-links a {
-    color: #94a3b8; /* Clear visible grey */
+    color: var(--footer-text);
     text-decoration: none;
     font-size: 14.5px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: inline-block;
+    opacity: 0.85;
 }
 
 .footer-links a:hover {
-    color: #f1f5f9; /* Brighter on hover */
+    color: var(--footer-heading);
     transform: translateX(4px);
+    opacity: 1;
 }
 
 .footer-bottom {
     margin-top: 80px;
     padding-top: 32px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid var(--footer-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 13px;
-    color: #475569;
+    color: var(--text-muted);
 }
 
 .social-links {
@@ -134,6 +136,7 @@
 }
 </style>
 
+</main>
 <footer class="premium-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
