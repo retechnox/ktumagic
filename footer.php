@@ -97,14 +97,14 @@
 .social-icon {
     width: 40px;
     height: 40px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .social-icon:hover {
@@ -195,7 +195,7 @@
     <div class="container footer-bottom">
         <div>
             © <?= date('Y') ?> KTU Magic. All rights reserved. 
-            <span style="margin-left: 10px; color: #475569;">Trusted by 30k+ Students ⚡️</span>
+            <span style="margin-left: 10px; color: var(--text-subtle);">Trusted by 30k+ Students ⚡️</span>
         </div>
         <div style="font-size: 14px; margin-top: 10px;">
             <a href="tel:+917907552296" style="color: var(--text-muted); text-decoration: none; font-weight: 600;">Contact: +91 79075 52296</a>

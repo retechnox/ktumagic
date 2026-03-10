@@ -35,10 +35,10 @@
   --modal-card-bg: #ffffff;
   --hamburger-color: #0f172a;
   --img-border: white;
-  --footer-bg: #0f172a;
-  --footer-text: #94a3b8;
-  --footer-heading: #ffffff;
-  --footer-border: rgba(255,255,255,0.05);
+  --footer-bg: #ffffff;
+  --footer-text: #64748b;
+  --footer-heading: #0f172a;
+  --footer-border: #f1f5f9;
   --input-bg: #ffffff;
   --input-border: #e2e8f0;
 }

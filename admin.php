@@ -56,6 +56,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
                 <hr><br>
                 <h3>PYQ Submissions</h3>
                 <a href="admin_pyq_submissions.php" class="btn btn-custom btn-admin">Manage PYQ Submissions</a>
+                <a href="admin_submissions.php" class="btn btn-custom btn-admin">Manage Resource Submissions</a>
                 <hr><br>
             </div>         
         </div>     
