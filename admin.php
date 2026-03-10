@@ -50,7 +50,13 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
                 <h3>notes</h3>                 
                 <a href="admin_notes.php" class="btn btn-custom btn-view">Notes</a>
-                <hr><br>                 
+                <hr><br>
+                <h3>Sponsored Content</h3>
+                <a href="admin_sponsored.php" class="btn btn-custom btn-add">Manage Sponsored Images</a>
+                <hr><br>
+                <h3>PYQ Submissions</h3>
+                <a href="admin_pyq_submissions.php" class="btn btn-custom btn-admin">Manage PYQ Submissions</a>
+                <hr><br>
             </div>         
         </div>     
     </div>          

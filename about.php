@@ -112,12 +112,12 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
             </p>
 
             <p class="primary-text">
-                With a growing community of <strong>40k+ active users</strong> already trusting our services, KTU Magic continues to support students by bringing everything they need for their studies together in one convenient place.
+                With a growing community of <strong>30k+ active users</strong> already trusting our services, KTU Magic continues to support students by bringing everything they need for their studies together in one convenient place.
             </p>
 
             <div class="stats-grid">
                 <div class="stat-item">
-                    <h2>40k+</h2>
+                    <h2>30k+</h2>
                     <p>Active Users</p>
                 </div>
                 <div class="stat-item">
