@@ -17,21 +17,38 @@ if (isset($_POST['action'])) {
         $sub = $sq->fetch();
 
         if ($sub) {
-            // Get current course pyqs
-            $cq = $pdo->prepare("SELECT pyqs FROM courses WHERE id = ?");
-            $cq->execute([$sub['course_id']]);
-            $course = $cq->fetch();
-            $pyqs = json_decode($course['pyqs'] ?? '[]', true) ?: [];
+            // Determine material type
+            $type = $sub['material_type'] ?? 'pyq';
             
-            // Add new pyq
-            $pyqs[] = [
-                'link_name' => $sub['link_name'],
-                'url' => $sub['url']
-            ];
-
-            // Update course
-            $uq = $pdo->prepare("UPDATE courses SET pyqs = ? WHERE id = ?");
-            $uq->execute([json_encode($pyqs), $sub['course_id']]);
+            if ($type === 'pyq') {
+                // Determine target column
+                $cq = $pdo->prepare("SELECT pyqs FROM courses WHERE id = ?");
+                $cq->execute([$sub['course_id']]);
+                $course = $cq->fetch();
+                $pyqs = json_decode($course['pyqs'] ?? '[]', true) ?: [];
+                
+                $pyqs[] = [
+                    'link_name' => $sub['link_name'],
+                    'url' => $sub['url']
+                ];
+                
+                $uq = $pdo->prepare("UPDATE courses SET pyqs = ? WHERE id = ?");
+                $uq->execute([json_encode($pyqs), $sub['course_id']]);
+            } else {
+                // For qp_answer, module, other -> they go to 'links'
+                $cq = $pdo->prepare("SELECT links FROM courses WHERE id = ?");
+                $cq->execute([$sub['course_id']]);
+                $course = $cq->fetch();
+                $links = json_decode($course['links'] ?? '[]', true) ?: [];
+                
+                $links[] = [
+                    'link_name' => $sub['link_name'],
+                    'url' => $sub['url']
+                ];
+                
+                $uq = $pdo->prepare("UPDATE courses SET links = ? WHERE id = ?");
+                $uq->execute([json_encode($links), $sub['course_id']]);
+            }
 
             // Mark submission as approved
             $pdo->prepare("UPDATE pyq_submissions SET status = 'approved' WHERE id = ?")->execute([$sub_id]);
@@ -41,7 +58,7 @@ if (isset($_POST['action'])) {
     } elseif ($action === 'delete') {
         $pdo->prepare("DELETE FROM pyq_submissions WHERE id = ?")->execute([$sub_id]);
     }
-    header("Location: admin_pyq_submissions.php");
+    header("Location: admin_submissions.php");
     exit();
 }
 
@@ -51,12 +68,19 @@ $submissions = $pdo->query("
     JOIN courses c ON s.course_id = c.id 
     ORDER BY s.created_at DESC
 ")->fetchAll();
+
+function getMaterialBadge($type) {
+    if ($type === 'pyq') return '<span class="badge bg-secondary">PYQ</span>';
+    if ($type === 'qp_answer') return '<span class="badge bg-info text-dark">QP & Answer</span>';
+    if ($type === 'module') return '<span class="badge bg-primary">Module</span>';
+    return '<span class="badge bg-dark">Other</span>';
+}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Manage PYQ Submissions — Admin</title>
+    <title>Manage Resource Submissions — Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
     <style>
@@ -72,8 +96,8 @@ $submissions = $pdo->query("
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h1 class="mb-0">PYQ Submissions</h1>
-                <p class="text-muted">Review and approve user-contributed question papers.</p>
+                <h1 class="mb-0">Resource Submissions</h1>
+                <p class="text-muted">Review and approve user-contributed study materials.</p>
             </div>
             <a href="admin.php" class="btn btn-outline-dark px-4">Back to Dashboard</a>
         </div>
@@ -84,6 +108,7 @@ $submissions = $pdo->query("
                     <thead class="bg-white">
                         <tr>
                             <th class="ps-4 py-3">Course / Subject</th>
+                            <th class="py-3">Type</th>
                             <th class="py-3">Link Name</th>
                             <th class="py-3">Resource</th>
                             <th class="py-3">Contributor</th>
@@ -95,7 +120,7 @@ $submissions = $pdo->query("
                     <tbody>
                         <?php if (empty($submissions)): ?>
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">No submissions found.</td>
+                                <td colspan="8" class="text-center py-5 text-muted">No submissions found.</td>
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($submissions as $s): ?>
@@ -104,6 +129,7 @@ $submissions = $pdo->query("
                                     <div class="fw-bold"><?= htmlspecialchars($s['course_name']) ?></div>
                                     <small class="text-muted">ID: #<?= $s['course_id'] ?></small>
                                 </td>
+                                <td><?= getMaterialBadge($s['material_type'] ?? 'pyq') ?></td>
                                 <td><?= htmlspecialchars($s['link_name']) ?></td>
                                 <td><a href="<?= htmlspecialchars($s['url']) ?>" target="_blank" class="text-primary text-decoration-none fw-semibold">View URL</a></td>
                                 <td><?= htmlspecialchars($s['contributor_name'] ?: 'Anonymous') ?></td>
