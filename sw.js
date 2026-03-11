@@ -41,3 +41,27 @@ self.addEventListener('notificationclick', (event) => {
         );
     }
 });
+
+// ── Background Push API Handler ──────────────────────────────────────────
+self.addEventListener('push', (event) => {
+    if (!event.data) return;
+    
+    try {
+        const data = event.data.json();
+        const { title, body, link, icon } = data;
+
+        event.waitUntil(
+            self.registration.showNotification(title || 'KTU Magic', {
+                body: body || '',
+                icon: icon || '/assets/favicon.png',
+                badge: '/assets/favicon.png',
+                data: { link: link || '' },
+                tag: 'ktu-broadcast',
+                requireInteraction: false,
+                vibrate: [200, 100, 200],
+            })
+        );
+    } catch (err) {
+        console.error('[SW] Push error:', err);
+    }
+});

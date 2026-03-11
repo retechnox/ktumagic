@@ -179,7 +179,7 @@
         <div class="footer-brand">
             <a href="index.php" class="logo" style="display:block; margin-bottom: 24px;">
                 <img src="assets/logooo.png" alt="KTU Magic"
-                    style="scale:1.5,height: 80px; width: auto; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25));">
+                    style="height: 150px; width: auto; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25));">
             </a>
             <p class="footer-desc">
                 KTU Magic is an all-in-one academic support platform created to help KTU students make their academic
@@ -290,6 +290,19 @@
         const _isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
         const _basePath = _isProduction ? '' : '/ktumagic';
         const _iconPath = _basePath + '/assets/favicon.png';
+        const _vapidPublicKey = '<?= getenv("VAPID_PUBLIC_KEY") ?>';
+
+        // Helper to convert VAPID key
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
 
         // ── Service Worker registration ──────────────────────────────────────────
         let _swReg = null;
@@ -298,8 +311,15 @@
                 .then(reg => {
                     _swReg = reg;
                     console.log('[SW] Registered:', reg.scope);
+                    // Check for existing push subscription
+                    return reg.pushManager.getSubscription();
                 })
-                .catch(err => console.error('[SW] Registration failed:', err));
+                .then(sub => {
+                    if (sub) {
+                        console.log('[Push] User is already subscribed.');
+                    }
+                })
+                .catch(err => console.error('[SW] Error:', err));
         }
 
         // ── Persistent notification via Service Worker ───────────────────────────
@@ -423,11 +443,32 @@
 
             btnEnablePush.addEventListener('click', async () => {
                 prompt.style.display = 'none';
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    connectWebSocket();
-                }
                 localStorage.setItem('push_prompt_dismissed', 'true');
+                
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        connectWebSocket();
+                        
+                        // Register for Background Web Push
+                        if (_swReg && _vapidPublicKey) {
+                            const subscription = await _swReg.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: urlBase64ToUint8Array(_vapidPublicKey)
+                            });
+                            
+                            // Send to server
+                            await fetch(_basePath + '/save_subscription.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(subscription)
+                            });
+                            console.log('[Push] Subscription saved to DB ✓');
+                        }
+                    }
+                } catch (err) {
+                    console.error('[Push] Subscription failed:', err);
+                }
             });
         });
     </script>

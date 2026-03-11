@@ -42,7 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($httpcode == 200) {
             $resData = json_decode($response, true);
-            $msg = "Broadcast sent successfully to " . ($resData['deliveredTo'] ?? 0) . " connected users.";
+            $wsCount = $resData['deliveredWS'] ?? 0;
+            $pushCount = $resData['deliveredPush'] ?? 0;
+            $msg = "Broadcast sent successfully! Delivered to $wsCount live users and $pushCount background devices.";
         } else {
             $err = "Failed to send broadcast. Ensure WebSocket server is running. Response: $response";
         }
