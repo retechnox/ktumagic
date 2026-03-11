@@ -220,9 +220,60 @@
             <button id="btnNotNow" style="flex: 1; padding: 8px; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-weight: 600; cursor: pointer;">Not Now</button>
             <button id="btnEnablePush" style="flex: 1; padding: 8px; background: var(--primary-blue); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">Enable</button>
         </div>
-    </div>
+    </div><!-- /.pushPrompt -->
 
     <script>
+        // ── Service Worker registration ──────────────────────────────────────────
+        let _swReg = null;
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/ktumagic/sw.js')
+                .then(reg => {
+                    _swReg = reg;
+                    console.log('[SW] Registered:', reg.scope);
+                })
+                .catch(err => console.error('[SW] Registration failed:', err));
+        }
+
+        // ── Persistent notification via Service Worker ───────────────────────────
+        function showPersistentNotification(title, body, link) {
+            if (_swReg && Notification.permission === 'granted') {
+                // Post to SW – it runs even when tab is in background
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.active.postMessage({
+                        type: 'SHOW_NOTIFICATION',
+                        title,
+                        body,
+                        link: link || '',
+                        icon: '/ktumagic/assets/favicon.png'
+                    });
+                });
+            }
+            // In-page toast so user also sees it if tab is active
+            showToast(title, body);
+        }
+
+        // ── In-page toast (fallback / complement) ────────────────────────────────
+        function showToast(title, body) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 80px; right: 20px; z-index: 99999;
+                background: var(--bg-card, #fff); color: var(--text-primary, #111);
+                border: 1px solid var(--border-color, #e5e7eb);
+                border-left: 4px solid #2563EB;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                padding: 14px 18px; border-radius: 14px;
+                max-width: 320px; font-family: 'Sora', sans-serif;
+                animation: slideInToast 0.3s ease;
+            `;
+            toast.innerHTML = `
+                <style>@keyframes slideInToast{from{transform:translateX(120%)}to{transform:translateX(0)}}</style>
+                <div style="font-weight:700;font-size:14px;margin-bottom:4px;">🔔 ${title}</div>
+                <div style="font-size:12.5px;opacity:0.8;line-height:1.5;">${body}</div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 6000);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const prompt = document.getElementById('pushPrompt');
             const btnNotNow = document.getElementById('btnNotNow');
@@ -233,44 +284,35 @@
                 const wsUrl = isProduction
                     ? 'wss://ktumagic.in/ws'
                     : 'ws://localhost:8080';
+
+                console.log('[WS] Connecting to', wsUrl);
                 const ws = new WebSocket(wsUrl);
-                
-                ws.onopen = () => console.log('[WS] Connected for real-time updates.');
-                ws.onclose = () => {
-                    console.log('[WS] Disconnected, attempting reconnect in 5s...');
+
+                ws.onopen = () => console.log('[WS] Connected ✓');
+                ws.onerror = (e) => console.error('[WS] Error:', e);
+                ws.onclose = (e) => {
+                    console.log('[WS] Disconnected (code:', e.code, '). Reconnecting in 5s…');
                     setTimeout(connectWebSocket, 5000);
                 };
-                
+
                 ws.onmessage = (event) => {
                     try {
                         const data = JSON.parse(event.data);
-                        if (data.type === 'notification' && Notification.permission === 'granted') {
-                            const notification = new Notification(data.title, {
-                                body: data.body,
-                                icon: '/ktumagic/assets/favicon.png' // Use real path if available
-                            });
-                            
-                            if (data.link) {
-                                notification.onclick = () => {
-                                    window.open(data.link, '_blank');
-                                };
-                            }
+                        if (data.type === 'notification') {
+                            showPersistentNotification(data.title, data.body, data.link);
                         }
                     } catch (e) {
-                        console.error('Push handling error:', e);
+                        console.error('[WS] Message parse error:', e);
                     }
                 };
             }
 
-            // Check if we already have permission
+            // Auto-connect if permission already granted
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
                     connectWebSocket();
                 } else if (Notification.permission !== 'denied' && !localStorage.getItem('push_prompt_dismissed')) {
-                    // Show custom prompt
-                    setTimeout(() => {
-                        prompt.style.display = 'flex';
-                    }, 2000); // 2 second delay so it doesn't block initial render
+                    setTimeout(() => { prompt.style.display = 'flex'; }, 2000);
                 }
             }
 
@@ -285,10 +327,8 @@
                 if (permission === 'granted') {
                     connectWebSocket();
                 }
-                // Store dismissed so we don't spam if they deny
                 localStorage.setItem('push_prompt_dismissed', 'true');
             });
         });
     </script>
 </footer>
-

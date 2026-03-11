@@ -420,7 +420,7 @@ include 'db.php';
 
     /* ======================= MAIN LAYOUT ======================= */
     .main-flex {
-      margin-top: 60px;
+      margin-top: 10px;
       display: flex;
       gap: 40px;
     }
@@ -808,7 +808,6 @@ include 'db.php';
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 32px;
-      padding: 60px;
       margin: 3px auto;
       display: flex;
       align-items: center;
@@ -878,9 +877,9 @@ include 'db.php';
       background: var(--bg-primary);
       border: 2px solid var(--border-color);
       border-radius: 28px;
-      padding: 32px;
+      padding: 40px 32px;
       width: 100%;
-      max-width: 360px;
+      max-width: 400px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -897,39 +896,58 @@ include 'db.php';
     }
 
     .compact-wa-card.wa-theme {
-      border-color: rgba(37, 211, 102, 0.3);
+      border-color: rgba(37, 211, 102, 0.4);
     }
 
     .compact-wa-card.ig-theme {
-      border-color: rgba(225, 48, 108, 0.3);
+      border-color: rgba(225, 48, 108, 0.4);
     }
 
     .compact-wa-card .whatsapp-logo-wrapper {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .compact-wa-card.wa-theme .whatsapp-logo-wrapper {
+      background: rgba(37, 211, 102, 0.1);
+    }
+
+    .compact-wa-card.ig-theme .whatsapp-logo-wrapper {
+      background: rgba(225, 48, 108, 0.1);
     }
 
     .compact-wa-card h3 {
       font-family: 'Sora', sans-serif;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 700;
       margin-bottom: 12px;
+      text-align: center;
     }
 
     .compact-wa-card p {
-      font-size: 13px;
+      font-size: 13.5px;
       margin-bottom: 20px;
-      line-height: 1.5;
+      line-height: 1.65;
+      text-align: center;
+      color: var(--text-secondary);
     }
 
     .compact-wa-card .community-stats {
       margin-bottom: 24px;
       gap: 12px;
+      display: flex;
+      justify-content: center;
     }
 
     .compact-wa-card .stat-badge {
-      padding: 6px 12px;
-      font-size: 12px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
     }
 
     @media (max-width: 1024px) {
@@ -1106,86 +1124,97 @@ endfor; ?>
 
 
       <div class="unified-hero fade-el">
+        <!-- LEFT: Text & CTA buttons -->
         <div class="hero-text-side">
           <h1> <span>KTU MAGIC</span> .</h1>
           <p>
             KTU Magic is an all-in-one academic support platform created to help KTU students make their academic
             journey easier, smarter, and more organized.
-            With a growing community of <strong>40k+ active users</strong>, we bring everything you need — from notes to
+            With a growing community of <strong>50k+ active users</strong>, we bring everything you need — from notes to
             internship updates — into one convenient place.
           </p>
           <div class="hero-action-buttons">
             <a href="view_scheme.php" class="hero-cta-btn" style="padding: 14px 32px; font-size: 15px;">Browse Notes</a>
-            <a href="about.php"
-              style="color: var(--text-primary); text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 15px;">Learn
-              More →</a>
           </div>
-        </div>
+        </div><!-- /.hero-text-side -->
 
+        <!-- RIGHT: Community cards, side-by-side on desktop -->
         <div class="hero-community-side" style="flex-direction: column; gap: 20px;">
-          <!-- WhatsApp Card -->
-          <div class="compact-wa-card wa-theme">
-            <div class="whatsapp-logo-wrapper" style="width: 64px; height: 64px; margin-bottom: 16px;">
-              <svg width="35" height="35" viewBox="0 0 24 24" fill="#25D366">
-                <path
-                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-              </svg>
-            </div>
-            <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">WhatsApp Community</h3>
-            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Get instant uploads of notes, solved
-              papers, model answers, and exam alerts.</p>
 
-            <div class="community-stats"
-              style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
-              <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
-                <div class="pulse-icon" style="background: #22c55e;"></div> Active
+          <style>
+            @media (min-width: 768px) {
+              .community-cards-row {
+                display: flex;
+                flex-direction: row;
+                gap: 16px;
+              }
+              .community-cards-row .compact-wa-card {
+                flex: 1;
+                min-width: 0;
+              }
+            }
+            @media (max-width: 767px) {
+              .community-cards-row {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              }
+            }
+          </style>
+
+          <div class="community-cards-row">
+
+            <!-- WhatsApp Card -->
+            <div class="compact-wa-card wa-theme">
+              <div class="whatsapp-logo-wrapper" style="width: 64px; height: 64px; margin-bottom: 16px;">
+                <svg width="35" height="35" viewBox="0 0 24 24" fill="#25D366">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+                </svg>
               </div>
-              <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">30k+ active users</div>
-            </div>
-
-            <div class="whatsapp-btn-group">
-              <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
-                class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">Join Community</a>
-              <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
-                class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px;">WhatsApp
-                Channel</a>
-            </div>
-          </div>
-
-          <!-- Instagram Card -->
-          <div class="compact-wa-card ig-theme">
-            <div class="whatsapp-logo-wrapper"
-              style="width: 64px; height: 64px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(225, 48, 108, 0.2);">
-              <svg width="35" height="35" viewBox="0 0 24 24" fill="#E1306C">
-                <path
-                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-              </svg>
-            </div>
-            <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">Instagram Community</h3>
-            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Follow us for quick updates, polls, and
-              academic tips directly in your feed.</p>
-
-            <div class="community-stats"
-              style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
-              <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
-                <div class="pulse-icon" style="background: #E1306C;"></div> Active
+              <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">WhatsApp Community</h3>
+              <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Join our Scheme-based WhatsApp group to get KTU live updates, study materials, question papers, notes, model questions, and more.</p>
+              <div class="community-stats" style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
+                <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
+                  <div class="pulse-icon" style="background: #22c55e;"></div> 30k+ live students
+                </div>
               </div>
-              <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">Join Us</div>
+              <div class="whatsapp-btn-group">
+                <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
+                  class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">2024 Scheme</a>
+                <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
+                  class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px;">2019 Scheme</a>
+              </div>
             </div>
 
-            <div class="whatsapp-btn-group">
-              <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn"
-                style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);">Follow
-                on Instagram</a>
-              <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn wa-btn-outline"
-                style="padding: 10px; font-size: 13px; border-width: 1px; color: #E1306C; border-color: #E1306C;">Instagram
-                Profile</a>
+            <!-- Instagram Card -->
+            <div class="compact-wa-card ig-theme">
+              <div class="whatsapp-logo-wrapper"
+                style="width: 64px; height: 64px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(225, 48, 108, 0.2);">
+                <svg width="35" height="35" viewBox="0 0 24 24" fill="#E1306C">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                </svg>
+              </div>
+              <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">Instagram Community</h3>
+              <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Join our 65K+ student community on Instagram! 🎓<br>We share KTU live updates, important topics, study materials, trolls, internship opportunities, and more.</p>
+              <div class="community-stats" style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
+                <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
+                  <div class="pulse-icon" style="background: #E1306C;"></div> 65k+ live students
+                </div>
+              </div>
+              <div class="whatsapp-btn-group">
+                <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn"
+                  style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);">Follow on Instagram</a>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <?php
+          </div><!-- /.community-cards-row -->
+        </div><!-- /.hero-community-side -->
+      </div><!-- /.unified-hero -->
+
+
+
+
+        <?php
 // Sponsored Images Section
 try {
   $stmt = $pdo->query("SELECT image_path FROM sponsored_images WHERE is_visible = 1 ORDER BY created_at DESC");
@@ -1196,98 +1225,100 @@ catch (PDOException $e) {
 }
 
 if (!empty($sponsoredImages)): ?>
-      <style>
-        .sponsored-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          margin: 60px 0;
-        }
-
-        .sponsored-grid .sponsored-card {
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: var(--card-shadow);
-          transition: 0.3s ease;
-          position: relative;
-        }
-
-        .sponsored-grid .sponsored-card:hover {
-          transform: translateY(-8px);
-        }
-
-        .sponsored-grid .sponsored-card img {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
-
-        .sponsored-badge-overlay {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          background: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(4px);
-          color: white;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 10px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        @media (max-width: 992px) {
+        <style>
           .sponsored-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin: 60px 0;
           }
-        }
 
-        @media (max-width: 600px) {
-          .sponsored-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin: 40px 0;
+          .sponsored-grid .sponsored-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: 0.3s ease;
+            position: relative;
           }
-        }
-      </style>
-      <div class="sponsored-grid fade-el">
-        <?php foreach ($sponsoredImages as $img): ?>
-        <div class="sponsored-card">
-          <span class="sponsored-badge-overlay">Sponsored</span>
-          <img src="<?= $img['image_path']?>" alt="Sponsored Content" loading="lazy">
+
+          .sponsored-grid .sponsored-card:hover {
+            transform: translateY(-8px);
+          }
+
+          .sponsored-grid .sponsored-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+
+          .sponsored-badge-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          @media (max-width: 992px) {
+            .sponsored-grid {
+              grid-template-columns: repeat(2, 1fr);
+              gap: 20px;
+            }
+          }
+
+          @media (max-width: 600px) {
+            .sponsored-grid {
+              grid-template-columns: 1fr;
+              gap: 16px;
+              margin: 40px 0;
+            }
+          }
+        </style>
+        <div class="sponsored-grid fade-el">
+          <?php foreach ($sponsoredImages as $img): ?>
+          <div class="sponsored-card">
+            <span class="sponsored-badge-overlay">Sponsored</span>
+            <img src="<?= $img['image_path']?>" alt="Sponsored Content" loading="lazy">
+          </div>
+          <?php
+  endforeach; ?>
         </div>
         <?php
-  endforeach; ?>
-      </div>
-      <?php
 endif; ?>
 
-      <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">ALL SCHEMES</h2>
-      <div class="scheme-grid">
-        <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
-          <img src="assets/2019/1.jpg" alt="2019">
-          <div class="card-body">
-            <h3 style="margin:0;">2019 Scheme</h3>
-            <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →</p>
-          </div>
-        </a>
-        <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
-          <img src="assets/2025/1.jpg" alt="2024">
-          <div class="card-body">
-            <h3 style="margin:0;">2024 Scheme</h3>
-            <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →</p>
-          </div>
-        </a>
-      </div>
+        <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">ALL SCHEMES</h2>
+        <div class="scheme-grid">
+          <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
+            <img src="assets/2019/1.jpg" alt="2019">
+            <div class="card-body">
+              <h3 style="margin:0;">2019 Scheme</h3>
+              <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →
+              </p>
+            </div>
+          </a>
+          <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
+            <img src="assets/2025/1.jpg" alt="2024">
+            <div class="card-body">
+              <h3 style="margin:0;">2024 Scheme</h3>
+              <p style="color:var(--primary-blue); font-size:13px; margin-top:8px; font-weight:600;">BROWSE BRANCHES →
+              </p>
+            </div>
+          </a>
+        </div>
 
 
-      <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">
-        Latest Updates
-      </h2>
+        <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">
+          Latest Updates
+        </h2>
 
-      <?php
+        <?php
 $updates = [];
 for ($i = 1; $i <= 3; $i++) {
   if (file_exists(__DIR__ . "/assets/updates/$i.png")) {
@@ -1296,89 +1327,91 @@ for ($i = 1; $i <= 3; $i++) {
 }
 ?>
 
-      <?php if (count($updates) > 0): ?>
-      <div class="updates-grid">
-        <?php foreach ($updates as $i): ?>
-        <div class="update-card fade-el">
-          <img src="assets/updates/<?= $i?>.png" alt="Update <?= $i?>">
-          <div class="update-body">
-            <h3>Update
-              <?= $i?>
-            </h3>
-            <p>Latest KTU related announcement.</p>
+        <?php if (count($updates) > 0): ?>
+        <div class="updates-grid">
+          <?php foreach ($updates as $i): ?>
+          <div class="update-card fade-el">
+            <img src="assets/updates/<?= $i?>.png" alt="Update <?= $i?>">
+            <div class="update-body">
+              <h3>Update
+                <?= $i?>
+              </h3>
+              <p>Latest KTU related announcement.</p>
+            </div>
           </div>
+          <?php
+  endforeach; ?>
         </div>
         <?php
-  endforeach; ?>
-      </div>
-      <?php
 else: ?>
-      <p style="color:#64748b; font-size:14px;">
-        No recent updates available.
-      </p>
-      <?php
+        <p style="color:#64748b; font-size:14px;">
+          No recent updates available.
+        </p>
+        <?php
 endif; ?>
 
-    </div>
+      </div>
 
 
 
-    <!-- <div class="right">
+      <!-- <div class="right">
     <div class="sponsor-card fade-el">
       <h3 style="color:var(--primary-blue); font-size:1.1rem; margin-top:0;">Sponsored</h3>
       <img src="assets/sponsered.jpeg" style="width:100%; border-radius:12px; margin-bottom:10px;">
     </div>
   </div> -->
 
-  </div>
-
-  <!-- SOCIAL MODAL -->
-  <div id="socialModal" class="modal-backdrop">
-    <div class="modal-card">
-      <h3>JOIN US</h3>
-      <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
-        Welcome students and educators! Join our community to access academic resources, stay updated with KTU
-        information, and be part of a growing learning network.
-      </p>
-
-      <div class="social-grid">
-        <a href="https://www.instagram.com/ktumagic" target="_blank" class="social instagram"
-          style="background:#E1306C; color:white;">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor"
-              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-          </svg>
-          Instagram
-        </a>
-
-        <a href="https://t.me/ktumagic" target="_blank" class="social telegram">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor"
-              d="M20.665 3.717l-17.73 6.837c-1.213.486-1.203 1.163-.222 1.462l4.552 1.42 1.566 4.802c.188.518.093.723.475.723.296 0 .43-.135.594-.293l2.394-2.327 4.98 3.68c.918.506 1.577.246 1.807-.85l3.268-15.396c.335-1.343-.513-1.952-1.394-1.56z" />
-          </svg>
-          Telegram
-        </a>
-
-        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-          </svg>
-          2019 Scheme
-        </a>
-
-        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-            </svg>
-            2025 Scheme
-          </a>
-      </div>
-
-      <button onclick="closeSocial()">Close</button>
     </div>
-  </div>
 
-  <!-- <div id="updateModal" class="modal-backdrop">
+    <!-- SOCIAL MODAL -->
+    <div id="socialModal" class="modal-backdrop">
+      <div class="modal-card">
+        <h3>JOIN US</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+          Welcome students and educators! Join our community to access academic resources, stay updated with KTU
+          information, and be part of a growing learning network.
+        </p>
+
+        <div class="social-grid">
+          <a href="https://www.instagram.com/ktumagic" target="_blank" class="social instagram"
+            style="background:#E1306C; color:white;">
+            <svg viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+            INSTAGRAM
+          </a>
+
+          <a href="https://t.me/ktumagic" target="_blank" class="social telegram">
+            <svg viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M20.665 3.717l-17.73 6.837c-1.213.486-1.203 1.163-.222 1.462l4.552 1.42 1.566 4.802c.188.518.093.723.475.723.296 0 .43-.135.594-.293l2.394-2.327 4.98 3.68c.918.506 1.577.246 1.807-.85l3.268-15.396c.335-1.343-.513-1.952-1.394-1.56z" />
+            </svg>
+            TELEGRAM
+          </a>
+
+          <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+            </svg>
+            2019 SCHEME
+          </a>
+
+          <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+            </svg>
+            2024 SCHEME
+          </a>
+        </div>
+
+        <button onclick="closeSocial()">Close</button>
+      </div>
+    </div>
+
+    <!-- <div id="updateModal" class="modal-backdrop">
   <div class="modal-card">
     <h3 id="updateTitle"></h3>
     <p id="updateContent"></p>
@@ -1387,133 +1420,133 @@ endif; ?>
 </div> -->
 
 
-  <script>
-    // Banner Carousel Logic
-    let currentSlide = 0;
-    const slides = document.querySelectorAll(".carousel-slide");
-    const indicators = document.getElementById("carouselIndicators");
+    <script>
+      // Banner Carousel Logic
+      let currentSlide = 0;
+      const slides = document.querySelectorAll(".carousel-slide");
+      const indicators = document.getElementById("carouselIndicators");
 
-    // Generate dots
-    slides.forEach((_, i) => {
-      const dot = document.createElement("div");
-      dot.classList.add("dot");
-      if (i === 0) dot.classList.add("active");
-      dot.onclick = () => {
-        clearInterval(slideInterval);
-        showSlide(i);
-        slideInterval = setInterval(() => moveSlide(1), 5000);
-      };
-      indicators.appendChild(dot);
-    });
-
-    function showSlide(n) {
-      slides.forEach(s => s.classList.remove("active"));
-      currentSlide = (n + slides.length) % slides.length;
-      slides[currentSlide].classList.add("active");
-
-      // Update dots
-      document.querySelectorAll(".dot").forEach((d, i) => {
-        d.classList.toggle("active", i === currentSlide);
+      // Generate dots
+      slides.forEach((_, i) => {
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        if (i === 0) dot.classList.add("active");
+        dot.onclick = () => {
+          clearInterval(slideInterval);
+          showSlide(i);
+          slideInterval = setInterval(() => moveSlide(1), 5000);
+        };
+        indicators.appendChild(dot);
       });
-    }
 
-    function moveSlide(n) {
-      showSlide(currentSlide + n);
-    }
+      function showSlide(n) {
+        slides.forEach(s => s.classList.remove("active"));
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add("active");
 
-    // Auto-play
-    let slideInterval = setInterval(() => moveSlide(1), 5000);
-
-    // Reset interval on manual click
-    document.querySelectorAll('.carousel-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        clearInterval(slideInterval);
-        slideInterval = setInterval(() => moveSlide(1), 5000);
-      });
-    });
-
-    const socialModal = document.getElementById("socialModal");
-
-    window.addEventListener("load", () => {
-      socialModal.style.display = "flex";
-    });
-
-    function closeSocial() {
-      socialModal.style.display = "none";
-    }
-
-    fetch("update.json")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("updateTitle").textContent = data.title;
-        document.getElementById("updateContent").textContent = data.content;
-        document.getElementById("updateModal").style.display = "flex";
-      })
-      .catch(() => { });
-
-    function closeUpdate() {
-      document.getElementById("updateModal").style.display = "none";
-    }
-
-    function toggleMobileNav() {
-      const nav = document.getElementById("mobileNav");
-      nav.style.display = nav.style.display === "flex" ? "none" : "flex";
-    }
-
-    fetch("updates_upperupdate.json", { cache: "no-store" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message) {
-          document.getElementById("alertMarquee").textContent = data.message;
-        }
-      })
-      .catch(() => {
-        document.getElementById("alertMarquee").textContent =
-          "✨ Stay tuned for the latest KTU updates ✨";
-      });
-  </script>
-  <style>
-    .floating-whatsapp {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #25D366;
-      color: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0px 4px 15px rgba(37, 211, 102, 0.4);
-      z-index: 1000;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .floating-whatsapp:hover {
-      transform: scale(1.1) translateY(-2px);
-      box-shadow: 0px 6px 20px rgba(37, 211, 102, 0.6);
-      color: white;
-    }
-
-    @media (max-width: 768px) {
-      .floating-whatsapp {
-        bottom: 20px;
-        right: 20px;
-        width: 55px;
-        height: 55px;
+        // Update dots
+        document.querySelectorAll(".dot").forEach((d, i) => {
+          d.classList.toggle("active", i === currentSlide);
+        });
       }
-    }
-  </style>
 
-  <a href="https://wa.me/917907552296" target="_blank" class="floating-whatsapp" aria-label="Chat on WhatsApp">
-    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-      <path
-        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-    </svg>
-  </a>
+      function moveSlide(n) {
+        showSlide(currentSlide + n);
+      }
 
-  <?php include 'footer.php'; ?>
+      // Auto-play
+      let slideInterval = setInterval(() => moveSlide(1), 5000);
+
+      // Reset interval on manual click
+      document.querySelectorAll('.carousel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          clearInterval(slideInterval);
+          slideInterval = setInterval(() => moveSlide(1), 5000);
+        });
+      });
+
+      const socialModal = document.getElementById("socialModal");
+
+      window.addEventListener("load", () => {
+        socialModal.style.display = "flex";
+      });
+
+      function closeSocial() {
+        socialModal.style.display = "none";
+      }
+
+      fetch("update.json")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("updateTitle").textContent = data.title;
+          document.getElementById("updateContent").textContent = data.content;
+          document.getElementById("updateModal").style.display = "flex";
+        })
+        .catch(() => { });
+
+      function closeUpdate() {
+        document.getElementById("updateModal").style.display = "none";
+      }
+
+      function toggleMobileNav() {
+        const nav = document.getElementById("mobileNav");
+        nav.style.display = nav.style.display === "flex" ? "none" : "flex";
+      }
+
+      fetch("updates_upperupdate.json", { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.message) {
+            document.getElementById("alertMarquee").textContent = data.message;
+          }
+        })
+        .catch(() => {
+          document.getElementById("alertMarquee").textContent =
+            "✨ Stay tuned for the latest KTU updates ✨";
+        });
+    </script>
+    <style>
+      .floating-whatsapp {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #25D366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 4px 15px rgba(37, 211, 102, 0.4);
+        z-index: 1000;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .floating-whatsapp:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: 0px 6px 20px rgba(37, 211, 102, 0.6);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .floating-whatsapp {
+          bottom: 20px;
+          right: 20px;
+          width: 55px;
+          height: 55px;
+        }
+      }
+    </style>
+
+    <a href="https://wa.me/917907552296" target="_blank" class="floating-whatsapp" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+        <path
+          d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+      </svg>
+    </a>
+
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>
