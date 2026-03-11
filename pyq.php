@@ -11,7 +11,7 @@ $sql = "SELECT c.*, b.name as branch_name, s.name as scheme_name
         FROM courses c 
         JOIN branches b ON c.branch_id = b.id 
         JOIN schemes s ON c.scheme_id = s.id 
-        WHERE (c.pyqs IS NOT NULL AND c.pyqs != '[]' AND c.pyqs != '')";
+        WHERE (JSON_LENGTH(c.pyqs) > 0 OR JSON_LENGTH(c.qp_answers) > 0)";
 
 if ($search) {
     $sql .= " AND c.name LIKE ?";
@@ -98,7 +98,9 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach($courses as $c): 
-                    $pyq_links = json_decode($c['pyqs'], true) ?: [];
+                    $pyqs = json_decode($c['pyqs'], true) ?: [];
+                    $qps = json_decode($c['qp_answers'], true) ?: [];
+                    $pyq_links = array_merge($pyqs, $qps);
                 ?>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition transform hover:-translate-y-1">
                         <div class="flex justify-between items-start mb-4">

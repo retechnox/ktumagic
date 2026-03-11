@@ -154,20 +154,16 @@ $sem_res = $resQ->fetch();
       $img = $c['image_path'] ?: $DEFAULT_IMG;
       $links = json_decode($c['links'] ?? '[]', true) ?: [];
       $pyqs = json_decode($c['pyqs'] ?? '[]', true) ?: [];
-      
-      // Categorize for quick check
-      $qpLinks = [];
-      $moduleLinks = [];
-      foreach($links as $l) {
-          $name = strtolower($l['link_name']);
-          if(strpos($name, 'qp') !== false || strpos($name, 'question') !== false || strpos($name, 'answer') !== false) {
-              $qpLinks[] = $l;
-          } else if(strpos($name, 'module') !== false) {
-              $moduleLinks[] = $l;
-          }
-      }
+      $modules = json_decode($c['modules'] ?? '[]', true) ?: [];
+      $qp_answers = json_decode($c['qp_answers'] ?? '[]', true) ?: [];
+      $other_links = json_decode($c['links'] ?? '[]', true) ?: [];
       
       $hasPyq = !empty($pyqs);
+      $hasModules = !empty($modules);
+      $hasQp = !empty($qp_answers);
+      $hasOther = !empty($other_links);
+      
+      $canModules = $hasModules || $hasOther;
     ?>
       <div data-name="<?= safe($c['name']) ?>"
            data-code="<?= safe($c['subject_code']) ?>"
@@ -184,32 +180,33 @@ $sem_res = $resQ->fetch();
         </div>
 
         <!-- Buttons Grid -->
-        <div class="space-y-3 mt-auto relative z-10">
-          <!-- Main Action -->
-          <button onclick='showDrawer("<?= $c['id'] ?>", "qp")'
-             class="flex items-center justify-center gap-3 py-3.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-2xl transition shadow-lg shadow-blue-500/20 uppercase tracking-widest w-full">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-            QP & Answer Key
+        <div class="space-y-4 mt-auto relative z-10">
+          <!-- Main Action: Modules (Biggest & Boldest) -->
+          <button onclick='showDrawer("<?= $c['id'] ?>", "modules")'
+             class="flex items-center justify-center gap-3 py-4 <?= $canModules ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' ?> text-white text-sm sm:text-base font-black rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/25 uppercase tracking-wider w-full transform group-hover:scale-[1.02]">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Study Modules
           </button>
 
           <!-- Secondary Actions -->
-          <div class="flex items-center gap-2">
-            <button onclick='showDrawer("<?= $c['id'] ?>", "modules")'
-               class="flex-1 flex items-center justify-center gap-2 py-3.5 bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-bold rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:border-blue-100 dark:hover:border-blue-900/30 transition uppercase tracking-widest">
-               <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-               Modules
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick='showDrawer("<?= $c['id'] ?>", "qp")'
+               class="flex items-center justify-center gap-2 py-3 <?= $hasQp ? 'bg-white dark:bg-gray-900 border-2 border-blue-100 dark:border-blue-900/50 text-gray-700 dark:text-gray-300' : 'bg-gray-50 dark:bg-gray-900 text-gray-400 border-2 border-gray-100 dark:border-gray-800' ?> text-[10px] sm:text-xs font-bold rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-800 transition uppercase tracking-widest">
+               QP & Answers
             </button>
             
-            <div class="flex-1 flex gap-2">
-              <button onclick='showDrawer("<?= $c['id'] ?>", "pyq")'
-                 class="flex-1 flex items-center justify-center gap-2 py-3.5 <?= $hasPyq ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-100 dark:border-indigo-900/50' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 border-2 border-gray-200 dark:border-gray-700' ?> text-[10px] sm:text-xs font-bold rounded-2xl hover:bg-white dark:hover:bg-gray-800 transition uppercase tracking-widest">
-                <?= $hasPyq ? 'PYQ' : 'No PYQ' ?>
-              </button>
-              <a href="submit_material.php?course_id=<?= $c['id'] ?>" class="flex items-center justify-center w-12 py-3.5 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition shadow-md shadow-blue-500/10 group/btn" title="Add Resource">
-                <svg class="w-6 h-6 group-hover/btn:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-              </a>
-            </div>
+            <button onclick='showDrawer("<?= $c['id'] ?>", "pyq")'
+               class="flex items-center justify-center gap-2 py-3 <?= $hasPyq ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-100 dark:border-indigo-900/50' : 'bg-gray-50 dark:bg-gray-900 text-gray-400 border-2 border-gray-100 dark:border-gray-800' ?> text-[10px] sm:text-xs font-bold rounded-xl hover:bg-white dark:hover:bg-gray-800 transition uppercase tracking-widest">
+               <?= $hasPyq ? 'PYQ' : 'No PYQ' ?>
+            </button>
           </div>
+
+          <!-- Add Content Link -->
+          <a href="submit_material.php?course_id=<?= $c['id'] ?>" 
+             class="flex items-center justify-center gap-2 py-2 text-[10px] font-bold text-gray-400 hover:text-blue-500 transition uppercase tracking-[0.2em]">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+            Contribute Material
+          </a>
         </div>
 
         <!-- Resource Drawer (The "Extra Layer") -->
@@ -236,13 +233,10 @@ $sem_res = $resQ->fetch();
       <script>
         window.courseData = window.courseData || {};
         window.courseData["<?= $c['id'] ?>"] = {
-            qp: <?= json_encode($qpLinks) ?>,
-            modules: <?= json_encode($moduleLinks) ?>,
+            qp: <?= json_encode($qp_answers) ?>,
+            modules: <?= json_encode($modules) ?>,
             pyq: <?= json_encode($pyqs) ?>,
-            other: <?= json_encode(array_values(array_filter($links, function($l) {
-                $n = strtolower($l['link_name']);
-                return strpos($n, 'qp') === false && strpos($n, 'question') === false && strpos($n, 'answer') === false && strpos($n, 'module') === false;
-            }))) ?>
+            other: <?= json_encode($links) ?>
         };
       </script>
 
@@ -277,19 +271,21 @@ $sem_res = $resQ->fetch();
         if (category === 'pyq') {
             displayLinks = data.pyq;
             categoryTitle = 'Previous Year Questions';
-        } else {
-            // Recommendation logic
-            const categoryMatch = category === 'qp' ? data.qp : data.modules;
-            
-            if (categoryMatch && categoryMatch.length > 0) {
-                displayLinks = categoryMatch;
-            } else {
-                // Fallback to all course links (excluding items already in other specific groups if you want, but easier to show all)
-                // Actually, let's show both categorized matching AND other resources
-                displayLinks = [...data.qp, ...data.modules, ...data.other];
+        } else if (category === 'qp') {
+            displayLinks = data.qp;
+            categoryTitle = 'QP & Answer Keys';
+        } else if (category === 'modules') {
+            displayLinks = data.modules;
+            categoryTitle = 'Subject Modules';
+
+            // Fallback for modules: if empty, show general resources
+            if (displayLinks.length === 0 && data.other.length > 0) {
+                displayLinks = data.other;
+                categoryTitle = 'Study Resources';
             }
-            
-            categoryTitle = category === 'qp' ? 'QP & Answer Keys' : 'Subject Modules';
+        } else {
+            displayLinks = data.other;
+            categoryTitle = 'General Resources';
         }
 
         title.innerText = categoryTitle;

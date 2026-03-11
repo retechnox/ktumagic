@@ -21,34 +21,28 @@ if (isset($_POST['action'])) {
             $type = $sub['material_type'] ?? 'pyq';
             
             if ($type === 'pyq') {
-                // Determine target column
-                $cq = $pdo->prepare("SELECT pyqs FROM courses WHERE id = ?");
-                $cq->execute([$sub['course_id']]);
-                $course = $cq->fetch();
-                $pyqs = json_decode($course['pyqs'] ?? '[]', true) ?: [];
-                
-                $pyqs[] = [
-                    'link_name' => $sub['link_name'],
-                    'url' => $sub['url']
-                ];
-                
-                $uq = $pdo->prepare("UPDATE courses SET pyqs = ? WHERE id = ?");
-                $uq->execute([json_encode($pyqs), $sub['course_id']]);
+                $col = 'pyqs';
+            } elseif ($type === 'module') {
+                $col = 'modules';
+            } elseif ($type === 'qp_answer') {
+                $col = 'qp_answers';
             } else {
-                // For qp_answer, module, other -> they go to 'links'
-                $cq = $pdo->prepare("SELECT links FROM courses WHERE id = ?");
-                $cq->execute([$sub['course_id']]);
-                $course = $cq->fetch();
-                $links = json_decode($course['links'] ?? '[]', true) ?: [];
-                
-                $links[] = [
-                    'link_name' => $sub['link_name'],
-                    'url' => $sub['url']
-                ];
-                
-                $uq = $pdo->prepare("UPDATE courses SET links = ? WHERE id = ?");
-                $uq->execute([json_encode($links), $sub['course_id']]);
+                $col = 'links';
             }
+
+            // Determine target column data
+            $cq = $pdo->prepare("SELECT $col FROM courses WHERE id = ?");
+            $cq->execute([$sub['course_id']]);
+            $course = $cq->fetch();
+            $data = json_decode($course[$col] ?? '[]', true) ?: [];
+            
+            $data[] = [
+                'link_name' => $sub['link_name'],
+                'url' => $sub['url']
+            ];
+            
+            $uq = $pdo->prepare("UPDATE courses SET $col = ? WHERE id = ?");
+            $uq->execute([json_encode($data), $sub['course_id']]);
 
             // Mark submission as approved
             $pdo->prepare("UPDATE pyq_submissions SET status = 'approved' WHERE id = ?")->execute([$sub_id]);

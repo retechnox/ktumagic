@@ -48,7 +48,8 @@ include 'db.php';
     }
 
     .container {
-      width: min(1300px, 95vw);
+      width: 93%;
+      max-width: 1100px;
       margin: auto;
     }
 
@@ -112,9 +113,8 @@ include 'db.php';
       box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
     }
 
-    /* ======================= ALERT BAR ======================= */
     .alert-bar {
-      margin-top: 5px;
+      width: 100%;
       background: #0f172a;
       color: white;
       padding: 0;
@@ -123,20 +123,20 @@ include 'db.php';
       display: flex;
       align-items: center;
       overflow: hidden;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      margin: 15px auto 25px;
+      border-radius: 12px;
     }
 
     .alert-static {
       background: #ef4444;
       color: white;
-      padding: 10px 20px;
+      padding: 6px 12px;
+      font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
       z-index: 10;
       position: relative;
-      box-shadow: 10px 0 20px rgba(0, 0, 0, 0.3);
     }
 
     .marquee-container {
@@ -177,7 +177,7 @@ include 'db.php';
 
     /* ======================= BANNER CAROUSEL ======================= */
     .banner-container {
-      max-width: 1100px;
+      width: 100%;
       margin: 0 auto 40px;
     }
 
@@ -219,8 +219,8 @@ include 'db.php';
       background: rgba(255, 255, 255, 0.4);
       backdrop-filter: blur(8px);
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       cursor: pointer;
       z-index: 10;
@@ -228,7 +228,7 @@ include 'db.php';
       align-items: center;
       justify-content: center;
       color: #0f172a;
-      font-size: 20px;
+      font-size: 16px;
       transition: 0.3s;
     }
 
@@ -243,6 +243,50 @@ include 'db.php';
 
     .carousel-next {
       right: 20px;
+    }
+
+    .carousel-indicators {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dot.active {
+      background: white;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    @media (max-width: 600px) {
+      .carousel-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+      }
+
+      .carousel-indicators {
+        bottom: 12px;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
     }
 
     /* ======================= HERO ======================= */
@@ -338,15 +382,11 @@ include 'db.php';
 
     /* ======================= ICON GRID ======================= */
     .icon-grid {
-      width: 80vw;
-      /* Specifically sets the width to 80% of the screen */
+      width: 100%;
+      max-width: 1100px;
       margin: 40px auto;
-      /* Keeps it centered horizontally */
       display: grid;
       gap: 20px;
-      /* Space between icons */
-
-      /* This makes 4 equal columns that fill the 80vw space */
       grid-template-columns: repeat(4, 1fr);
       justify-content: center;
       padding-bottom: 10px;
@@ -596,7 +636,8 @@ include 'db.php';
       margin-top: 14px;
       border: none;
       background: none;
-      color: #64748b;
+      color: #4373adff;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -768,7 +809,7 @@ include 'db.php';
       border: 1px solid var(--border-color);
       border-radius: 32px;
       padding: 60px;
-      margin: 60px auto;
+      margin: 3px auto;
       display: flex;
       align-items: center;
       gap: 60px;
@@ -825,7 +866,11 @@ include 'db.php';
     .hero-community-side {
       flex: 0.8;
       display: flex;
+      flex-direction: column;
+      gap: 20px;
       justify-content: center;
+      max-width: 450px;
+      margin: 0 auto;
     }
 
     /* Redesigning WhatsApp Card for Unified Side */
@@ -851,8 +896,13 @@ include 'db.php';
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     }
 
-    .compact-wa-card.wa-theme { border-color: rgba(37, 211, 102, 0.3); }
-    .compact-wa-card.ig-theme { border-color: rgba(225, 48, 108, 0.3); }
+    .compact-wa-card.wa-theme {
+      border-color: rgba(37, 211, 102, 0.3);
+    }
+
+    .compact-wa-card.ig-theme {
+      border-color: rgba(225, 48, 108, 0.3);
+    }
 
     .compact-wa-card .whatsapp-logo-wrapper {
       width: 64px;
@@ -992,12 +1042,11 @@ include 'db.php';
 <body>
 
   <?php include 'nav.php'; ?>
-
-
+  <br /> <br />
 
   <div class="container">
     <div class="alert-bar">
-      <div class="alert-static">🔔 Alerts</div>
+      <div class="alert-static">Alert</div>
       <div class="marquee-container">
         <div class="marquee" id="alertMarquee">
           <span class="blink-text">NEW:</span> 2024 Scheme Notes are now available! | KTU Result updates...
@@ -1022,6 +1071,9 @@ include 'db.php';
 
       <button class="carousel-btn carousel-prev" onclick="moveSlide(-1)">❮</button>
       <button class="carousel-btn carousel-next" onclick="moveSlide(1)">❯</button>
+
+      <!-- Dots Indicators -->
+      <div class="carousel-indicators" id="carouselIndicators"></div>
     </div>
   </div>
 
@@ -1081,9 +1133,11 @@ endfor; ?>
               </svg>
             </div>
             <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">WhatsApp Community</h3>
-            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Get instant uploads of notes, solved papers, model answers, and exam alerts.</p>
+            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Get instant uploads of notes, solved
+              papers, model answers, and exam alerts.</p>
 
-            <div class="community-stats" style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
+            <div class="community-stats"
+              style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
               <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
                 <div class="pulse-icon" style="background: #22c55e;"></div> Active
               </div>
@@ -1094,22 +1148,26 @@ endfor; ?>
               <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
                 class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">Join Community</a>
               <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
-                class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px;">WhatsApp Channel</a>
+                class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px;">WhatsApp
+                Channel</a>
             </div>
           </div>
 
           <!-- Instagram Card -->
           <div class="compact-wa-card ig-theme">
-            <div class="whatsapp-logo-wrapper" style="width: 64px; height: 64px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(225, 48, 108, 0.2);">
+            <div class="whatsapp-logo-wrapper"
+              style="width: 64px; height: 64px; margin-bottom: 16px; box-shadow: 0 10px 20px rgba(225, 48, 108, 0.2);">
               <svg width="35" height="35" viewBox="0 0 24 24" fill="#E1306C">
                 <path
                   d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
               </svg>
             </div>
             <h3 style="font-family: 'Sora', sans-serif; font-size: 18px; margin-bottom: 12px;">Instagram Community</h3>
-            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Follow us for quick updates, polls, and academic tips directly in your feed.</p>
+            <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Follow us for quick updates, polls, and
+              academic tips directly in your feed.</p>
 
-            <div class="community-stats" style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
+            <div class="community-stats"
+              style="margin-bottom: 24px; gap: 12px; justify-content: center; display: flex;">
               <div class="stat-badge" style="padding: 6px 12px; font-size: 12px;">
                 <div class="pulse-icon" style="background: #E1306C;"></div> Active
               </div>
@@ -1118,9 +1176,11 @@ endfor; ?>
 
             <div class="whatsapp-btn-group">
               <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn"
-                style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);">Follow on Instagram</a>
-              <a href="https://www.instagram.com/ktumagic" target="_blank"
-                class="wa-btn wa-btn-outline" style="padding: 10px; font-size: 13px; border-width: 1px; color: #E1306C; border-color: #E1306C;">Instagram Profile</a>
+                style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);">Follow
+                on Instagram</a>
+              <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn wa-btn-outline"
+                style="padding: 10px; font-size: 13px; border-width: 1px; color: #E1306C; border-color: #E1306C;">Instagram
+                Profile</a>
             </div>
           </div>
         </div>
@@ -1276,7 +1336,7 @@ endif; ?>
   <!-- SOCIAL MODAL -->
   <div id="socialModal" class="modal-backdrop">
     <div class="modal-card">
-      <h3>Join Us</h3>
+      <h3>JOIN US</h3>
       <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
         Welcome students and educators! Join our community to access academic resources, stay updated with KTU
         information, and be part of a growing learning network.
@@ -1287,35 +1347,32 @@ endif; ?>
           style="background:#E1306C; color:white;">
           <svg viewBox="0 0 24 24">
             <path fill="currentColor"
-              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
           </svg>
           Instagram
         </a>
 
-        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
-          <!-- WhatsApp SVG -->
-          <svg viewBox="0 0 32 32">
-            <path fill="currentColor"
-              d="M19.11 17.56c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.35-.79-.7-1.33-1.56-1.49-1.83-.16-.27-.02-.41.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.97 2.63 1.11 2.81c.14.18 1.9 2.9 4.6 4.07.64.28 1.14.45 1.53.58.64.2 1.23.17 1.69.1.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32z" />
-          </svg>
-          WhatsApp
-        </a>
-
-        <a href="https://t.me/XXXXXXX" target="_blank" class="social telegram">
+        <a href="https://t.me/ktumagic" target="_blank" class="social telegram">
           <svg viewBox="0 0 24 24">
             <path fill="currentColor"
-              d="M9.04 15.47l-.38 5.36c.54 0 .78-.23 1.06-.51l2.54-2.43 5.26 3.85c.97.53 1.67.25 1.93-.9l3.5-16.38h0c.31-1.45-.53-2.02-1.48-1.67L1.66 9.41c-1.42.55-1.4 1.33-.25 1.68l5.37 1.68L18.9 6.18c.57-.35 1.1-.16.67.19" />
+              d="M20.665 3.717l-17.73 6.837c-1.213.486-1.203 1.163-.222 1.462l4.552 1.42 1.566 4.802c.188.518.093.723.475.723.296 0 .43-.135.594-.293l2.394-2.327 4.98 3.68c.918.506 1.577.246 1.807-.85l3.268-15.396c.335-1.343-.513-1.952-1.394-1.56z" />
           </svg>
           Telegram
         </a>
 
-        <a href="https://linkedin.com/company/XXXX" target="_blank" class="social linkedin">
-          <svg viewBox="0 0 24 24">
-            <path fill="currentColor"
-              d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.22 8h4.56v14H.22V8zM8.54 8h4.37v1.91h.06c.61-1.16 2.11-2.39 4.35-2.39 4.65 0 5.51 3.06 5.51 7.04V22h-4.56v-6.62c0-1.58-.03-3.62-2.21-3.62-2.21 0-2.55 1.72-2.55 3.5V22H8.54V8z" />
+        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
           </svg>
-          LinkedIn
+          2019 Scheme
         </a>
+
+        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank" class="social whatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+            </svg>
+            2025 Scheme
+          </a>
       </div>
 
       <button onclick="closeSocial()">Close</button>
@@ -1331,17 +1388,34 @@ endif; ?>
 </div> -->
 
 
-
-
   <script>
     // Banner Carousel Logic
     let currentSlide = 0;
     const slides = document.querySelectorAll(".carousel-slide");
+    const indicators = document.getElementById("carouselIndicators");
+
+    // Generate dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement("div");
+      dot.classList.add("dot");
+      if (i === 0) dot.classList.add("active");
+      dot.onclick = () => {
+        clearInterval(slideInterval);
+        showSlide(i);
+        slideInterval = setInterval(() => moveSlide(1), 5000);
+      };
+      indicators.appendChild(dot);
+    });
 
     function showSlide(n) {
       slides.forEach(s => s.classList.remove("active"));
       currentSlide = (n + slides.length) % slides.length;
       slides[currentSlide].classList.add("active");
+
+      // Update dots
+      document.querySelectorAll(".dot").forEach((d, i) => {
+        d.classList.toggle("active", i === currentSlide);
+      });
     }
 
     function moveSlide(n) {
