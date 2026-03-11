@@ -140,7 +140,9 @@
 <footer class="premium-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
-            <a href="index.php" class="logo">KTU Magic</a>
+            <a href="index.php" class="logo" style="display:block; margin-bottom: 24px;">
+                <img src="assets/logooo.png" alt="KTU Magic" style="height: 52px; width: auto; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.18));">
+            </a>
             <p class="footer-desc">
                 KTU Magic is an all-in-one academic support platform created to help KTU students make their academic journey easier, smarter, and more organized.
             </p>
@@ -195,14 +197,11 @@
     <div class="container footer-bottom">
         <div>
             © <?= date('Y') ?> KTU Magic. All rights reserved. 
-            <span style="margin-left: 10px; color: var(--text-subtle);">Trusted by 30k+ Students ⚡️</span>
+            <span style="margin-left: 10px; color: var(--text-subtle);">Trusted by 50k+ Students ⚡️</span>
         </div>
-        <div style="font-size: 14px; margin-top: 10px;">
-            <a href="tel:+917907552296" style="color: var(--text-muted); text-decoration: none; font-weight: 600;">Contact: +91 79075 52296</a>
-        </div>
-        <div>
+        <!-- <div>
             Built with ❤️ for KTU Students
-        </div>
+        </div> -->
     </div>
 
     <!-- Push Notification Prompt -->
@@ -223,10 +222,15 @@
     </div><!-- /.pushPrompt -->
 
     <script>
+        // ── Derive base path (works on localhost/ktumagic AND ktumagic.in root) ────
+        const _isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
+        const _basePath = _isProduction ? '' : '/ktumagic';
+        const _iconPath = _basePath + '/assets/favicon.png';
+
         // ── Service Worker registration ──────────────────────────────────────────
         let _swReg = null;
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/ktumagic/sw.js')
+            navigator.serviceWorker.register(_basePath + '/sw.js')
                 .then(reg => {
                     _swReg = reg;
                     console.log('[SW] Registered:', reg.scope);
@@ -238,8 +242,8 @@
         function showPersistentNotification(title, body, link) {
             const notifOptions = {
                 body: body,
-                icon: '/ktumagic/assets/favicon.png',
-                badge: '/ktumagic/assets/favicon.png',
+                icon: _iconPath,
+                badge: _iconPath,
                 data: { link: link || '' },
                 tag: 'ktu-broadcast',
                 requireInteraction: false,
@@ -256,7 +260,7 @@
                                 title,
                                 body,
                                 link: link || '',
-                                icon: '/ktumagic/assets/favicon.png'
+                                icon: _iconPath
                             });
                         } else {
                             // Tier 2: Direct SW registration.showNotification()
