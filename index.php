@@ -811,7 +811,7 @@ include 'db.php';
       margin: 3px auto;
       display: flex;
       align-items: center;
-      gap: 60px;
+      gap: 10px;
       box-shadow: var(--card-shadow);
       position: relative;
       overflow: hidden;
@@ -829,7 +829,7 @@ include 'db.php';
     }
 
     .hero-text-side {
-      flex: 1.2;
+      flex: .4;
       text-align: left;
     }
 
@@ -863,12 +863,12 @@ include 'db.php';
     }
 
     .hero-community-side {
-      flex: 0.8;
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 20px;
       justify-content: center;
-      max-width: 450px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
@@ -1077,13 +1077,16 @@ include 'db.php';
   <div class="container banner-container">
     <div class="banner-carousel" id="mainCarousel">
       <div class="carousel-slide active">
-        <img src="https://placehold.co/1200x400/2563EB/FFF?text=Welcome+to+KTU+Magic+⚡️" alt="Banner 1">
+        <img src="assets/heroimg/2.jpg.jpeg" alt="KTU Magic Banner 1" loading="eager">
       </div>
       <div class="carousel-slide">
-        <img src="https://placehold.co/1200x400/8b5cf6/FFF?text=All+KTU+Notes+in+One+Place" alt="Banner 2">
+        <img src="assets/heroimg/3.jpg.jpeg" alt="KTU Magic Banner 2" loading="lazy">
       </div>
       <div class="carousel-slide">
-        <img src="https://placehold.co/1200x400/ec4899/FFF?text=Previous+Year+Question+Papers" alt="Banner 3">
+        <img src="assets/heroimg/4.jpg.jpeg" alt="KTU Magic Banner 3" loading="lazy">
+      </div>
+      <div class="carousel-slide">
+        <img src="assets/heroimg/5.jpg.jpeg" alt="KTU Magic Banner 4" loading="lazy">
       </div>
 
       <button class="carousel-btn carousel-prev" onclick="moveSlide(-1)">❮</button>

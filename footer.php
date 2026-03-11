@@ -236,42 +236,74 @@
 
         // ── Persistent notification via Service Worker ───────────────────────────
         function showPersistentNotification(title, body, link) {
-            if (_swReg && Notification.permission === 'granted') {
-                // Post to SW – it runs even when tab is in background
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.active.postMessage({
-                        type: 'SHOW_NOTIFICATION',
-                        title,
-                        body,
-                        link: link || '',
-                        icon: '/ktumagic/assets/favicon.png'
+            const notifOptions = {
+                body: body,
+                icon: '/ktumagic/assets/favicon.png',
+                badge: '/ktumagic/assets/favicon.png',
+                data: { link: link || '' },
+                tag: 'ktu-broadcast',
+                requireInteraction: false,
+                vibrate: [200, 100, 200]
+            };
+
+            if (Notification.permission === 'granted') {
+                // Tier 1: Service Worker showNotification (persists in OS panel)
+                navigator.serviceWorker.ready
+                    .then(reg => {
+                        if (reg.active) {
+                            reg.active.postMessage({
+                                type: 'SHOW_NOTIFICATION',
+                                title,
+                                body,
+                                link: link || '',
+                                icon: '/ktumagic/assets/favicon.png'
+                            });
+                        } else {
+                            // Tier 2: Direct SW registration.showNotification()
+                            return reg.showNotification(title, notifOptions);
+                        }
+                    })
+                    .catch(() => {
+                        // Tier 3: Classic Notification API
+                        try { new Notification(title, notifOptions); } catch(e) {}
                     });
-                });
             }
-            // In-page toast so user also sees it if tab is active
-            showToast(title, body);
+
+            // Always show in-page toast (works even if notifications denied)
+            showToast(title, body, link);
         }
 
-        // ── In-page toast (fallback / complement) ────────────────────────────────
-        function showToast(title, body) {
+        // ── In-page toast (top-center, below navbar) ──────────────────────────────
+        function showToast(title, body, link) {
             const toast = document.createElement('div');
             toast.style.cssText = `
-                position: fixed; bottom: 80px; right: 20px; z-index: 99999;
+                position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
                 background: var(--bg-card, #fff); color: var(--text-primary, #111);
                 border: 1px solid var(--border-color, #e5e7eb);
                 border-left: 4px solid #2563EB;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
                 padding: 14px 18px; border-radius: 14px;
-                max-width: 320px; font-family: 'Sora', sans-serif;
-                animation: slideInToast 0.3s ease;
+                width: min(380px, 90vw);
+                font-family: 'Sora', sans-serif;
+                z-index: 99999;
+                animation: slideDownToast 0.35s cubic-bezier(0.34,1.56,0.64,1);
+                cursor: ${link ? 'pointer' : 'default'};
             `;
             toast.innerHTML = `
-                <style>@keyframes slideInToast{from{transform:translateX(120%)}to{transform:translateX(0)}}</style>
-                <div style="font-weight:700;font-size:14px;margin-bottom:4px;">🔔 ${title}</div>
-                <div style="font-size:12.5px;opacity:0.8;line-height:1.5;">${body}</div>
+                <style>@keyframes slideDownToast{from{transform:translateX(-50%) translateY(-30px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}</style>
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                    <span style="font-size:20px;line-height:1;">🔔</span>
+                    <div>
+                        <div style="font-weight:700;font-size:14px;margin-bottom:3px;">${title}</div>
+                        <div style="font-size:12.5px;opacity:0.75;line-height:1.5;">${body}</div>
+                    </div>
+                    <span id="toastClose" style="margin-left:auto;cursor:pointer;opacity:0.5;font-size:18px;line-height:1;">✕</span>
+                </div>
             `;
+            if (link) toast.onclick = () => window.open(link, '_blank');
+            toast.querySelector('#toastClose').onclick = (e) => { e.stopPropagation(); toast.remove(); };
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 6000);
+            setTimeout(() => { if(toast.parentNode) toast.remove(); }, 7000);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
