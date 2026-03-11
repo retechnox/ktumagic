@@ -9,4 +9,4 @@ Options -Indexes
 
 # Generic error pages (customizing later if needed)
 ErrorDocument 403 /ktumagic/index.php
-ErrorDocument 404 /ktumagic/index.php
+ErrorDocument 404 /ktumagic/404.php

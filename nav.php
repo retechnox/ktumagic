@@ -363,6 +363,83 @@
       display: flex;
     }
   }
+
+  /* ======================= SPOTLIGHT SEARCH ======================= */
+  .spotlight-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .spotlight-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .spotlight-card {
+    width: min(650px, 90vw);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+    transform: scale(0.95) translateY(-20px);
+    transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    overflow: hidden;
+  }
+
+  .spotlight-overlay.active .spotlight-card {
+    transform: scale(1) translateY(0);
+  }
+
+  .spotlight-search-inner {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    gap: 16px;
+  }
+
+  .spotlight-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .spotlight-input::placeholder {
+    color: var(--text-subtle);
+  }
+
+  .spotlight-hint {
+    padding: 12px 24px;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .spotlight-hint kbd {
+    background: var(--border-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 11px;
+  }
 </style>
 
 <nav>
@@ -437,7 +514,7 @@
     <!-- RIGHT SIDE ACTIONS -->
     <div class="nav-right-actions">
       <!-- SEARCH ICON -->
-      <a href="search.php" class="p-2 text-gray-500 hover:text-blue-600 transition" aria-label="Search">
+      <a href="javascript:void(0)" onclick="openSpotlight()" class="p-2 text-gray-500 hover:text-blue-600 transition" aria-label="Search">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:24px; height:24px;">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -606,6 +683,23 @@
   </div>
 </div>
 
+<!-- SPOTLIGHT SEARCH OVERLAY -->
+<div id="spotlightSearch" class="spotlight-overlay" onclick="closeSpotlight()">
+  <div class="spotlight-card" onclick="event.stopPropagation()">
+    <div class="spotlight-search-inner">
+      <svg width="24" height="24" fill="none" stroke="var(--primary-blue)" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Course name,Code " 
+             onkeydown="if(event.key === 'Enter') performSpotlightSearch()">
+    </div>
+    <div class="spotlight-hint">
+      <span>Search KTU Magic</span>
+      <span>Press <kbd>Enter</kbd> to search &bull; <kbd>ESC</kbd> to close</span>
+    </div>
+  </div>
+</div>
+
 <script>
   function openSidebar() {
     document.getElementById("mobileOverlay").style.display = "block";
@@ -637,6 +731,41 @@
     html.classList.toggle('dark');
     localStorage.setItem('ktu-theme', html.classList.contains('dark') ? 'dark' : 'light');
   }
+
+  // --- SPOTLIGHT LOGIC ---
+  function openSpotlight() {
+    const spotlight = document.getElementById("spotlightSearch");
+    const input = document.getElementById("spotlightInput");
+    spotlight.style.display = "flex";
+    setTimeout(() => {
+      spotlight.classList.add("active");
+      input.focus();
+    }, 10);
+    document.body.style.overflow = "hidden"; // Prevent scroll
+  }
+
+  function closeSpotlight() {
+    const spotlight = document.getElementById("spotlightSearch");
+    spotlight.classList.remove("active");
+    setTimeout(() => {
+      spotlight.style.display = "none";
+      document.body.style.overflow = ""; // Restore scroll
+    }, 300);
+  }
+
+  function performSpotlightSearch() {
+    const query = document.getElementById("spotlightInput").value.trim();
+    if (query) {
+      window.location.href = `search.php?q=${encodeURIComponent(query)}`;
+    }
+  }
+
+  // Global ESC listener
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById("spotlightSearch").classList.contains("active")) {
+      closeSpotlight();
+    }
+  });
 </script>
 <div style="height: 60px;"></div> <!-- Spacer for fixed nav -->
 <main class="flex-grow">
