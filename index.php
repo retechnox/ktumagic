@@ -1084,7 +1084,7 @@ $contact = $data['contact'] ?? [];
 <body>
 
   <?php include 'nav.php'; ?>
-
+  <br />  
   <div class="container">
     <div class="alert-bar-wrapper">
       <div class="alert-bar">
