@@ -142,6 +142,7 @@ $contact = $data['contact'] ?? [];
         margin: 0 0 20px 0;
         border-radius: 0;
       }
+
       .alert-bar .marquee {
         font-size: 12px;
       }
@@ -1161,8 +1162,24 @@ endfor; ?>
             With a growing community of <strong>50k+ active users</strong>, we bring everything you need — from notes to
             internship updates — into one convenient place.
           </p>
-          <div class="hero-action-buttons">
-            <a href="view_scheme.php" class="hero-cta-btn" style="padding: 14px 32px; font-size: 15px;">Browse Notes</a>
+          <div class="hero-action-buttons" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="view_scheme.php" class="hero-cta-btn"
+              style="padding: 14px 32px; font-size: 15px; text-decoration: none;">Browse Notes</a>
+            <button onclick="window.requestPushPermission()" class="hero-push-btn"
+              style="padding: 14px 32px; font-size: 15px; background: transparent; border: 2px solid var(--primary-blue); color: var(--primary-blue); border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                </path>
+              </svg>
+              Enable Updates
+            </button>
+            <style>
+              .hero-push-btn:hover {
+                background: rgba(37, 99, 235, 0.05);
+                transform: translateY(-2px);
+              }
+            </style>
           </div>
         </div><!-- /.hero-text-side -->
 
@@ -1215,12 +1232,16 @@ endfor; ?>
                 </div>
               </div>
               <div class="whatsapp-btn-group">
-                <a href="<?= $contact['whatsapp_2024'] ?? '#' ?>" target="_blank"
-                  class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">2024 Scheme Group</a>
-                <a href="<?= $contact['whatsapp_2019'] ?? '#' ?>" target="_blank"
-                  class="wa-btn wa-btn-primary" style="padding: 10px; font-size: 13px; border-width: 1px;">2019
+                <a href="<?= $contact['whatsapp_2024'] ?? '#'?>" target="_blank" class="wa-btn wa-btn-primary"
+                  style="padding: 12px; font-size: 14px; text-decoration: none;">2024 Scheme Group</a>
+                <a href="<?= $contact['whatsapp_2019'] ?? '#'?>" target="_blank" class="wa-btn wa-btn-primary"
+                  style="padding: 10px; font-size: 13px; border-width: 1px; text-decoration: none;">2019
                   Scheme Group</a>
               </div>
+              <!-- <a href="javascript:void(0)" onclick="window.requestPushPermission()" 
+                 style="display: block; text-align: center; margin-top: 15px; font-size: 12px; font-weight: 700; color: var(--primary-blue); text-decoration: none; border: 1px dashed var(--primary-blue); padding: 8px; border-radius: 8px; transition: 0.3s; background: rgba(37, 99, 235, 0.05);">
+                 🔔 Get Real-time Push Alerts
+              </a> -->
             </div>
 
             <!-- Instagram Card -->
@@ -1248,9 +1269,13 @@ endfor; ?>
               </div>
               <div class="whatsapp-btn-group">
                 <a href="https://www.instagram.com/ktumagic" target="_blank" class="wa-btn"
-                  style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);">Follow
+                  style="background: #E1306C; color: white; padding: 12px; font-size: 14px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3); text-decoration: none;">Follow
                   on Instagram</a>
               </div>
+              <!-- <a href="javascript:void(0)" onclick="window.requestPushPermission()" 
+                 style="display: block; text-align: center; margin-top: 15px; font-size: 12px; font-weight: 700; color: #E1306C; text-decoration: none; border: 1px dashed #E1306C; padding: 8px; border-radius: 8px; transition: 0.3s; background: rgba(225, 48, 108, 0.05);">
+                 🔔 Get Real-time Push Alerts
+              </a> -->
             </div>
 
           </div><!-- /.community-cards-row -->
@@ -1400,12 +1425,7 @@ endif; ?>
 
     </div>
 
-
-      <button onclick="closeSocial()">Close</button>
-    </div>
-  </div>
-
-  <!-- <div id="updateModal" class="modal-backdrop">
+    <!-- <div id="updateModal" class="modal-backdrop">
   <div class="modal-card">
     <h3 id="updateTitle"></h3>
     <p id="updateContent"></p>
@@ -1414,112 +1434,93 @@ endif; ?>
 </div> -->
 
 
-  <script>
-    // Banner Carousel Logic
-    let currentSlide = 0;
-    const slides = document.querySelectorAll(".carousel-slide");
-    const indicators = document.getElementById("carouselIndicators");
+    <script>
+      // Banner Carousel Logic
+      let currentSlide = 0;
+      const slides = document.querySelectorAll(".carousel-slide");
+      const indicators = document.getElementById("carouselIndicators");
 
-    // Generate dots
-    slides.forEach((_, i) => {
-      const dot = document.createElement("div");
-      dot.classList.add("dot");
-      if (i === 0) dot.classList.add("active");
-      dot.onclick = () => {
-        clearInterval(slideInterval);
-        showSlide(i);
-        slideInterval = setInterval(() => moveSlide(1), 5000);
-      };
-      indicators.appendChild(dot);
-    });
-
-    function showSlide(n) {
-      slides.forEach(s => s.classList.remove("active"));
-      currentSlide = (n + slides.length) % slides.length;
-      slides[currentSlide].classList.add("active");
-
-      // Update dots
-      document.querySelectorAll(".dot").forEach((d, i) => {
-        d.classList.toggle("active", i === currentSlide);
+      // Generate dots
+      slides.forEach((_, i) => {
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        if (i === 0) dot.classList.add("active");
+        dot.onclick = () => {
+          clearInterval(slideInterval);
+          showSlide(i);
+          slideInterval = setInterval(() => moveSlide(1), 5000);
+        };
+        indicators.appendChild(dot);
       });
-    }
 
-    function moveSlide(n) {
-      showSlide(currentSlide + n);
-    }
+      function showSlide(n) {
+        slides.forEach(s => s.classList.remove("active"));
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add("active");
 
-    // Auto-play
-    let slideInterval = setInterval(() => moveSlide(1), 5000);
+        // Update dots
+        document.querySelectorAll(".dot").forEach((d, i) => {
+          d.classList.toggle("active", i === currentSlide);
+        });
+      }
 
-    // Reset interval on manual click
-    document.querySelectorAll('.carousel-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        clearInterval(slideInterval);
-        slideInterval = setInterval(() => moveSlide(1), 5000);
+      function moveSlide(n) {
+        showSlide(currentSlide + n);
+      }
+
+      // Auto-play
+      let slideInterval = setInterval(() => moveSlide(1), 5000);
+
+      // Reset interval on manual click
+      document.querySelectorAll('.carousel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          clearInterval(slideInterval);
+          slideInterval = setInterval(() => moveSlide(1), 5000);
+        });
       });
-    });
 
-    const socialModal = document.getElementById("socialModal");
+      const socialModal = document.getElementById("socialModal");
 
-    window.addEventListener("load", () => {
-      socialModal.style.display = "flex";
-    });
-
-    function closeSocial() {
-      socialModal.style.display = "none";
-    }
-
-    fetch("update.json")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("updateTitle").textContent = data.title;
-        document.getElementById("updateContent").textContent = data.content;
-        document.getElementById("updateModal").style.display = "flex";
-      })
-      .catch(() => { });
-
-    function closeUpdate() {
-      document.getElementById("updateModal").style.display = "none";
-    }
-
-    function toggleMobileNav() {
-      const nav = document.getElementById("mobileNav");
-      nav.style.display = nav.style.display === "flex" ? "none" : "flex";
-    }
-
-    fetch("updates_upperupdate.json", { cache: "no-store" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message) {
-          document.getElementById("alertMarquee").textContent = data.message;
-        }
-      })
-      .catch(() => {
-        document.getElementById("alertMarquee").textContent =
-          "✨ Stay tuned for the latest KTU updates ✨";
+      window.addEventListener("load", () => {
+        socialModal.style.display = "flex";
       });
-  </script>
-  <style>
-    .floating-whatsapp {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #25D366;
-      color: white;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0px 4px 15px rgba(37, 211, 102, 0.4);
-      z-index: 1000;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
 
-  </style>
+      function closeSocial() {
+        socialModal.style.display = "none";
+      }
 
-  <?php include 'footer.php'; ?>
+      fetch("update.json")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("updateTitle").textContent = data.title;
+          document.getElementById("updateContent").textContent = data.content;
+          document.getElementById("updateModal").style.display = "flex";
+        })
+        .catch(() => { });
+
+      function closeUpdate() {
+        document.getElementById("updateModal").style.display = "none";
+      }
+
+      function toggleMobileNav() {
+        const nav = document.getElementById("mobileNav");
+        nav.style.display = nav.style.display === "flex" ? "none" : "flex";
+      }
+
+      fetch("updates_upperupdate.json", { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.message) {
+            document.getElementById("alertMarquee").textContent = data.message;
+          }
+        })
+        .catch(() => {
+          document.getElementById("alertMarquee").textContent =
+            "✨ Stay tuned for the latest KTU updates ✨";
+        });
+    </script>
+
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

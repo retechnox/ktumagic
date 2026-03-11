@@ -1,6 +1,7 @@
 <?php
 // footer.php - comprehensive premium footer
-$jsonData = file_get_contents(__DIR__ . '/data/data.json');
+include_once __DIR__ . '/db.php';
+$jsonData = @file_get_contents(__DIR__ . '/data/data.json') ?: '{}';
 $data = json_decode($jsonData, true);
 $contact = $data['contact'] ?? [];
 ?>
@@ -174,6 +175,61 @@ $contact = $data['contact'] ?? [];
             text-align: center;
         }
     }
+
+    /* Global Floating Actions */
+    .floating-actions {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 1000;
+        pointer-events: none; /* Let clicks pass through gaps */
+    }
+
+    .floating-btn {
+        pointer-events: auto;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+    }
+
+    .floating-btn:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .floating-btn.instagram {
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    }
+
+    .floating-btn.whatsapp {
+        background: #25D366;
+    }
+
+    .floating-btn svg {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    }
+
+    @media (max-width: 768px) {
+        .floating-actions {
+            bottom: 25px;
+            right: 20px;
+            gap: 12px;
+        }
+        .floating-btn {
+            width: 54px;
+            height: 54px;
+        }
+    }
 </style>
 
 </main>
@@ -187,7 +243,8 @@ $contact = $data['contact'] ?? [];
             <p class="footer-desc">
                 KTU Magic is an all-in-one academic support platform created to help KTU students make their academic
                 journey easier, smarter, and more organized.
-            </p            <div class="social-links">
+            </p>
+            <div class="social-links">
                 <a href="<?= $contact['whatsapp_main'] ?? '#' ?>" class="social-icon si-whatsapp"
                     aria-label="WhatsApp">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -214,7 +271,6 @@ $contact = $data['contact'] ?? [];
                     </svg>
                 </a>
             </div>
->
         </div>
 
         <div>
@@ -265,7 +321,7 @@ $contact = $data['contact'] ?? [];
         style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 16px 24px; border-radius: 16px; z-index: 9999; flex-direction: column; gap: 12px; min-width: 320px;">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div
-                style="background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); width: 40px; height: 40px; border-radius: 50%; display: flex; center; justify-content: center; align-items: center;">
+                style="background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
@@ -303,20 +359,6 @@ $contact = $data['contact'] ?? [];
         </a>
     </div>
 
-    <!-- Global Floating Buttons -->
-    <div class="floating-actions">
-        <!-- Instagram Above WhatsApp -->
-        <a href="https://www.instagram.com/ktumagic" target="_blank" class="floating-btn instagram" aria-label="Instagram">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-            </svg>
-        </a>
-        <a href="https://wa.me/917907552296" target="_blank" class="floating-btn whatsapp" aria-label="WhatsApp">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-            </svg>
-        </a>
-    </div>
 
     <script>
         // ── Derive base path (works on localhost/ktumagic AND ktumagic.in root) ────
@@ -432,77 +474,99 @@ $contact = $data['contact'] ?? [];
             const btnNotNow = document.getElementById('btnNotNow');
             const btnEnablePush = document.getElementById('btnEnablePush');
 
-            function connectWebSocket() {
-                const isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
-                const wsUrl = isProduction
-                    ? 'wss://ktumagic.in/ws'
-                    : 'ws://localhost:8080';
+        let _ws = null;
+        function connectWebSocket() {
+            if (_ws && _ws.readyState === WebSocket.OPEN) return;
 
-                console.log('[WS] Connecting to', wsUrl);
-                const ws = new WebSocket(wsUrl);
+            const isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
+            const wsUrl = isProduction
+                ? 'wss://ktumagic.in/ws'
+                : 'ws://localhost:8080';
 
-                ws.onopen = () => console.log('[WS] Connected ✓');
-                ws.onerror = (e) => console.error('[WS] Error:', e);
-                ws.onclose = (e) => {
-                    console.log('[WS] Disconnected (code:', e.code, '). Reconnecting in 5s…');
-                    setTimeout(connectWebSocket, 5000);
-                };
+            console.log('[WS] Connecting to', wsUrl);
+            _ws = new WebSocket(wsUrl);
 
-                ws.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'notification') {
-                            showPersistentNotification(data.title, data.body, data.link);
-                        }
-                    } catch (e) {
-                        console.error('[WS] Message parse error:', e);
+            _ws.onopen = () => console.log('[WS] Connected ✓');
+            _ws.onerror = (e) => console.error('[WS] Error:', e);
+            _ws.onclose = (e) => {
+                console.log('[WS] Disconnected (code:', e.code, '). Reconnecting in 5s…');
+                setTimeout(connectWebSocket, 5000);
+            };
+
+            _ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'notification') {
+                        showPersistentNotification(data.title, data.body, data.link);
                     }
-                };
+                } catch (e) {
+                    console.error('[WS] Message parse error:', e);
+                }
+            };
+        }
+
+        window.requestPushPermission = async function() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    connectWebSocket();
+                    
+                    // Register for Background Web Push
+                    if (_swReg && _vapidPublicKey) {
+                        const subscription = await _swReg.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(_vapidPublicKey)
+                        });
+                        
+                        // Send to server
+                        await fetch(_basePath + '/save_subscription.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(subscription)
+                        });
+                        console.log('[Push] Subscription saved to DB ✓');
+                        return true;
+                    }
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error('[Push] Subscription failed:', err);
+                return false;
             }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const prompt = document.getElementById('pushPrompt');
+            const btnNotNow = document.getElementById('btnNotNow');
+            const btnEnablePush = document.getElementById('btnEnablePush');
 
             // Auto-connect if permission already granted
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
                     connectWebSocket();
                 } else if (Notification.permission !== 'denied' && !localStorage.getItem('push_prompt_dismissed')) {
-                    setTimeout(() => { prompt.style.display = 'flex'; }, 2000);
+                    setTimeout(() => { 
+                        if (prompt) prompt.style.display = 'flex'; 
+                    }, 2000);
                 }
             }
 
-            btnNotNow.addEventListener('click', () => {
-                localStorage.setItem('push_prompt_dismissed', 'true');
-                prompt.style.display = 'none';
-            });
+            if (btnNotNow) {
+                btnNotNow.addEventListener('click', () => {
+                    localStorage.setItem('push_prompt_dismissed', 'true');
+                    if (prompt) prompt.style.display = 'none';
+                });
+            }
 
-            btnEnablePush.addEventListener('click', async () => {
-                prompt.style.display = 'none';
-                localStorage.setItem('push_prompt_dismissed', 'true');
-                
-                try {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        connectWebSocket();
-                        
-                        // Register for Background Web Push
-                        if (_swReg && _vapidPublicKey) {
-                            const subscription = await _swReg.pushManager.subscribe({
-                                userVisibleOnly: true,
-                                applicationServerKey: urlBase64ToUint8Array(_vapidPublicKey)
-                            });
-                            
-                            // Send to server
-                            await fetch(_basePath + '/save_subscription.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(subscription)
-                            });
-                            console.log('[Push] Subscription saved to DB ✓');
-                        }
-                    }
-                } catch (err) {
-                    console.error('[Push] Subscription failed:', err);
-                }
-            });
+            if (btnEnablePush) {
+                btnEnablePush.addEventListener('click', async () => {
+                    if (prompt) prompt.style.display = 'none';
+                    localStorage.setItem('push_prompt_dismissed', 'true');
+                    await window.requestPushPermission();
+                });
+            }
+        });
         });
     </script>
 </footer>
