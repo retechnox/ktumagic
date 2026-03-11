@@ -1,7 +1,8 @@
 # ─── Stage 1: Build Node.js WebSocket server deps ────────────────────────────
 FROM node:20-alpine AS ws-builder
 WORKDIR /ws
-COPY ws_server/package*.json ./
+COPY ws_server/package.json ./
+COPY ws_server/package-lock.json ./
 RUN npm ci --omit=dev
 
 # ─── Stage 2: Final image (Nginx + PHP-FPM + Node) ──────────────────────────
@@ -12,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev libonig-dev libxml2-dev \
     zip unzip git curl \
     nginx supervisor nodejs \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
 RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd
