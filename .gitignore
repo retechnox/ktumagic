@@ -15,7 +15,6 @@ ws_server/ws.log
 
 # Node.js
 ws_server/node_modules/
-ws_server/package-lock.json
 
 # PHP migration scripts
 migrate_*.php
