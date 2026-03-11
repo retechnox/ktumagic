@@ -1,16 +1,29 @@
 services:
   - type: web
-    name: php-app
+    name: ktumagic-app
     env: docker
     dockerfilePath: ./Dockerfile
+    domains:
+      - ktumagic.in
     envVars:
       - key: DB_HOST
         sync: false
       - key: DB_PORT
-        value: 3306
+        value: 21600
       - key: DB_DATABASE
         sync: false
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
         sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: WS_ADMIN_SECRET
+        sync: false   # Set this in the Render dashboard as a secret
+    ports:
+      - port: 80
+        protocol: HTTP

@@ -1,35 +1,38 @@
-FROM php:8.1-apache
+# ─── Stage 1: Build Node.js WebSocket server deps ────────────────────────────
+FROM node:20-alpine AS ws-builder
+WORKDIR /ws
+COPY ws_server/package*.json ./
+RUN npm ci --omit=dev
 
-# Install system dependencies and PHP extensions
+# ─── Stage 2: Final image (Nginx + PHP-FPM + Node) ──────────────────────────
+FROM php:8.1-fpm
+
+# Install system packages
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl
+    libpng-dev libonig-dev libxml2-dev \
+    zip unzip git curl \
+    nginx supervisor nodejs \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
+# PHP extensions
 RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd
 
-# Enable Apache modules
-RUN a2enmod rewrite
+# ── Nginx config ──────────────────────────────────────────────────────────
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Set working directory
+# ── Node WebSocket server ──────────────────────────────────────────────────
+WORKDIR /ws
+COPY ws_server/ ./
+COPY --from=ws-builder /ws/node_modules ./node_modules
+
+# ── PHP application ────────────────────────────────────────────────────────
 WORKDIR /var/www/html
-
-# Copy application files
 COPY . /var/www/html/
-
-# Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Expose port 80
-EXPOSE 80
+# ── Supervisor: manage nginx, php-fpm, and node ───────────────────────────
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Start Apache server
-CMD ["apache2-foreground"]
+EXPOSE 80 8080
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

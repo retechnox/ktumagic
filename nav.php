@@ -399,7 +399,7 @@
         </div>
       </div>
 
-      <a href="pyq.php" style="color:var(--primary-blue);">PYQ</a>
+      <a href="pyq.php" style="color:var(--primary-blue);">PYQ Search</a>
 
 
 

@@ -1,6 +1,31 @@
+# Environment
 .env
+
+# macOS
 .DS_Store
+**/.DS_Store
+
+# PHP vendor
 /vendor/
 /tmp/
+
+# Logs
 *.log
-migrate_pyq.php
+ws_server/ws.log
+
+# Node.js
+ws_server/node_modules/
+ws_server/package-lock.json
+
+# PHP migration scripts
+migrate_*.php
+
+# Uploads (user-generated content – should not be versioned)
+/uploads/*
+!/uploads/.gitkeep
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo

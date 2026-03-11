@@ -54,6 +54,9 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
                 <h3>Sponsored Content</h3>
                 <a href="admin_sponsored.php" class="btn btn-custom btn-add">Manage Sponsored Images</a>
                 <hr><br>
+                <h3>Live Broadcasts</h3>
+                <a href="admin_broadcast.php" class="btn btn-custom btn-primary">Send Push Notifications</a>
+                <hr><br>
                 <h3>PYQ Submissions</h3>
                 <a href="admin_pyq_submissions.php" class="btn btn-custom btn-admin">Manage PYQ Submissions</a>
                 <a href="admin_submissions.php" class="btn btn-custom btn-admin">Manage Resource Submissions</a>

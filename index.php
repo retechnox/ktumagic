@@ -1042,7 +1042,6 @@ include 'db.php';
 <body>
 
   <?php include 'nav.php'; ?>
-  <br /> <br />
 
   <div class="container">
     <div class="alert-bar">
@@ -1108,7 +1107,7 @@ endfor; ?>
 
       <div class="unified-hero fade-el">
         <div class="hero-text-side">
-          <h1> KTU study made <span>simple</span> .</h1>
+          <h1> <span>KTU MAGIC</span> .</h1>
           <p>
             KTU Magic is an all-in-one academic support platform created to help KTU students make their academic
             journey easier, smarter, and more organized.

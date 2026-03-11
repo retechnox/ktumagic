@@ -204,4 +204,91 @@
             Built with ❤️ for KTU Students
         </div>
     </div>
+
+    <!-- Push Notification Prompt -->
+    <div id="pushPrompt" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 16px 24px; border-radius: 16px; z-index: 9999; flex-direction: column; gap: 12px; min-width: 320px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="background: rgba(37, 99, 235, 0.1); color: var(--primary-blue); width: 40px; height: 40px; border-radius: 50%; display: flex; center; justify-content: center; align-items: center;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            </div>
+            <div>
+                <h4 style="margin: 0; font-family: 'Sora', sans-serif; font-size: 15px; color: var(--text-primary);">Enable Notifications</h4>
+                <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-secondary);">Get real-time KTU updates instantly.</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 4px;">
+            <button id="btnNotNow" style="flex: 1; padding: 8px; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-weight: 600; cursor: pointer;">Not Now</button>
+            <button id="btnEnablePush" style="flex: 1; padding: 8px; background: var(--primary-blue); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">Enable</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const prompt = document.getElementById('pushPrompt');
+            const btnNotNow = document.getElementById('btnNotNow');
+            const btnEnablePush = document.getElementById('btnEnablePush');
+
+            function connectWebSocket() {
+                const isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
+                const wsUrl = isProduction
+                    ? 'wss://ktumagic.in/ws'
+                    : 'ws://localhost:8080';
+                const ws = new WebSocket(wsUrl);
+                
+                ws.onopen = () => console.log('[WS] Connected for real-time updates.');
+                ws.onclose = () => {
+                    console.log('[WS] Disconnected, attempting reconnect in 5s...');
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'notification' && Notification.permission === 'granted') {
+                            const notification = new Notification(data.title, {
+                                body: data.body,
+                                icon: '/ktumagic/assets/favicon.png' // Use real path if available
+                            });
+                            
+                            if (data.link) {
+                                notification.onclick = () => {
+                                    window.open(data.link, '_blank');
+                                };
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Push handling error:', e);
+                    }
+                };
+            }
+
+            // Check if we already have permission
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    connectWebSocket();
+                } else if (Notification.permission !== 'denied' && !localStorage.getItem('push_prompt_dismissed')) {
+                    // Show custom prompt
+                    setTimeout(() => {
+                        prompt.style.display = 'flex';
+                    }, 2000); // 2 second delay so it doesn't block initial render
+                }
+            }
+
+            btnNotNow.addEventListener('click', () => {
+                localStorage.setItem('push_prompt_dismissed', 'true');
+                prompt.style.display = 'none';
+            });
+
+            btnEnablePush.addEventListener('click', async () => {
+                prompt.style.display = 'none';
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    connectWebSocket();
+                }
+                // Store dismissed so we don't spam if they deny
+                localStorage.setItem('push_prompt_dismissed', 'true');
+            });
+        });
+    </script>
 </footer>
+
