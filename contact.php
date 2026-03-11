@@ -1,6 +1,9 @@
 <?php
 include 'db.php';
 function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
+$jsonData = file_get_contents(__DIR__ . '/data/data.json');
+$data = json_decode($jsonData, true);
+$contact = $data['contact'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -113,7 +116,7 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
                 <div class="contact-info">
                     <h3>Email Support</h3>
                     <p>Send us an email and we'll get back to you within 24 hours.</p>
-                    <a href="mailto:support@ktumagic.com" class="contact-link">support@ktumagic.com</a>
+                    <a href="mailto:support@ktumagic.in" class="contact-link">support@ktumagic.in</a>
                 </div>
             </div>
 
@@ -124,7 +127,7 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
                 <div class="contact-info">
                     <h3>WHATSAPP SUPPORT</h3>
                     <p>Join our group for instant updates and study peer support.</p>
-                    <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" class="contact-link">Join Group →</a>
+                    <a href="<?= $contact['whatsapp_main'] ?? '#' ?>" class="contact-link">Join Group →</a>
                 </div>
             </div>
 
@@ -135,7 +138,7 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
                 <div class="contact-info">
                     <h3>Phone Support</h3>
                     <p>Call or Message us for urgent assistance.</p>
-                    <a href="tel:+917907552296" class="contact-link">+91 79075 52296</a>
+                    <a href="tel:<?= str_replace(' ', '', $contact['phone'] ?? '+917907552296') ?>" class="contact-link"><?= $contact['phone'] ?? '+91 79075 52296' ?></a>
                 </div>
             </div>
         </div>

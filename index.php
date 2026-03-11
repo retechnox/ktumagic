@@ -3,6 +3,9 @@ ob_start();
 header("Cache-Control: no-transform");
 header("Content-Encoding: none");
 include 'db.php';
+$jsonData = file_get_contents(__DIR__ . '/data/data.json');
+$data = json_decode($jsonData, true);
+$contact = $data['contact'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +54,14 @@ include 'db.php';
       width: 93%;
       max-width: 1100px;
       margin: auto;
+    }
+
+    @media (max-width: 768px) {
+      .alert-bar-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+      }
     }
 
     /* ======================= NAVBAR (Added Upload CTA) ======================= */
@@ -124,6 +135,16 @@ include 'db.php';
       align-items: center;
       overflow: hidden;
       margin: 15px auto 25px;
+    }
+
+    @media (max-width: 768px) {
+      .alert-bar {
+        margin: 0 0 20px 0;
+        border-radius: 0;
+      }
+      .alert-bar .marquee {
+        font-size: 12px;
+      }
     }
 
     .alert-static {
@@ -1064,11 +1085,13 @@ include 'db.php';
   <?php include 'nav.php'; ?>
 
   <div class="container">
-    <div class="alert-bar">
-      <div class="alert-static">Alert</div>
-      <div class="marquee-container">
-        <div class="marquee" id="alertMarquee">
-          <span class="blink-text">NEW:</span> 2024 Scheme Notes are now available! | KTU Result updates...
+    <div class="alert-bar-wrapper">
+      <div class="alert-bar">
+        <div class="alert-static">Alert</div>
+        <div class="marquee-container">
+          <div class="marquee" id="alertMarquee">
+            <span class="blink-text">NEW:</span> 2024 Scheme Notes are now available! | KTU Result updates...
+          </div>
         </div>
       </div>
     </div>
@@ -1192,9 +1215,9 @@ endfor; ?>
                 </div>
               </div>
               <div class="whatsapp-btn-group">
-                <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
+                <a href="<?= $contact['whatsapp_2024'] ?? '#' ?>" target="_blank"
                   class="wa-btn wa-btn-primary" style="padding: 12px; font-size: 14px;">2024 Scheme Group</a>
-                <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" target="_blank"
+                <a href="<?= $contact['whatsapp_2019'] ?? '#' ?>" target="_blank"
                   class="wa-btn wa-btn-primary" style="padding: 10px; font-size: 13px; border-width: 1px;">2019
                   Scheme Group</a>
               </div>
@@ -1494,28 +1517,7 @@ endif; ?>
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .floating-whatsapp:hover {
-      transform: scale(1.1) translateY(-2px);
-      box-shadow: 0px 6px 20px rgba(37, 211, 102, 0.6);
-      color: white;
-    }
-
-    @media (max-width: 768px) {
-      .floating-whatsapp {
-        bottom: 20px;
-        right: 20px;
-        width: 55px;
-        height: 55px;
-      }
-    }
   </style>
-
-  <a href="https://wa.me/917907552296" target="_blank" class="floating-whatsapp" aria-label="Chat on WhatsApp">
-    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-      <path
-        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
-    </svg>
-  </a>
 
   <?php include 'footer.php'; ?>
 </body>
