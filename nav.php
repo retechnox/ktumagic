@@ -25,7 +25,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: min(1300px, 95vw);
+    width: min(1500px, 95vw);
     margin: auto;
   }
 
@@ -443,7 +443,7 @@
 </style>
 
 <nav>
-  <div class="container nav-inner">
+  <div class="nav-inner">
     <a href="index.php" class="logo">KTU Magic</a>
 
     <!-- DESKTOP LINKS -->
@@ -610,7 +610,7 @@
       </div>
     </div>
 
-    <a href="<?= sign_url('pyq.php', []) ?>" class="menu-item" style="color:var(--primary-blue);"><span>PYQ Search</span></a>
+    <a href="<?= sign_url('pyq.php', []) ?>" class="menu-item" ><span>PYQ Search</span></a>
 
     <div class="menu-group">
       <div class="menu-item" onclick="toggleSubmenu(this)">

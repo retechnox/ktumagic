@@ -64,24 +64,6 @@ $contact = $data['contact'] ?? [];
       }
     }
 
-    /* ======================= NAVBAR (Added Upload CTA) ======================= */
-    nav {
-      background: var(--bg-nav);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 12px 0;
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .nav-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
 
     .logo {
       font-family: 'Sora', sans-serif;

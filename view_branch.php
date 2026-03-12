@@ -81,7 +81,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <img   referrerpolicy="no-referrer" src="<?= safe($img) ?>"
-             class="w-full h-36 object-cover rounded-lg mb-3"
+             class="w-full aspect-[4/3] object-cover rounded-lg mb-3"
              onerror="this.src='<?= $DEFAULT_IMG ?>'">
 
         <div class="text-lg font-semibold dark:text-white">
