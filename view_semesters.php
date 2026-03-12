@@ -61,44 +61,55 @@ $branch_image = $branch['image_path'] ?:
 
   <!-- Branch Resources (Syllabus, Calendar, Timetable) -->
   <?php if (!empty($branch['syllabus_link']) || !empty($branch['calendar_link']) || !empty($branch['timetable_link'])): ?>
-    <div class="flex flex-wrap gap-3 mb-8 justify-center">
+    <div class="flex flex-wrap gap-4 mb-10 justify-center">
       <?php if (!empty($branch['syllabus_link'])): ?>
-        <a href="<?= safe($branch['syllabus_link']) ?>" target="_blank" class="px-6 py-2.5 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-semibold rounded-xl shadow-sm border border-blue-100 dark:border-blue-900 hover:shadow-md transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        <a href="<?= safe($branch['syllabus_link']) ?>" target="_blank" class="px-6 py-3 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 text-blue-700 dark:text-blue-300 font-bold rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2 ring-1 ring-blue-200 dark:ring-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           Syllabus
         </a>
       <?php endif; ?>
 
       <?php if (!empty($branch['calendar_link'])): ?>
-        <a href="<?= safe($branch['calendar_link']) ?>" target="_blank" class="px-6 py-2.5 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 font-semibold rounded-xl shadow-sm border border-indigo-100 dark:border-indigo-900 hover:shadow-md transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        <a href="<?= safe($branch['calendar_link']) ?>" target="_blank" class="px-6 py-3 bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 text-indigo-700 dark:text-indigo-300 font-bold rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2 ring-1 ring-indigo-200 dark:ring-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           Calendar
         </a>
       <?php endif; ?>
 
       <?php if (!empty($branch['timetable_link'])): ?>
-        <a href="<?= safe($branch['timetable_link']) ?>" target="_blank" class="px-6 py-2.5 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 font-semibold rounded-xl shadow-sm border border-purple-100 dark:border-purple-900 hover:shadow-md transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <a href="<?= safe($branch['timetable_link']) ?>" target="_blank" class="px-6 py-3 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-gray-800 dark:to-gray-700 text-purple-700 dark:text-purple-300 font-bold rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2 ring-1 ring-purple-200 dark:ring-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           Timetable
         </a>
       <?php endif; ?>
     </div>
   <?php endif; ?>
 
-  <h2 class="text-2xl font-bold mb-4 dark:text-white">Select Semester</h2>
+  <div class="flex flex-col items-center justify-center text-center mb-8">
+    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white font-['Sora'] mb-2">Select Semester</h2>
+    <p class="text-gray-500 dark:text-gray-400">Choose your current semester to explore courses and study materials.</p>
+  </div>
 
   <!-- Semester Cards -->
-  <div class="grid md:grid-cols-4 gap-6">
-
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     <?php for ($i = 1; $i <= 8; $i++): ?>
       <!-- FIXED FLOW: Now passes branch_id (NOT scheme_id) -->
       <a href="view_courses.php?branch_id=<?= $branch_id ?>&semester=<?= $i ?>"
-         class="block bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl p-8 text-center border dark:border-gray-700 transition">
-         
-        <h3 class="text-xl font-semibold dark:text-white">Semester <?= $i ?></h3>
+         class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center p-8 z-10">
+        
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-full group-hover:scale-[2.5] transition-transform duration-500 -z-10"></div>
+        
+        <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:-rotate-6 transition-transform duration-300">
+          <span class="text-2xl font-extrabold font-['Sora'] drop-shadow-sm">S<?= $i ?></span>
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Semester <?= $i ?></h3>
+        
+        <div class="absolute bottom-4 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 text-blue-500 dark:text-blue-400 transition-all duration-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </div>
       </a>
     <?php endfor; ?>
-
   </div>
 
 </div>

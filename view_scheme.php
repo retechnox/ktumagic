@@ -32,12 +32,24 @@ $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    <?php if (!empty($schemes)): foreach ($schemes as $s): ?>
+    <?php if (!empty($schemes)): foreach ($schemes as $s): 
+      $img = 'assets/logooo.png'; // Default
+      if (strpos(strtolower($s['name']), '2019') !== false) $img = 'assets/2019/1.jpg';
+      if (strpos(strtolower($s['name']), '2024') !== false || strpos(strtolower($s['name']), '2025') !== false) $img = 'assets/2025/1.jpg';
+    ?>
       <!-- FIX: Removed link to semesters. Now goes to branches -->
       <a href="view_branch.php?scheme_id=<?= $s['id'] ?>"
-         class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-lg transition">
-        <div class="text-2xl font-semibold"><?= safe($s['name']) ?></div>
-        <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">View branches</div>
+         class="group block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="aspect-video w-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+          <img src="<?= $img ?>" alt="<?= safe($s['name']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="p-6">
+          <div class="text-2xl font-bold font-['Sora'] text-blue-600 dark:text-blue-400"><?= safe($s['name']) ?></div>
+          <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-3">
+            <span>View branches</span>
+            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </div>
+        </div>
       </a>
     <?php endforeach; else: ?>
       <div class="col-span-full text-center text-gray-500">No schemes found.</div>

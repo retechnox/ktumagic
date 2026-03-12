@@ -327,6 +327,14 @@ $pyqs = [];
 $sem_res = null;
 
 if (isset($_GET['course_id'])) {
+    $token = $_GET['token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_token'], (string)$token)) {
+        $flashtxt = 'Security Error: Invalid or missing token in URL. Request blocked to prevent tampering.';
+        $_SESSION['flash'][] = ['msg'=>$flashtxt,'type'=>'danger'];
+        header('Location: admin_notes.php');
+        exit;
+    }
+
     $course_id = intval($_GET['course_id']);
     $q = $pdo->prepare('SELECT * FROM courses WHERE id = ?');
     $q->execute([$course_id]);
@@ -647,6 +655,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
 
           <!-- SELECT COURSE -->
           <form method="GET" id="selectCourseForLinksForm" class="mb-3">
+            <input type="hidden" name="token" value="<?= $csrfToken ?>">
             <label class="form-label small">Select course</label>
             <select name="course_id" id="course_select_for_links" class="form-select form-select-sm" onchange="this.form.submit()">
               <option value="">Select a course</option>
@@ -1122,6 +1131,31 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
     });
   }
 
+  /* LINK ADD FORM ROWS */
+  let linkAddCount = 1;
+  const addLinkCourseBtn = document.getElementById('addLinkCourseBtn');
+  const linksListCourse = document.getElementById('links-list-course');
+
+  if(addLinkCourseBtn){
+    addLinkCourseBtn.addEventListener('click', ()=>{
+      const idx = linkAddCount++;
+      const row = document.createElement('div');
+      row.className = "row link-row g-2 mb-2";
+      row.innerHTML = `
+        <div class="col">
+          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+        </div>
+        <div class="col">
+          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+        </div>
+      `;
+      linksListCourse.appendChild(row);
+    });
+  }
+
   /* PYQ ADD FORM ROWS */
   let pyqAddCount = 1;
   const addPyqCourseBtn = document.getElementById('addPyqCourseBtn');
@@ -1171,6 +1205,25 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
       document.getElementById("modal_course_sem").value = btn.dataset.sem;
 
       courseEditModal.show();
+    });
+  });
+
+  /* -------------------------
+      PREVENT DOUBLE SUBMISSION
+  -------------------------- */
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (this.dataset.submitting) {
+        e.preventDefault();
+        return;
+      }
+      this.dataset.submitting = 'true';
+      const btn = this.querySelector('button[type="submit"], button.btn-primary, button.btn-success, button.btn-danger, button.btn-outline-primary, button.btn-outline-danger');
+      if (btn) {
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Wait...';
+        btn.classList.add('disabled');
+        btn.style.pointerEvents = 'none';
+      }
     });
   });
 
