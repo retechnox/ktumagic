@@ -136,7 +136,11 @@ $links = $pdo->query("SELECT * FROM short_links ORDER BY created_at DESC")->fetc
                         </thead>
                         <tbody>
                             <?php 
-                            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+                            $protocol = "http://";
+                            if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+                                (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
+                                $protocol = "https://";
+                            }
                             $host = $_SERVER['HTTP_HOST'];
                             $base_url = $protocol . $host . "/s/";
                             
