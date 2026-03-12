@@ -61,6 +61,9 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
                 <a href="admin_pyq_submissions.php" class="btn btn-custom btn-admin">Manage PYQ Submissions</a>
                 <a href="admin_submissions.php" class="btn btn-custom btn-admin">Manage Resource Submissions</a>
                 <hr><br>
+                <h3>Utilities</h3>
+                <a href="admin_shortener.php" class="btn btn-custom btn-dark">Manage Shortened Links</a>
+                <hr><br>
             </div>         
         </div>     
     </div>          
