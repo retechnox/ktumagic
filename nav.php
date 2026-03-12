@@ -476,7 +476,7 @@
         </div>
       </div>
 
-      <a href="<?= sign_url('pyq.php', []) ?>" style="color:var(--primary-blue);">PYQ Search</a>
+      <a href="<?= sign_url('pyq.php', []) ?>">PYQ Search</a>
 
 
 
