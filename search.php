@@ -121,7 +121,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
                        class="group bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
                         
                         <div class="relative h-48 overflow-hidden">
-                            <img src="<?= safe($img) ?>" referrerpolicy="no-referrer" 
+                            <img referrerpolicy="no-referrer" src="<?= safe($img) ?>" 
                                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                  onerror="this.src='<?= $DEFAULT_IMG ?>'">
                             <div class="absolute top-4 left-4 flex gap-2">

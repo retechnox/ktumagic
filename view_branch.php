@@ -44,10 +44,12 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
 <div class="max-w-6xl mx-auto px-4 py-6">
 
   <!-- Breadcrumb -->
+  <!--
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
     <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
     <span class="font-semibold"><?= safe($scheme['name']) ?></span>
   </div>
+  -->
 
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <h1 class="text-2xl font-bold font-['Sora'] dark:text-white">
@@ -80,7 +82,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
       <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id']]) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
-        <img   referrerpolicy="no-referrer" src="<?= safe($img) ?>"
+        <img referrerpolicy="no-referrer" src="<?= safe($img) ?>"
              class="w-full aspect-[4/3] object-cover rounded-lg mb-3"
              onerror="this.src='<?= $DEFAULT_IMG ?>'">
 

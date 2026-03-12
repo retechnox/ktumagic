@@ -58,11 +58,11 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     // Link directly to viewer_embed.php without signing
     $viewerLink = 'viewer_embed.php?url=' . urlencode($preview);
     
-    $html .= '<a href="'.$viewerLink.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 active:scale-95 whitespace-nowrap">';
+    $html .= '<a href="'.$viewerLink.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 active:scale-95 whitespace-nowrap">';
     $html .= '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
     $html .= 'View</a>';
     if ($download) {
-        $html .= '<a href="'.$download.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-emerald-500/25 active:scale-95 whitespace-nowrap">';
+        $html .= '<a href="'.$download.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-600/25 active:scale-95 whitespace-nowrap">';
         $html .= '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>';
         $html .= 'Download</a>';
     }
@@ -90,6 +90,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
 <div class="max-w-5xl mx-auto px-4 pb-10">
 
   <!-- Breadcrumb -->
+  <!--
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
     <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
     <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']]) ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
@@ -100,6 +101,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
 
     <span class="font-semibold"><?= safe($course['name']) ?></span>
   </div>
+  -->
 
   <!-- Back -->
   <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch['id'], 'semester' => $course['semester']]) ?>"
@@ -107,8 +109,29 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
      ← Back to Courses
   </a>
 
+  <!-- Header banner -->
+  <?php $course_img = $course['image_path'] ?: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80"; ?>
+  <div class="relative rounded-[2rem] overflow-hidden shadow-2xl mb-8 group">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+    <img referrerpolicy="no-referrer" src="<?= safe($course_img) ?>"
+         class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-700"
+         onerror="this.src='https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80'">
+
+    <div class="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 text-center">
+      <span class="px-4 py-1.5 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full mb-4 tracking-widest uppercase">
+        <?= safe($scheme['name']) ?> • <?= safe($branch['name']) ?>
+      </span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
+        <?= safe($course['name']) ?>
+      </h2>
+      <?php if($course['subject_code']): ?>
+        <p class="mt-2 text-blue-200 font-bold tracking-widest uppercase text-sm"><?= safe($course['subject_code']) ?></p>
+      <?php endif; ?>
+    </div>
+  </div>
+
   <h2 class="text-2xl font-bold mt-3 mb-4 dark:text-white">
-    <?= safe($course['name']) ?> — Notes
+    Academic Resources
   </h2>
 
   <div class="space-y-4">

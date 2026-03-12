@@ -91,6 +91,7 @@ $sem_res = $resQ->fetch();
     <div class="max-w-6xl mx-auto px-4 py-10">
 
       <!-- Breadcrumb -->
+      <!--
       <div class="text-sm text-gray-600 dark:text-gray-400 mb-8">
         <a href="<?= sign_url('view_scheme.php', [])?>" class="hover:underline">Schemes</a> &rsaquo;
         <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']])?>" class="hover:underline">
@@ -103,21 +104,37 @@ $sem_res = $resQ->fetch();
           <?= $semester?>
         </span>
       </div>
+      -->
 
-      <div class="flex flex-col lg:flex-row justify-between items-end mb-2 gap-8">
+      <!-- Header banner -->
+      <div class="relative rounded-[2rem] overflow-hidden shadow-2xl mb-12 group">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+        <img referrerpolicy="no-referrer" src="<?= safe($branch['image_path'] ?: $DEFAULT_IMG) ?>"
+             class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-700"
+             onerror="this.src='<?= $DEFAULT_IMG ?>'">
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 text-center">
+          <span class="px-4 py-1.5 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full mb-4 tracking-widest uppercase">
+            <?= safe($scheme['name']) ?>
+          </span>
+          <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
+            <?= safe($branch['name']) ?>
+          </h2>
+        </div>
+      </div>
+
+      <div class="flex flex-col lg:flex-row justify-between items-end mb-8 gap-8">
         <div class="flex items-center gap-6">
-
           <div>
-            <h1 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white font-['Sora'] tracking-tight">
-              <?= safe($branch['name'])?>
+            <h1 class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white font-['Sora'] tracking-tight">
+              Courses — Semester <?= $semester ?>
             </h1>
             <div class="flex items-center gap-3 mt-3">
-              <span
-                class="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-widest uppercase rounded-full border border-blue-200 dark:border-blue-800">Semester
-                <?= $semester?>
+              <span class="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-widest uppercase rounded-full border border-blue-200 dark:border-blue-800">
+                <?= safe($branch['name']) ?>
               </span>
               <span class="text-gray-400 text-sm font-semibold uppercase tracking-wider">
-                <?= count($courses)?> Courses Found
+                <?= count($courses) ?> Courses Found
               </span>
             </div>
           </div>
@@ -177,10 +194,23 @@ else: ?>
         <div data-name="<?= safe($c['name'])?>" data-code="<?= safe($c['subject_code'])?>"
           class="course-card group relative bg-white dark:bg-gray-800 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden">
 
+          <div class="relative h-48 overflow-hidden">
+            <img referrerpolicy="no-referrer" src="<?= safe($img) ?>" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                 onerror="this.src='<?= $DEFAULT_IMG ?>'">
+            <?php if($c['subject_code']): ?>
+            <div class="absolute top-4 left-4">
+              <span class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">
+                <?= safe($c['subject_code']) ?>
+              </span>
+            </div>
+            <?php endif; ?>
+          </div>
+
           <div class="px-6 py-5 flex-grow text-center flex flex-col justify-center items-center">
             <div class="flex flex-col items-center justify-center gap-3">
               <h3
-                class="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400 leading-tight font-['Sora'] uppercase tracking-tight line-clamp-5">
+                class="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400 leading-tight font-['Sora'] uppercase tracking-tight line-clamp-2">
                 <?= safe($c['name'])?>
               </h3>
               <?php if ($c['subject_code']): ?>

@@ -45,12 +45,14 @@ $branch_image = $branch['image_path'] ?:
 <div class="max-w-5xl mx-auto px-4 pb-10">
 
   <!-- Breadcrumb -->
+  <!--
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
     <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
     <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']]) ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> 
     &rsaquo;
     <span class="font-semibold"><?= safe($branch['name']) ?></span>
   </div>
+  -->
 
   <!-- Header banner -->
   <div class="relative rounded-[2rem] overflow-hidden shadow-2xl mb-12 group">
@@ -118,7 +120,7 @@ $branch_image = $branch['image_path'] ?:
   </div>
 
   <!-- Semester Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+  <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
     <?php for ($i = 1; $i <= 8; $i++): ?>
       <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch_id, 'semester' => $i]) ?>"
          class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center justify-center text-center">

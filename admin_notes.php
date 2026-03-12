@@ -548,9 +548,10 @@ $csrfToken = safe(get_csrf_token());
                   <?php foreach ($branches as $b): ?>
                     <div class="col-md-4">
                       <div class="card h-100">
-                        <?php if (!empty($b['image_path'])): ?>
-                          <img referrerpolicy="no-referrer" src="<?= safe($b['image_path'])  ?>" class="branch-img" alt="" onerror="this.style.display='none'">
-                        <?php endif; ?>
+                        <?php 
+                          $img_preview = !empty($b['image_path']) ? $b['image_path'] : "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80";
+                        ?>
+                        <img referrerpolicy="no-referrer" src="<?= safe($img_preview) ?>" class="branch-img" alt="" onerror="this.src='https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80'">
                         <div class="card-body text-center">
                           <h6 class="mb-1"><?= safe($b['name']) ?></h6>
                           <small class="text-muted">ID: <?= $b['id'] ?></small>
