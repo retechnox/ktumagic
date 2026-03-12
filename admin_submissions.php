@@ -6,8 +6,10 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-if (isset($_POST['action'])) {
-    $sub_id = intval($_POST['sub_id']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    try {
+        check_csrf();
+        $sub_id = intval($_POST['sub_id']);
     $action = $_POST['action'];
 
     if ($action === 'approve') {
@@ -52,8 +54,11 @@ if (isset($_POST['action'])) {
     } elseif ($action === 'delete') {
         $pdo->prepare("DELETE FROM pyq_submissions WHERE id = ?")->execute([$sub_id]);
     }
-    header("Location: admin_submissions.php");
-    exit();
+        header("Location: admin_submissions.php");
+        exit();
+    } catch (Exception $e) {
+        die("Security Error: " . $e->getMessage());
+    }
 }
 
 $submissions = $pdo->query("
@@ -137,12 +142,14 @@ function getMaterialBadge($type) {
                                     <div class="btn-group">
                                         <?php if ($s['status'] === 'pending'): ?>
                                             <form method="POST" class="d-inline">
+                                                <?= csrf_field() ?>
                                                 <input type="hidden" name="sub_id" value="<?= $s['id'] ?>">
                                                 <button name="action" value="approve" class="btn btn-sm btn-success px-3">Approve</button>
                                                 <button name="action" value="reject" class="btn btn-sm btn-danger px-3">Reject</button>
                                             </form>
                                         <?php endif; ?>
                                         <form method="POST" class="d-inline" onsubmit="return confirm('Permanently delete this submission?')">
+                                            <?= csrf_field() ?>
                                             <input type="hidden" name="sub_id" value="<?= $s['id'] ?>">
                                             <button name="action" value="delete" class="btn btn-sm btn-light ms-1" title="Delete record">🗑️</button>
                                         </form>
@@ -157,5 +164,25 @@ function getMaterialBadge($type) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      /* -------------------------
+          PREVENT DOUBLE SUBMISSION
+      -------------------------- */
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          if (this.dataset.submitting) {
+            e.preventDefault();
+            return;
+          }
+          this.dataset.submitting = 'true';
+          const btn = e.submitter || this.querySelector('button[type="submit"], .btn-success, .btn-danger');
+          if (btn) {
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            btn.classList.add('disabled');
+            btn.style.pointerEvents = 'none';
+          }
+        });
+      });
+    </script>
 </body>
 </html>

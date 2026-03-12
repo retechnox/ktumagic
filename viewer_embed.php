@@ -2,10 +2,15 @@
 // viewer_embed.php
 // Usage: viewer_embed.php?url=<FULL_GOOGLE_DRIVE_VIEW_URL>
 
+include 'db.php';
 $raw = $_GET['url'] ?? '';
 
 if (!$raw) {
     die("<h3>No file provided.</h3>");
+}
+
+if (!verify_url_sig()) {
+    die("<h3>Security Error: Invalid or missing viewer token.</h3>");
 }
 
 $url = htmlspecialchars($raw);

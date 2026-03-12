@@ -10,6 +10,8 @@ $message = "";
 
 // Handle file upload
 if (isset($_POST['upload'])) {
+    try {
+        check_csrf();
     if (!empty($_FILES['images']['name'][0])) {
         $uploadDir = 'uploads/sponsored/';
         if (!is_dir($uploadDir)) {
@@ -26,11 +28,15 @@ if (isset($_POST['upload'])) {
             }
         }
         $message = "Images uploaded successfully!";
+        }
+    } catch (Exception $e) {
+        $message = "Error: " . $e->getMessage();
     }
 }
 
 // Handle visibility toggle
 if (isset($_GET['toggle'])) {
+    if (!verify_url_sig()) die("Security Error: Invalid signature.");
     $id = (int)$_GET['toggle'];
     $stmt = $pdo->prepare("UPDATE sponsored_images SET is_visible = 1 - is_visible WHERE id = ?");
     $stmt->execute([$id]);
@@ -38,6 +44,7 @@ if (isset($_GET['toggle'])) {
 
 // Handle delete
 if (isset($_GET['delete'])) {
+    if (!verify_url_sig()) die("Security Error: Invalid signature.");
     $id = (int)$_GET['delete'];
     $stmt = $pdo->prepare("SELECT image_path FROM sponsored_images WHERE id = ?");
     $stmt->execute([$id]);
@@ -86,6 +93,7 @@ $images = $pdo->query("SELECT * FROM sponsored_images ORDER BY created_at DESC")
             <div class="card-body">
                 <h5 class="card-title">Upload New Images</h5>
                 <form action="" method="POST" enctype="multipart/form-data" class="form-inline">
+                    <?= csrf_field() ?>
                     <input type="file" name="images[]" multiple class="form-control mr-2" required>
                     <button type="submit" name="upload" class="btn btn-primary">Upload</button>
                 </form>
@@ -115,10 +123,10 @@ $images = $pdo->query("SELECT * FROM sponsored_images ORDER BY created_at DESC")
                         <?php endif; ?>
                     </td>
                     <td>
-                        <a href="?toggle=<?= $img['id'] ?>" class="btn btn-sm <?= $img['is_visible'] ? 'btn-warning' : 'btn-success' ?>">
+                        <a href="<?= sign_url('admin_sponsored.php', ['toggle' => $img['id']]) ?>" class="btn btn-sm <?= $img['is_visible'] ? 'btn-warning' : 'btn-success' ?>">
                             <?= $img['is_visible'] ? 'Hide' : 'Show' ?>
                         </a>
-                        <a href="?delete=<?= $img['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="<?= sign_url('admin_sponsored.php', ['delete' => $img['id']]) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -130,5 +138,25 @@ $images = $pdo->query("SELECT * FROM sponsored_images ORDER BY created_at DESC")
             </tbody>
         </table>
     </div>
+<script>
+  /* -------------------------
+      PREVENT DOUBLE SUBMISSION
+  -------------------------- */
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (this.dataset.submitting) {
+        e.preventDefault();
+        return;
+      }
+      this.dataset.submitting = 'true';
+      const btn = this.querySelector('button[type="submit"], .btn-primary');
+      if (btn) {
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Waiting...';
+        btn.classList.add('disabled');
+        btn.style.pointerEvents = 'none';
+      }
+    });
+  });
+</script>
 </body>
 </html>

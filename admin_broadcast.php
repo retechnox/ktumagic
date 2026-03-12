@@ -1,5 +1,4 @@
-<?php
-session_start();
+include 'db.php';
 if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true){
     header("Location: login.php");
     exit;
@@ -9,6 +8,8 @@ $msg = '';
 $err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        check_csrf();
     $title = trim($_POST['title'] ?? '');
     $body = trim($_POST['body'] ?? '');
     $link = trim($_POST['link'] ?? '');
@@ -48,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $err = "Failed to send broadcast. Ensure WebSocket server is running. Response: $response";
         }
+    } catch (Exception $e) {
+        $err = $e->getMessage();
     }
 }
 ?>
@@ -139,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="p-6">
                 <form method="POST" class="space-y-6">
+                    <?= csrf_field() ?>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Notification Title <span class="text-red-500">*</span></label>
                         <input type="text" name="title" required maxlength="50" placeholder="e.g. Important Announcement!" class="w-full h-11 px-4 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow">
@@ -173,5 +177,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     </div>
 </main>
+<script>
+  /* -------------------------
+      PREVENT DOUBLE SUBMISSION
+  -------------------------- */
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      if (this.dataset.submitting) {
+        e.preventDefault();
+        return;
+      }
+      this.dataset.submitting = 'true';
+      const btn = this.querySelector('button[type="submit"]');
+      if (btn) {
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    });
+  });
+</script>
 </body>
 </html>

@@ -5,6 +5,15 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 $search = trim($_GET['q'] ?? '');
 $scheme_id = intval($_GET['scheme_id'] ?? 0);
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    // Only verify if searching or filtering to prevent bulk scraping
+    if ($search !== '' || $scheme_id > 0) {
+        header("Location: search.php"); 
+        exit;
+    }
+}
+
 $params = [];
 $sql = "SELECT c.*, b.name as branch_name, s.name as scheme_name 
         FROM courses c 
@@ -82,12 +91,12 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
             <div class="flex items-center gap-3 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <span class="text-sm font-semibold text-gray-500 px-2">Scheme:</span>
                 <div class="flex gap-2">
-                    <a href="search.php?q=<?= urlencode($search) ?>" 
+                    <a href="<?= sign_url('search.php', ['q' => $search]) ?>" 
                        class="px-3 py-1 rounded-lg text-sm <?= $scheme_id == 0 ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700' ?>">
                        All
                     </a>
                     <?php foreach($schemes as $s): ?>
-                        <a href="search.php?q=<?= urlencode($search) ?>&scheme_id=<?= $s['id'] ?>" 
+                        <a href="<?= sign_url('search.php', ['q' => $search, 'scheme_id' => $s['id']]) ?>" 
                            class="px-3 py-1 rounded-lg text-sm <?= $scheme_id == $s['id'] ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700' ?>">
                            <?= safe($s['name']) ?>
                         </a>
@@ -108,7 +117,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
                 <?php foreach ($results as $c): 
                     $img = $c['image_path'] ?: $DEFAULT_IMG;
                 ?>
-                    <a href="view_link.php?course_id=<?= $c['id'] ?>" 
+                    <a href="<?= sign_url('view_link.php', ['course_id' => $c['id']]) ?>" 
                        class="group bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
                         
                         <div class="relative h-48 overflow-hidden">

@@ -10,6 +10,12 @@ if (!$branch_id || !$semester) {
     exit; 
 }
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    header("Location: index.php");
+    exit;
+}
+
 // Fetch branch
 $bq = $pdo->prepare("SELECT * FROM branches WHERE id = ?");
 $bq->execute([$branch_id]);
@@ -57,9 +63,9 @@ $sem_res = $resQ->fetch();
 
   <!-- Breadcrumb -->
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-    <a href="view_scheme.php" class="hover:underline">Schemes</a> &rsaquo;
-    <a href="view_branch.php?scheme_id=<?= $scheme['id'] ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
-    <a href="view_semesters.php?branch_id=<?= $branch_id ?>" class="hover:underline"><?= safe($branch['name']) ?></a> &rsaquo;
+    <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
+    <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']]) ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
+    <a href="<?= sign_url('view_semesters.php', ['branch_id' => $branch_id]) ?>" class="hover:underline"><?= safe($branch['name']) ?></a> &rsaquo;
     <span class="font-semibold">Sem <?= $semester ?></span>
   </div>
 
@@ -202,7 +208,7 @@ $sem_res = $resQ->fetch();
           </div>
 
           <!-- Add Content Link -->
-          <a href="submit_material.php?course_id=<?= $c['id'] ?>" 
+          <a href="<?= sign_url('submit_material.php', ['course_id' => $c['id']]) ?>" 
              class="flex items-center justify-center gap-2 py-2 text-[10px] font-bold text-gray-400 hover:text-blue-500 transition uppercase tracking-[0.2em]">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
             Contribute Material
@@ -223,7 +229,7 @@ $sem_res = $resQ->fetch();
             </div>
 
             <div class="mt-6 pt-4 border-t dark:border-gray-700 flex justify-center">
-                <a href="view_link.php?course_id=<?= $c['id'] ?>" class="text-xs font-bold text-gray-400 hover:text-blue-500 transition uppercase tracking-widest">View All Details →</a>
+                <a href="<?= sign_url('view_link.php', ['course_id' => $c['id']]) ?>" class="text-xs font-bold text-gray-400 hover:text-blue-500 transition uppercase tracking-widest">View All Details →</a>
             </div>
         </div>
 

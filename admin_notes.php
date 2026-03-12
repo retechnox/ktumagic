@@ -6,33 +6,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-// Simple flash helper
-function flash($msg = null, $type = 'info') {
-    if ($msg === null) {
-        $f = $_SESSION['flash'] ?? [];
-        unset($_SESSION['flash']);
-        return $f;
-    }
-    $_SESSION['flash'][] = ['msg'=>$msg,'type'=>$type];
-}
-
-// CSRF helpers
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(16));
-}
-function csrf_field() {
-    $t = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
-    return "<input type='hidden' name='csrf_token' value='{$t}'>";
-}
-function check_csrf() {
-    $p = $_POST['csrf_token'] ?? '';
-    if (!hash_equals($_SESSION['csrf_token'], (string)$p)) {
-        throw new Exception('Invalid CSRF token.');
-    }
-}
-
-function safe($v) { return htmlspecialchars((string)$v, ENT_QUOTES); }
-
 // -----------------------------
 // Drive link conversion helper
 // -----------------------------
@@ -327,8 +300,7 @@ $pyqs = [];
 $sem_res = null;
 
 if (isset($_GET['course_id'])) {
-    $token = $_GET['token'] ?? '';
-    if (!hash_equals($_SESSION['csrf_token'], (string)$token)) {
+    if (!verify_url_sig(true)) {
         $flashtxt = 'Security Error: Invalid or missing token in URL. Request blocked to prevent tampering.';
         $_SESSION['flash'][] = ['msg'=>$flashtxt,'type'=>'danger'];
         header('Location: admin_notes.php');
@@ -351,7 +323,7 @@ if (isset($_GET['course_id'])) {
 }
 
 $flashes = flash();
-$csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
+$csrfToken = safe(get_csrf_token());
 ?>
 <!doctype html>
 <html lang="en">
@@ -654,18 +626,18 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
           </div>
 
           <!-- SELECT COURSE -->
-          <form method="GET" id="selectCourseForLinksForm" class="mb-3">
-            <input type="hidden" name="token" value="<?= $csrfToken ?>">
+          <div class="mb-3">
             <label class="form-label small">Select course</label>
-            <select name="course_id" id="course_select_for_links" class="form-select form-select-sm" onchange="this.form.submit()">
+            <select id="course_select_for_links" class="form-select form-select-sm" onchange="location.href=this.value">
               <option value="">Select a course</option>
               <?php foreach ($courses as $course):
                 $dScheme = safe(strtolower($course['scheme_name']));
                 $dBranch = safe(strtolower($course['branch_name']));
                 $dSem = safe($course['semester']);
                 $dName = safe(strtolower($course['name']));
+                $signedUrl = sign_url('admin_notes.php', ['course_id' => $course['id']], true);
               ?>
-                <option value="<?= $course['id'] ?>"
+                <option value="<?= $signedUrl ?>"
                         data-scheme="<?= $dScheme ?>"
                         data-branch="<?= $dBranch ?>"
                         data-sem="<?= $dSem ?>"
@@ -675,7 +647,7 @@ $csrfToken = htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES);
                 </option>
               <?php endforeach; ?>
             </select>
-          </form>
+          </div>
 
           <?php if ($selected_course): ?>
             <!-- EDITABLE COURSE META + LINKS -->

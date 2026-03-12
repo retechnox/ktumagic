@@ -81,43 +81,63 @@ function check_csrf() {
 }
 
 /**
- * Anti-Scraping URL Signature
- * Generates a hex signature based on parameters and session secret
+ * Get a stable app secret for public anti-scraping
  */
-function get_url_sig($params) {
+function get_app_secret() {
+    return getenv('APP_SECRET') ?: 'ktu_magic_permanent_secret_2026';
+}
+
+/**
+ * Anti-Scraping URL Signature
+ * Generates a hex signature based on parameters and a secret
+ */
+function get_url_sig($params, $use_session = false) {
     ksort($params);
     $query = http_build_query($params);
-    $secret = get_csrf_token(); // Use CSRF token as the session-specific secret
-    return hash_hmac('sha256', $query, $secret);
+    $secret = $use_session ? get_csrf_token() : get_app_secret();
+    return hash_hmac('sha1', $query, $secret); // sha1 is shorter for URLs
 }
 
 /**
  * Sign an internal URL to prevent parameter tampering
  */
-function sign_url($base, $params) {
-    $params['sig'] = get_url_sig($params);
+function sign_url($base, $params, $use_session = false) {
+    $params['sig'] = get_url_sig($params, $use_session);
     return $base . '?' . http_build_query($params);
 }
 
 /**
  * Verify GET request signature
  */
-function verify_url_sig() {
+function verify_url_sig($use_session = false) {
     $params = $_GET;
     if (!isset($params['sig'])) return false;
     
     $received_sig = $params['sig'];
     unset($params['sig']);
     
-    return hash_equals(get_url_sig($params), $received_sig);
+    return hash_equals(get_url_sig($params, $use_session), $received_sig);
 }
 
 /**
  * Strict Sanitize Input (for text fields)
  */
 function sanitize_input($data) {
-    $data = trim($data);
+    if ($data === null) return '';
+    $data = trim((string)$data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     return $data;
+}
+
+/**
+ * Flash message helper
+ */
+function flash($msg = null, $type = 'info') {
+    if ($msg === null) {
+        $f = $_SESSION['flash'] ?? [];
+        unset($_SESSION['flash']);
+        return $f;
+    }
+    $_SESSION['flash'][] = ['msg'=>$msg,'type'=>$type];
 }

@@ -471,12 +471,12 @@
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="view_branch.php?scheme_id=2">2024 Scheme</a>
-          <a href="view_branch.php?scheme_id=1">2019 Scheme</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>">2024 Scheme</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>">2019 Scheme</a>
         </div>
       </div>
 
-      <a href="pyq.php" style="color:var(--primary-blue);">PYQ Search</a>
+      <a href="<?= sign_url('pyq.php', []) ?>" style="color:var(--primary-blue);">PYQ Search</a>
 
 
 
@@ -488,13 +488,13 @@
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="pyq.php?scheme_id=2">2024 Scheme</a>
-          <a href="pyq.php?scheme_id=1">2019 Scheme</a>
+          <a href="<?= sign_url('pyq.php', ['scheme_id' => 2]) ?>">2024 Scheme</a>
+          <a href="<?= sign_url('pyq.php', ['scheme_id' => 1]) ?>">2019 Scheme</a>
         </div>
       </div>
 
       <a href="#">Internships</a>
-      <a href="view_scheme.php">KTU Tuitions</a>
+      <a href="<?= sign_url('view_scheme.php', []) ?>">KTU Tuitions</a>
       <a href="#">Upload Notes</a>
 
       <div class="desktop-menu-group">
@@ -605,12 +605,12 @@
         </svg>
       </div>
       <div class="submenu">
-        <a href="view_branch.php?scheme_id=2" class="submenu-item">2024 Scheme</a>
-        <a href="view_branch.php?scheme_id=1" class="submenu-item">2019 Scheme</a>
+        <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>" class="submenu-item">2024 Scheme</a>
+        <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
       </div>
     </div>
 
-    <a href="pyq.php" class="menu-item" style="color:var(--primary-blue);"><span>PYQ Search</span></a>
+    <a href="<?= sign_url('pyq.php', []) ?>" class="menu-item" style="color:var(--primary-blue);"><span>PYQ Search</span></a>
 
     <div class="menu-group">
       <div class="menu-item" onclick="toggleSubmenu(this)">
@@ -621,13 +621,13 @@
         </svg>
       </div>
       <div class="submenu">
-        <a href="pyq.php?scheme_id=2" class="submenu-item">2024 Scheme</a>
-        <a href="pyq.php?scheme_id=1" class="submenu-item">2019 Scheme</a>
+        <a href="<?= sign_url('pyq.php', ['scheme_id' => 2]) ?>" class="submenu-item">2024 Scheme</a>
+        <a href="<?= sign_url('pyq.php', ['scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
       </div>
     </div>
 
     <a href="#" class="menu-item"><span>Internships</span></a>
-    <a href="view_scheme.php" class="menu-item"><span>KTU Tuitions</span></a>
+    <a href="<?= sign_url('view_scheme.php', []) ?>" class="menu-item"><span>KTU Tuitions</span></a>
     <a href="#" class="menu-item"><span>Upload Notes</span></a>
 
     <div class="menu-group">

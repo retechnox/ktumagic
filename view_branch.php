@@ -6,6 +6,12 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 $scheme_id = intval($_GET['scheme_id'] ?? 0);
 if (!$scheme_id) { header("Location: view_scheme.php"); exit; }
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    header("Location: index.php"); 
+    exit;
+}
+
 // Fetch scheme
 $sq = $pdo->prepare("SELECT * FROM schemes WHERE id = ?");
 $sq->execute([$scheme_id]);
@@ -39,7 +45,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
 
   <!-- Breadcrumb -->
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-    <a href="view_scheme.php" class="hover:underline">Schemes</a> &rsaquo;
+    <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
     <span class="font-semibold"><?= safe($scheme['name']) ?></span>
   </div>
 
@@ -71,7 +77,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
       ?>
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
-      <a href="view_semesters.php?branch_id=<?= $b['id'] ?>"
+      <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id']]) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <img   referrerpolicy="no-referrer" src="<?= safe($img) ?>"

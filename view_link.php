@@ -5,6 +5,12 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 $course_id = intval($_GET['course_id'] ?? 0);
 if (!$course_id) { header("Location: view_scheme.php"); exit; }
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    header("Location: index.php");
+    exit;
+}
+
 // Fetch course
 $cq = $pdo->prepare("SELECT * FROM courses WHERE id = ?");
 $cq->execute([$course_id]);
@@ -48,7 +54,11 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     $html .= '<p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Academic Resource • Google Drive</p>';
     $html .= '</div>';
     $html .= '<div class="flex items-center gap-3">';
-    $html .= '<a href="viewer_embed.php?url='.urlencode($preview).'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 active:scale-95 whitespace-nowrap">';
+    
+    // Sign the viewer_embed link
+    $viewerLink = sign_url('viewer_embed.php', ['url' => $preview]);
+    
+    $html .= '<a href="'.$viewerLink.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 active:scale-95 whitespace-nowrap">';
     $html .= '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
     $html .= 'View</a>';
     if ($download) {
@@ -81,10 +91,10 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
 
   <!-- Breadcrumb -->
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-    <a href="view_scheme.php" class="hover:underline">Schemes</a> &rsaquo;
-    <a href="view_branch.php?scheme_id=<?= $scheme['id'] ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
-    <a href="view_semesters.php?branch_id=<?= $branch['id'] ?>" class="hover:underline"><?= safe($branch['name']) ?></a> &rsaquo;
-    <a href="view_courses.php?branch_id=<?= $branch['id'] ?>&semester=<?= $course['semester'] ?>" class="hover:underline">
+    <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
+    <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']]) ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> &rsaquo;
+    <a href="<?= sign_url('view_semesters.php', ['branch_id' => $branch['id']]) ?>" class="hover:underline"><?= safe($branch['name']) ?></a> &rsaquo;
+    <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch['id'], 'semester' => $course['semester']]) ?>" class="hover:underline">
       Sem <?= $course['semester'] ?>
     </a> &rsaquo;
 
@@ -92,7 +102,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
   </div>
 
   <!-- Back -->
-  <a href="view_courses.php?branch_id=<?= $branch['id'] ?>&semester=<?= $course['semester'] ?>"
+  <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch['id'], 'semester' => $course['semester']]) ?>"
      class="text-blue-600 dark:text-blue-400">
      ← Back to Courses
   </a>

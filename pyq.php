@@ -6,6 +6,15 @@ $search = $_GET['search'] ?? '';
 $scheme_filter = $_GET['scheme_id'] ?? '';
 $branch_filter = $_GET['branch_id'] ?? '';
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    // Only allow if no filters are set (base search page)
+    if ($search || $scheme_filter || $branch_filter) {
+        header("Location: pyq.php");
+        exit;
+    }
+}
+
 $params = [];
 $sql = "SELECT c.*, b.name as branch_name, s.name as scheme_name 
         FROM courses c 

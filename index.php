@@ -1127,13 +1127,13 @@ $contact = $data['contact'] ?? [];
     <div class="icon-grid">
       <?php
 $grid_links = [
-  1 => "view_scheme.php", // Syllabus
-  2 => "view_scheme.php", // KTU Notes
+  1 => sign_url("view_scheme.php", []), // Syllabus
+  2 => sign_url("view_scheme.php", []), // KTU Notes
   3 => "pyq.php", // Question Papers
   4 => "contact.php", // Connect With Us
   5 => "#", // Important Topics
   6 => "#", // Internships
-  7 => "view_scheme.php", // KTU Tuitions
+  7 => sign_url("view_scheme.php", []), // KTU Tuitions
   8 => "#" // Text Books
 ];
 for ($i = 1; $i <= 8; $i++): ?>
@@ -1366,7 +1366,7 @@ endif; ?>
 
       <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">AVAILABLE SCHEMES</h2>
       <div class="scheme-grid">
-        <a href="view_branch.php?scheme_id=1" class="card scheme-card fade-el">
+        <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>" class="card scheme-card fade-el">
           <img src="assets/2019/1.jpg" alt="2019">
           <div class="card-body">
             <h3 style="margin:0; font-family:'Sora', sans-serif; font-size: 16px;">2019 SCHEME MATERIALS</h3>
@@ -1375,7 +1375,7 @@ endif; ?>
               BROWSE MATERIALS →</div>
           </div>
         </a>
-        <a href="view_branch.php?scheme_id=2" class="card scheme-card fade-el">
+        <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>" class="card scheme-card fade-el">
           <img src="assets/2025/1.jpg" alt="2024">
           <div class="card-body">
             <h3 style="margin:0; font-family:'Sora', sans-serif; font-size: 16px;">2024 SCHEME MATERIALS</h3>

@@ -6,6 +6,12 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 $branch_id = intval($_GET['branch_id'] ?? 0);
 if (!$branch_id) { header("Location: view_scheme.php"); exit; }
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    header("Location: index.php");
+    exit;
+}
+
 // Fetch branch
 $bq = $pdo->prepare("SELECT * FROM branches WHERE id = ?");
 $bq->execute([$branch_id]);
@@ -40,8 +46,8 @@ $branch_image = $branch['image_path'] ?:
 
   <!-- Breadcrumb -->
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-    <a href="view_scheme.php" class="hover:underline">Schemes</a> &rsaquo;
-    <a href="view_branch.php?scheme_id=<?= $scheme['id'] ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> 
+    <a href="<?= sign_url('view_scheme.php', []) ?>" class="hover:underline">Schemes</a> &rsaquo;
+    <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']]) ?>" class="hover:underline"><?= safe($scheme['name']) ?></a> 
     &rsaquo;
     <span class="font-semibold"><?= safe($branch['name']) ?></span>
   </div>
@@ -94,7 +100,7 @@ $branch_image = $branch['image_path'] ?:
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     <?php for ($i = 1; $i <= 8; $i++): ?>
       <!-- FIXED FLOW: Now passes branch_id (NOT scheme_id) -->
-      <a href="view_courses.php?branch_id=<?= $branch_id ?>&semester=<?= $i ?>"
+      <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch_id, 'semester' => $i]) ?>"
          class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center p-8 z-10">
         
         <div class="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-full group-hover:scale-[2.5] transition-transform duration-500 -z-10"></div>

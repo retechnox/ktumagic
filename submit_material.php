@@ -5,6 +5,12 @@ function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 $course_id = intval($_GET['course_id'] ?? 0);
 if (!$course_id) { header("Location: index.php"); exit; }
 
+// Verify signature for anti-scraping
+if (!verify_url_sig()) {
+    header("Location: index.php");
+    exit;
+}
+
 $cq = $pdo->prepare("SELECT * FROM courses WHERE id = ?");
 $cq->execute([$course_id]);
 $course = $cq->fetch();
@@ -14,6 +20,8 @@ $success = false;
 $error = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        check_csrf();
     $link_name = trim($_POST['link_name'] ?? '');
     $url = trim($_POST['url'] ?? '');
     $contributor = trim($_POST['contributor_name'] ?? '');
@@ -28,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = "Something went wrong. Please try again.";
         }
+        }
+    } catch (Exception $e) {
+        $error = "Security Error: " . $e->getMessage();
     }
 }
 ?>
@@ -44,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 font-['Inter']">
     <?php include 'nav.php'; ?>
     <div class="max-w-xl mx-auto px-4 py-32">
-        <a href="view_courses.php?branch_id=<?= $course['branch_id'] ?>&semester=<?= $course['semester'] ?>" class="text-blue-600 dark:text-blue-400 hover:underline mb-8 inline-flex items-center gap-2 font-semibold text-sm">
+        <a href="<?= sign_url('view_courses.php', ['branch_id' => $course['branch_id'], 'semester' => $course['semester']]) ?>" class="text-blue-600 dark:text-blue-400 hover:underline mb-8 inline-flex items-center gap-2 font-semibold text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Back to Courses
         </a>
@@ -63,12 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p class="text-sm opacity-90 leading-relaxed">Thank you for helping other students. Our team will review and approve your submission shortly.</p>
                     </div>
                 </div>
-                <a href="view_courses.php?branch_id=<?= $course['branch_id'] ?>&semester=<?= $course['semester'] ?>" class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-blue-500/30 uppercase tracking-widest">Return to Courses</a>
+                <a href="<?= sign_url('view_courses.php', ['branch_id' => $course['branch_id'], 'semester' => $course['semester']]) ?>" class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-blue-500/30 uppercase tracking-widest">Return to Courses</a>
             <?php else: ?>
                 <?php if ($error): ?>
                     <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl mb-8 border border-red-100 dark:border-red-800 font-semibold"><?= $error ?></div>
                 <?php endif; ?>
                 <form method="POST" class="space-y-6">
+                    <?= csrf_field() ?>
                     <div>
                         <label class="block text-xs font-black mb-2 ml-1 text-gray-400 dark:text-gray-500 uppercase tracking-widest">Resource Category</label>
                         <select name="material_type" class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-gray-700 dark:text-gray-300">
