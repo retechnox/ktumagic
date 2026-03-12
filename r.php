@@ -31,13 +31,11 @@ if (!isset($parsed['host']) || $parsed['host'] === 'ktumagic.in' || $parsed['hos
 }
 
 if ($is_internal) {
-    $path = ltrim($parsed['path'] ?? '', '/');
+    $path = '/' . ltrim($parsed['path'] ?? '', '/');
     $query = $parsed['query'] ?? '';
     parse_str($query, $params);
     
     // sign_url expects base and params
-    // We recreate the signed URL using our app secret
-    // Note: sign_url handles http_build_query and signature generation
     $redirect_url = sign_url($path, $params);
 } else {
     $redirect_url = $dest;
