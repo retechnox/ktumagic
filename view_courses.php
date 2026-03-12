@@ -159,7 +159,7 @@ $sem_res = $resQ->fetch();
       <?php
 else: ?>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <?php foreach ($courses as $c):
     $img = $c['image_path'] ?: $DEFAULT_IMG;
     $links = json_decode($c['links'] ?? '[]', true) ?: [];
@@ -177,7 +177,7 @@ else: ?>
         <div data-name="<?= safe($c['name'])?>" data-code="<?= safe($c['subject_code'])?>"
           class="course-card group relative bg-white dark:bg-gray-800 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden">
 
-          <div class="px-6 py-10 flex-grow text-center flex flex-col justify-center items-center">
+          <div class="px-6 py-5 flex-grow text-center flex flex-col justify-center items-center">
             <div class="flex flex-col items-center justify-center gap-3">
               <h3
                 class="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400 leading-tight font-['Sora'] uppercase tracking-tight line-clamp-5">
@@ -190,7 +190,7 @@ else: ?>
               <?php endif; ?>
             </div>
 
-            <div class="mt-6">
+            <div class="mt-4">
               <p class="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed px-4">
                 Access curated notes, previous papers, and study materials.
               </p>
@@ -198,10 +198,10 @@ else: ?>
           </div>
 
           <!-- Action Buttons Area -->
-          <div class="px-8 pb-10 space-y-8">
+          <div class="px-6 pb-6 space-y-6">
             <!-- Main Button: Study Modules -->
             <button onclick='showDrawer("<?= $c['id']?>", "modules")'
-              class="w-full py-5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn">
+              class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn">
               <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -213,12 +213,12 @@ else: ?>
             <!-- Status Row: QP & PYQ -->
             <div class="flex items-center justify-between gap-4 px-2">
               <button onclick='showDrawer("<?= $c['id']?>", "qp")' 
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-2 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
                 <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">QP & Answers</span>
               </button>
 
               <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-2 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
                 <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
                   <?= $hasPyq ? 'PYQ Available' : 'No PYQ' ?>
                 </span>
