@@ -175,72 +175,63 @@ else: ?>
     $canModules = $hasModules || $hasOther;
 ?>
         <div data-name="<?= safe($c['name'])?>" data-code="<?= safe($c['subject_code'])?>"
-          class="course-card group relative bg-white dark:bg-gray-800 rounded-3xl shadow-md border-2 border-gray-300 dark:border-gray-600 hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden">
+          class="course-card group relative bg-white dark:bg-gray-800 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden">
 
-          <div class="p-6 pb-6 flex-grow text-center">
-            <?php if ($c['subject_code']): ?>
-            <span
-              class="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-bold uppercase tracking-widest rounded-lg mb-2">
-              <?= safe($c['subject_code'])?>
-            </span>
-            <?php
-    endif; ?>
-
-            <div class="flex items-center justify-center">
+          <div class="px-6 py-10 flex-grow text-center flex flex-col justify-center items-center">
+            <div class="flex flex-col items-center justify-center gap-3">
               <h3
-                class="text-xl font-bold text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors font-['Sora'] line-clamp-4 min-h-[3.5rem]">
+                class="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400 leading-tight font-['Sora'] uppercase tracking-tight line-clamp-5">
                 <?= safe($c['name'])?>
               </h3>
+              <?php if ($c['subject_code']): ?>
+              <p class="text-blue-500/80 dark:text-blue-400/60 font-black text-xs md:text-sm tracking-[0.2em] uppercase">
+                <?= safe($c['subject_code'])?>
+              </p>
+              <?php endif; ?>
+            </div>
+
+            <div class="mt-6">
+              <p class="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed px-4">
+                Access curated notes, previous papers, and study materials.
+              </p>
             </div>
           </div>
 
-          <!-- Buttons Group - 80% width and centered -->
-          <div class="px-6 pb-8">
-            <div
-              class="w-[90%] mx-auto overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 divide-y-2 divide-gray-200 dark:divide-gray-700 shadow-sm">
-              <!-- Main Action: Study Modules -->
-              <button onclick='showDrawer("<?= $c['id']?>", "modules")'
-                class="flex items-center justify-center gap-3 w-full py-4 px-4 text-sm font-bold uppercase
-                tracking-wider transition-all
-                <?= $canModules ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 cursor-not-allowed'?>">
+          <!-- Action Buttons Area -->
+          <div class="px-8 pb-10 space-y-8">
+            <!-- Main Button: Study Modules -->
+            <button onclick='showDrawer("<?= $c['id']?>", "modules")'
+              class="w-full py-5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn">
+              <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                  </path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
-                Module Notes
+              </div>
+              <span class="text-base font-black uppercase tracking-wider">Study Modules</span>
+            </button>
+
+            <!-- Status Row: QP & PYQ -->
+            <div class="flex items-center justify-between gap-4 px-2">
+              <button onclick='showDrawer("<?= $c['id']?>", "qp")' 
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-2 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">QP & Answers</span>
               </button>
 
-              <!-- Secondary Actions: Answers & PYQ -->
-              <div class="grid grid-cols-2 divide-x-2 divide-gray-200 dark:divide-gray-700">
-                <button onclick='showDrawer("<?= $c['id']?>", "qp")'
-                  class="flex flex-col items-center justify-center py-3 px-2 bg-white dark:bg-gray-800 hover:bg-gray-50
-                  dark:hover:bg-gray-700/50 transition-all
-                  <?= $hasQp ? 'text-gray-700 dark:text-gray-200 font-bold' : 'text-gray-400 cursor-not-allowed'?>">
-                  <span class="text-[10px] uppercase tracking-widest">Answers</span>
-                  <span class="text-[9px] font-medium opacity-60">
-                    <?= $hasQp ? 'Available' : 'Empty'?>
-                  </span>
-                </button>
+              <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-2 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
+                  <?= $hasPyq ? 'PYQ Available' : 'No PYQ' ?>
+                </span>
+              </button>
+            </div>
 
-                <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
-                  class="flex flex-col items-center justify-center py-3 px-2 bg-white dark:bg-gray-800 hover:bg-gray-50
-                  dark:hover:bg-gray-700/50 transition-all
-                  <?= $hasPyq ? 'text-gray-700 dark:text-gray-200 font-bold' : 'text-gray-400 cursor-not-allowed'?>">
-                  <span class="text-[10px] uppercase tracking-widest">PYQ</span>
-                  <span class="text-[9px] font-medium opacity-60">
-                    <?= $hasPyq ? 'Questions' : 'Empty'?>
-                  </span>
-                </button>
-              </div>
-
-              <!-- Footer Action: Contribute -->
+            <!-- Bottom Action: Contribute -->
+            <div class="pt-4 border-t border-gray-100 dark:border-gray-700/50 flex justify-center">
               <a href="<?= sign_url('submit_material.php', ['course_id' => $c['id']])?>"
-                class="flex items-center justify-center gap-2 py-3 bg-gray-50 dark:bg-gray-900/40 text-[10px] font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:bg-white dark:hover:bg-gray-800 transition-all uppercase tracking-widest">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Contribute
+                class="flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-blue-500 transition-all uppercase tracking-[0.2em] group/contribute">
+                <span class="opacity-0 group-hover/contribute:opacity-100 transition-opacity">+</span>
+                Contribute Material
+                <span class="opacity-0 group-hover/contribute:opacity-100 transition-opacity">+</span>
               </a>
             </div>
           </div>
