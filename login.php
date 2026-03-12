@@ -1,6 +1,5 @@
 <?php
 ob_start();
-session_start();
 include 'db.php';
 
 // ---- Rate limiting (brute-force protection) ----

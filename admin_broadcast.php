@@ -1,3 +1,4 @@
+<?php
 include 'db.php';
 if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true){
     header("Location: login.php");
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = "Broadcast sent successfully! Delivered to $wsCount live users and $pushCount background devices.";
         } else {
             $err = "Failed to send broadcast. Ensure WebSocket server is running. Response: $response";
+            }
         }
     } catch (Exception $e) {
         $err = $e->getMessage();

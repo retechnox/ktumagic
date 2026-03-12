@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Simple .env loader
 if (file_exists(__DIR__ . '/.env')) {
     $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -38,9 +41,6 @@ try {
 
 // --- Global Security Helpers ---
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 /**
  * Sanitize output for HTML
