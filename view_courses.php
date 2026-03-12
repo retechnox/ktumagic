@@ -199,16 +199,16 @@ else: ?>
 
           <!-- Action Buttons Area -->
           <div class="px-6 pb-6 space-y-6">
-            <!-- Main Button: Study Modules -->
-            <button onclick='showDrawer("<?= $c['id']?>", "modules")'
-              class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn">
+            <!-- Main Link: Module Notes -->
+            <a href="<?= sign_url('view_link.php', ['course_id' => $c['id']])?>"
+              class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn no-underline">
               <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
               </div>
-              <span class="text-base font-black uppercase tracking-wider">Study Modules</span>
-            </button>
+              <span class="text-base font-black uppercase tracking-wider">Module Notes</span>
+            </a>
 
             <!-- Status Row: QP & PYQ -->
             <div class="flex items-center justify-between gap-4 px-2">

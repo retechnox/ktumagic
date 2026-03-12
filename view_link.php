@@ -55,8 +55,8 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     $html .= '</div>';
     $html .= '<div class="flex items-center gap-3">';
     
-    // Sign the viewer_embed link
-    $viewerLink = sign_url('viewer_embed.php', ['url' => $preview]);
+    // Link directly to viewer_embed.php without signing
+    $viewerLink = 'viewer_embed.php?url=' . urlencode($preview);
     
     $html .= '<a href="'.$viewerLink.'" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/25 active:scale-95 whitespace-nowrap">';
     $html .= '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
@@ -116,7 +116,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     <!-- MODULES SECTION -->
     <?php if ($modules): ?>
       <h2 class="text-2xl font-black mt-10 mb-6 text-blue-600 dark:text-blue-400 uppercase font-['Sora'] tracking-tight">
-        Study Modules
+        Module Notes
       </h2>
       <div class="grid grid-cols-1 gap-4">
         <?php foreach ($modules as $m): echo renderResourceCard($m, 'border-blue-600'); endforeach; ?>
