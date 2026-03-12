@@ -1052,15 +1052,18 @@ $csrfToken = safe(get_csrf_token());
 
 
   /* -------------------------
-      ADD / REMOVE LINK ROWS
+      ADD / REMOVE LINK ROWS (Using Delegation)
   -------------------------- */
   let linkUpdateCount = <?= !empty($links) ? count($links) : 1 ?>;
-  const addLinkUpdateBtn = document.getElementById('addLinkUpdateBtn');
-  const linksListUpdate = document.getElementById('links-list-update');
+  let pyqUpdateCount = <?= !empty($pyqs) ? count($pyqs) : 1 ?>;
+  let linkAddCount = 1;
 
-  if(addLinkUpdateBtn){
-    addLinkUpdateBtn.addEventListener('click', ()=>{
+  document.addEventListener('click', (e) => {
+    // Add Link Update
+    if (e.target.id === 'addLinkUpdateBtn') {
       const idx = linkUpdateCount++;
+      const linksListUpdate = document.getElementById('links-list-update');
+      if (!linksListUpdate) return;
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
@@ -1075,17 +1078,13 @@ $csrfToken = safe(get_csrf_token());
         </div>
       `;
       linksListUpdate.appendChild(row);
-    });
-  }
+    }
 
-  /* PYQ UPDATE ROWS */
-  let pyqUpdateCount = <?= !empty($pyqs) ? count($pyqs) : 1 ?>;
-  const addPyqUpdateBtn = document.getElementById('addPyqUpdateBtn');
-  const pyqsListUpdate = document.getElementById('pyqs-list-update');
-
-  if(addPyqUpdateBtn){
-    addPyqUpdateBtn.addEventListener('click', ()=>{
+    // Add PYQ Update
+    if (e.target.id === 'addPyqUpdateBtn') {
       const idx = pyqUpdateCount++;
+      const pyqsListUpdate = document.getElementById('pyqs-list-update');
+      if (!pyqsListUpdate) return;
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
@@ -1100,17 +1099,13 @@ $csrfToken = safe(get_csrf_token());
         </div>
       `;
       pyqsListUpdate.appendChild(row);
-    });
-  }
+    }
 
-  /* LINK ADD FORM ROWS */
-  let linkAddCount = 1;
-  const addLinkCourseBtn = document.getElementById('addLinkCourseBtn');
-  const linksListCourse = document.getElementById('links-list-course');
-
-  if(addLinkCourseBtn){
-    addLinkCourseBtn.addEventListener('click', ()=>{
+    // Add Link Course
+    if (e.target.id === 'addLinkCourseBtn') {
       const idx = linkAddCount++;
+      const linksListCourse = document.getElementById('links-list-course');
+      if (!linksListCourse) return;
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
@@ -1125,8 +1120,8 @@ $csrfToken = safe(get_csrf_token());
         </div>
       `;
       linksListCourse.appendChild(row);
-    });
-  }
+    }
+  });
 
   /* PYQ ADD FORM ROWS */
   let pyqAddCount = 1;
