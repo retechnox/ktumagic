@@ -34,21 +34,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slug = trim($_POST['slug'] ?? '');
         $dest = trim($_POST['destination'] ?? '');
 
-        if (!$slug || !$dest) {
+        // Security Hardening: Slug validation (alphanumeric, dashes, underscores only)
+        if (!preg_match('/^[a-zA-Z0-9\-_]+$/', $slug)) {
+            flash("Invalid slug. Use only letters, numbers, dashes, and underscores.", "danger");
+        } 
+        elseif (!$slug || !$dest) {
             flash("Slug and Destination are required.", "danger");
-        } else {
-            // Clean the destination URL if it contains a signature
-            $dest = clean_internal_url($dest);
+        } 
+        else {
+            // Security Hardening: Destination URL validation
+            $dest = filter_var($dest, FILTER_SANITIZE_URL);
+            $parsed_dest = parse_url($dest);
+            $scheme = strtolower($parsed_dest['scheme'] ?? '');
             
-            try {
-                $stmt = $pdo->prepare("INSERT INTO short_links (slug, destination_url) VALUES (?, ?)");
-                $stmt->execute([$slug, $dest]);
-                flash("Short link created: <strong>/s/$slug</strong>", "success");
-            } catch (PDOException $e) {
-                if ($e->getCode() == 23000) {
-                    flash("Slug '$slug' already exists.", "danger");
-                } else {
-                    flash("Database error: " . $e->getMessage(), "danger");
+            // Allow only http, https, or relative paths
+            if ($scheme !== '' && !in_array($scheme, ['http', 'https'])) {
+                flash("Security Error: Invalid protocol. Only http and https are allowed.", "danger");
+            } else {
+                // Clean the destination URL if it contains a signature
+                $dest = clean_internal_url($dest);
+                
+                try {
+                    $stmt = $pdo->prepare("INSERT INTO short_links (slug, destination_url) VALUES (?, ?)");
+                    $stmt->execute([$slug, $dest]);
+                    flash("Short link created: <strong>/s/$slug</strong>", "success");
+                } catch (PDOException $e) {
+                    if ($e->getCode() == 23000) {
+                        flash("Slug '$slug' already exists.", "danger");
+                    } else {
+                        flash("Database error: " . $e->getMessage(), "danger");
+                    }
                 }
             }
         }

@@ -34,12 +34,19 @@ if ($is_internal) {
     $path = '/' . ltrim($parsed['path'] ?? '', '/');
     $query = $parsed['query'] ?? '';
     parse_str($query, $params);
-    
-    // sign_url expects base and params
     $redirect_url = sign_url($path, $params);
 } else {
+    // Security Hardening: External URL validation
+    $scheme = strtolower($parsed['scheme'] ?? '');
+    if (!in_array($scheme, ['http', 'https'])) {
+        header("Location: /404.php");
+        exit();
+    }
     $redirect_url = $dest;
 }
+
+// Security Hardening: Prevent HTTP Response Splitting (CRLF Injection)
+$redirect_url = str_replace(["\r", "\n"], '', $redirect_url);
 
 header("Location: " . $redirect_url, true, 302);
 exit();

@@ -95,7 +95,7 @@ function get_url_sig($params, $use_session = false) {
     ksort($params);
     $query = http_build_query($params);
     $secret = $use_session ? get_csrf_token() : get_app_secret();
-    return hash_hmac('sha1', $query, $secret); // sha1 is shorter for URLs
+    return hash_hmac('sha256', $query, $secret); // Upgraded from sha1 for security
 }
 
 /**
