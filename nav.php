@@ -458,8 +458,8 @@
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="#">KTU Syllabus</a>
-          <a href="#">Academic Calendar</a>
+          <a href="404.php">KTU Syllabus</a>
+          <a href="404.php">Academic Calendar</a>
         </div>
       </div>
 
@@ -493,9 +493,9 @@
         </div>
       </div>
 
-      <a href="#">Internships</a>
+      <a href="404.php">Internships</a>
       <a href="<?= sign_url('view_scheme.php', []) ?>">KTU Tuitions</a>
-      <a href="#">Upload Notes</a>
+      <a href="404.php">Upload Notes</a>
 
       <div class="desktop-menu-group">
         <a href="#" class="desktop-dropdown">
@@ -522,7 +522,7 @@
       </a>
 
       <!-- NOTIFICATION BELL -->
-      <button onclick="window.requestPushPermission()" class="p-2 text-gray-500 hover:text-blue-600 transition" 
+      <button id="navNotificationBell" onclick="window.requestPushPermission()" class="p-2 text-gray-500 hover:text-blue-600 transition" 
               aria-label="Enable Notifications" style="background:none; border:none; cursor:pointer; padding:8px; display:flex; align-items:center; position:relative;">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:24px; height:24px;">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -573,7 +573,7 @@
   </div>
 
   <div class="sidebar-content">
-    <div class="menu-item" onclick="window.requestPushPermission()" style="background: rgba(37, 99, 235, 0.05); color: var(--primary-blue); border-left: 4px solid var(--primary-blue); margin-bottom: 8px;">
+    <div id="sidebarNotificationItem" class="menu-item" onclick="window.requestPushPermission()" style="background: rgba(37, 99, 235, 0.05); color: var(--primary-blue); border-left: 4px solid var(--primary-blue); margin-bottom: 8px;">
         <span>🔔 Enable Live Updates</span>
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -591,8 +591,8 @@
         </svg>
       </div>
       <div class="submenu">
-        <a href="#" class="submenu-item">KTU Syllabus</a>
-        <a href="#" class="submenu-item">Academic Calendar</a>
+        <a href="404.php" class="submenu-item">KTU Syllabus</a>
+        <a href="404.php" class="submenu-item">Academic Calendar</a>
       </div>
     </div>
 
@@ -626,9 +626,9 @@
       </div>
     </div>
 
-    <a href="#" class="menu-item"><span>Internships</span></a>
+    <a href="404.php" class="menu-item"><span>Internships</span></a>
     <a href="<?= sign_url('view_scheme.php', []) ?>" class="menu-item"><span>KTU Tuitions</span></a>
-    <a href="#" class="menu-item"><span>Upload Notes</span></a>
+    <a href="404.php" class="menu-item"><span>Upload Notes</span></a>
 
     <div class="menu-group">
       <div class="menu-item" onclick="toggleSubmenu(this)">

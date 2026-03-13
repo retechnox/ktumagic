@@ -51,7 +51,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     $html = '<div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 border-l-8 '.$colorClass.' flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md hover:border-l-[12px]">';
     $html .= '<div>';
     $html .= '<h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">'.$name.'</h3>';
-    $html .= '<p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Academic Resource • Google Drive</p>';
+    $html .= '<p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Academic Resource</p>';
     $html .= '</div>';
     $html .= '<div class="flex items-center gap-3">';
     

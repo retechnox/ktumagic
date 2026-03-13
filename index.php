@@ -1147,7 +1147,7 @@ endfor; ?>
           <div class="hero-action-buttons" style="display: flex; gap: 15px; flex-wrap: wrap;">
             <a href="view_scheme.php" class="hero-cta-btn"
               style="padding: 14px 32px; font-size: 15px; text-decoration: none;">Browse Notes</a>
-            <button onclick="window.requestPushPermission()" class="hero-push-btn"
+            <button id="heroNotificationBtn" onclick="window.requestPushPermission()" class="hero-push-btn"
               style="padding: 14px 32px; font-size: 15px; background: transparent; border: 2px solid var(--primary-blue); color: var(--primary-blue); border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

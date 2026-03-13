@@ -117,9 +117,9 @@ $sem_res = $resQ->fetch();
           <span class="px-4 py-1.5 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full mb-4 tracking-widest uppercase">
             <?= safe($scheme['name']) ?>
           </span>
-          <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
+          <!-- <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
             <?= safe($branch['name']) ?>
-          </h2>
+          </h2> -->
         </div>
       </div>
 
@@ -194,7 +194,7 @@ else: ?>
         <div data-name="<?= safe($c['name'])?>" data-code="<?= safe($c['subject_code'])?>"
           class="course-card group relative bg-white dark:bg-gray-800 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 flex flex-col overflow-hidden">
 
-          <div class="relative h-48 overflow-hidden">
+          <!-- <div class="relative h-48 overflow-hidden">
             <img referrerpolicy="no-referrer" src="<?= safe($img) ?>" 
                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                  onerror="this.src='<?= $DEFAULT_IMG ?>'">
@@ -205,7 +205,7 @@ else: ?>
               </span>
             </div>
             <?php endif; ?>
-          </div>
+          </div> -->
 
           <div class="px-6 py-5 flex-grow text-center flex flex-col justify-center items-center">
             <div class="flex flex-col items-center justify-center gap-3">
@@ -446,11 +446,18 @@ else: ?>
           const uniqueLinks = displayLinks;
 
           if (uniqueLinks.length === 0) {
-            content.innerHTML = `<div class="py-20 text-center"><div class="text-gray-200 dark:text-gray-800 mb-4"><svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg></div><p class="text-gray-400 font-bold uppercase tracking-widest text-xs">No entries found yet.</p></div>`;
+            content.innerHTML = `<div class="py-20 text-center"><div class="text-gray-200 dark:text-gray-800 mb-4"><svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg></div><p class="text-gray-400 font-bold uppercase tracking-widest text-xs">No entries found yet.</p></div>`;
           } else {
             uniqueLinks.forEach(item => {
               const previewUrl = toPreview(item.url);
               const signedUrl = `viewer_embed.php?url=${encodeURIComponent(previewUrl)}`;
+              
+              const escapedName = item.link_name
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
 
               content.innerHTML += `
                     <a href="${signedUrl}" target="_blank" class="flex items-center justify-between p-3 md:p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:rounded-[1.5rem] border-2 border-transparent hover:border-blue-500 hover:bg-white dark:hover:bg-gray-800 transition-all group/item shadow-sm">
@@ -459,7 +466,7 @@ else: ?>
                                 <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             </div>
                             <div class="text-left">
-                               <p class="text-xs md:text-sm font-black text-gray-800 dark:text-gray-100 group-hover/item:text-blue-600 transition-colors line-clamp-1">${item.link_name}</p>
+                               <p class="text-xs md:text-sm font-black text-gray-800 dark:text-gray-100 group-hover/item:text-blue-600 transition-colors line-clamp-1">${escapedName}</p>
                                <span class="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest">Click to open doc</span>
                             </div>
                         </div>

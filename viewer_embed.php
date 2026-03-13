@@ -9,7 +9,12 @@ if (!$raw) {
     die("<h3>No file provided.</h3>");
 }
 
-// verify_url_sig() check removed for compatibility
+// Security Hardening: Enforce domain whitelist for viewer
+$parsed = parse_url($raw);
+$host = strtolower($parsed['host'] ?? '');
+if ($host !== 'drive.google.com') {
+    die("<h3>Security Error: Only Google Drive links are allowed.</h3>");
+}
 
 $url = htmlspecialchars($raw);
 ?>

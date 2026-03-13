@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="<?= sign_url('view_courses.php', ['branch_id' => $course['branch_id'], 'semester' => $course['semester']]) ?>" class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-blue-500/30 uppercase tracking-widest">Return to Courses</a>
             <?php else: ?>
                 <?php if ($error): ?>
-                    <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl mb-8 border border-red-100 dark:border-red-800 font-semibold"><?= $error ?></div>
+                    <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl mb-8 border border-red-100 dark:border-red-800 font-semibold"><?= safe($error) ?></div>
                 <?php endif; ?>
                 <form method="POST" class="space-y-6">
                     <?= csrf_field() ?>

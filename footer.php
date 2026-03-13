@@ -386,13 +386,10 @@ $contact = $data['contact'] ?? [];
                 .then(reg => {
                     _swReg = reg;
                     console.log('[SW] Registered:', reg.scope);
-                    // Check for existing push subscription
                     return reg.pushManager.getSubscription();
                 })
                 .then(sub => {
-                    if (sub) {
-                        console.log('[Push] User is already subscribed.');
-                    }
+                    if (sub) console.log('[Push] User is already subscribed.');
                 })
                 .catch(err => console.error('[SW] Error:', err));
         }
@@ -400,43 +397,31 @@ $contact = $data['contact'] ?? [];
         // ── Persistent notification via Service Worker ───────────────────────────
         function showPersistentNotification(title, body, link) {
             const notifOptions = {
-                body: body,
-                icon: _iconPath,
-                badge: _iconPath,
-                data: { link: link || '' },
-                tag: 'ktu-broadcast',
-                requireInteraction: false,
-                vibrate: [200, 100, 200]
+                body: body, icon: _iconPath, badge: _iconPath,
+                data: { link: link || '' }, tag: 'ktu-broadcast',
+                requireInteraction: false, vibrate: [200, 100, 200]
             };
 
             if (Notification.permission === 'granted') {
-                // Tier 1: Service Worker showNotification (persists in OS panel)
                 navigator.serviceWorker.ready
                     .then(reg => {
                         if (reg.active) {
                             reg.active.postMessage({
                                 type: 'SHOW_NOTIFICATION',
-                                title,
-                                body,
-                                link: link || '',
-                                icon: _iconPath
+                                title, body, link: link || '', icon: _iconPath
                             });
                         } else {
-                            // Tier 2: Direct SW registration.showNotification()
                             return reg.showNotification(title, notifOptions);
                         }
                     })
                     .catch(() => {
-                        // Tier 3: Classic Notification API
                         try { new Notification(title, notifOptions); } catch (e) { }
                     });
             }
-
-            // Always show in-page toast (works even if notifications denied)
             showToast(title, body, link);
         }
 
-        // ── In-page toast (top-center, below navbar) ──────────────────────────────
+        // ── In-page toast ────────────────────────────────────────────────────────
         function showToast(title, body, link) {
             const toast = document.createElement('div');
             toast.style.cssText = `
@@ -469,39 +454,18 @@ $contact = $data['contact'] ?? [];
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, 7000);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const prompt = document.getElementById('pushPrompt');
-            const btnNotNow = document.getElementById('btnNotNow');
-            const btnEnablePush = document.getElementById('btnEnablePush');
-
         let _ws = null;
         function connectWebSocket() {
             if (_ws && _ws.readyState === WebSocket.OPEN) return;
-
-            const isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
-            const wsUrl = isProduction
-                ? 'wss://ktumagic.in/ws'
-                : 'ws://localhost:8080';
-
-            console.log('[WS] Connecting to', wsUrl);
+            const wsUrl = _isProduction ? 'wss://ktumagic.in/ws' : 'ws://localhost:8080';
             _ws = new WebSocket(wsUrl);
-
             _ws.onopen = () => console.log('[WS] Connected ✓');
-            _ws.onerror = (e) => console.error('[WS] Error:', e);
-            _ws.onclose = (e) => {
-                console.log('[WS] Disconnected (code:', e.code, '). Reconnecting in 5s…');
-                setTimeout(connectWebSocket, 5000);
-            };
-
+            _ws.onclose = () => setTimeout(connectWebSocket, 5000);
             _ws.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    if (data.type === 'notification') {
-                        showPersistentNotification(data.title, data.body, data.link);
-                    }
-                } catch (e) {
-                    console.error('[WS] Message parse error:', e);
-                }
+                    if (data.type === 'notification') showPersistentNotification(data.title, data.body, data.link);
+                } catch (e) { console.error('[WS] Error:', e); }
             };
         }
 
@@ -510,63 +474,64 @@ $contact = $data['contact'] ?? [];
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
                     connectWebSocket();
-                    
-                    // Register for Background Web Push
                     if (_swReg && _vapidPublicKey) {
                         const subscription = await _swReg.pushManager.subscribe({
                             userVisibleOnly: true,
                             applicationServerKey: urlBase64ToUint8Array(_vapidPublicKey)
                         });
-                        
-                        // Send to server
                         await fetch(_basePath + '/save_subscription.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(subscription)
                         });
-                        console.log('[Push] Subscription saved to DB ✓');
-                        return true;
                     }
+                    localStorage.setItem('notifications_enabled', 'true');
+                    updateNotificationUI();
                     return true;
                 }
                 return false;
-            } catch (err) {
-                console.error('[Push] Subscription failed:', err);
-                return false;
-            }
+            } catch (err) { return false; }
         };
+
+        function updateNotificationUI() {
+            const isEnabled = localStorage.getItem('notifications_enabled') === 'true' || 
+                             (window.Notification && Notification.permission === 'granted');
+            const navBell = document.getElementById('navNotificationBell');
+            const sidebarItem = document.getElementById('sidebarNotificationItem');
+            const heroBtn = document.getElementById('heroNotificationBtn');
+            const prompt = document.getElementById('pushPrompt');
+            if (isEnabled) {
+                if (navBell) navBell.style.display = 'none';
+                if (sidebarItem) sidebarItem.style.display = 'none';
+                if (heroBtn) heroBtn.style.display = 'none';
+                if (prompt) prompt.style.display = 'none';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const prompt = document.getElementById('pushPrompt');
             const btnNotNow = document.getElementById('btnNotNow');
             const btnEnablePush = document.getElementById('btnEnablePush');
 
-            // Auto-connect if permission already granted
-            if ('Notification' in window) {
-                if (Notification.permission === 'granted') {
-                    connectWebSocket();
-                } else if (Notification.permission !== 'denied' && !localStorage.getItem('push_prompt_dismissed')) {
-                    setTimeout(() => { 
-                        if (prompt) prompt.style.display = 'flex'; 
-                    }, 2000);
-                }
+            updateNotificationUI();
+            if ('Notification' in window && Notification.permission === 'granted') {
+                connectWebSocket();
+            } else if (Notification.permission !== 'denied' && !localStorage.getItem('push_prompt_dismissed')) {
+                setTimeout(() => { if (prompt && localStorage.getItem('notifications_enabled') !== 'true') prompt.style.display = 'flex'; }, 2000);
             }
 
             if (btnNotNow) {
-                btnNotNow.addEventListener('click', () => {
+                btnNotNow.onclick = () => {
                     localStorage.setItem('push_prompt_dismissed', 'true');
                     if (prompt) prompt.style.display = 'none';
-                });
+                };
             }
-
             if (btnEnablePush) {
-                btnEnablePush.addEventListener('click', async () => {
+                btnEnablePush.onclick = async () => {
                     if (prompt) prompt.style.display = 'none';
-                    localStorage.setItem('push_prompt_dismissed', 'true');
                     await window.requestPushPermission();
-                });
+                };
             }
-        });
         });
     </script>
 </footer>

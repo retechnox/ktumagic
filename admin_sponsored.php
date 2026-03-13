@@ -18,8 +18,26 @@ if (isset($_POST['upload'])) {
         }
 
         foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
-            $fileName = basename($_FILES['images']['name'][$key]);
-            $targetPath = $uploadDir . time() . '_' . $fileName;
+            $originalName = $_FILES['images']['name'][$key];
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            // 1. Extension Whitelist
+            if (!in_array($ext, $allowedExts)) {
+                throw new Exception("Invalid file extension: $ext. Allowed: " . implode(', ', $allowedExts));
+            }
+
+            // 2. MIME Type Verification (actual image check)
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $tmpName);
+            finfo_close($finfo);
+            if (strpos($mime, 'image/') !== 0) {
+                throw new Exception("File is not a valid image (MIME: $mime)");
+            }
+
+            // 3. Random Renaming to prevent RCE and path traversal
+            $newFileName = bin2hex(random_bytes(16)) . '.' . $ext;
+            $targetPath = $uploadDir . $newFileName;
             
             if (move_uploaded_file($tmpName, $targetPath)) {
                 $stmt = $pdo->prepare("INSERT INTO sponsored_images (image_path) VALUES (?)");
