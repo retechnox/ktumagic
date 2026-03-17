@@ -34,7 +34,7 @@ $cq = $pdo->prepare("
     SELECT *
     FROM courses
     WHERE branch_id = ? AND semester = ?
-    ORDER BY name
+    ORDER BY (display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC
 ");
 $cq->execute([$branch_id, $semester]);
 $courses = $cq->fetchAll();

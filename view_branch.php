@@ -19,7 +19,7 @@ $scheme = $sq->fetch();
 if (!$scheme) { header("Location: view_scheme.php"); exit; }
 
 // Fetch branches for this scheme
-$stmt = $pdo->prepare("SELECT * FROM branches WHERE scheme_id = ? ORDER BY name");
+$stmt = $pdo->prepare("SELECT * FROM branches WHERE scheme_id = ? ORDER BY (display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC");
 $stmt->execute([$scheme_id]);
 $branches = $stmt->fetchAll();
 
