@@ -1,7 +1,9 @@
 <?php
 include 'db.php';
 
-function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
+if (!function_exists('safe')) {
+    function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
+}
 
 $scheme_id = intval($_GET['scheme_id'] ?? 0);
 if (!$scheme_id) { header("Location: view_scheme.php"); exit; }
@@ -19,7 +21,9 @@ $scheme = $sq->fetch();
 if (!$scheme) { header("Location: view_scheme.php"); exit; }
 
 // Fetch branches for this scheme
-$stmt = $pdo->prepare("SELECT * FROM branches WHERE scheme_id = ? ORDER BY (display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC");
+$checkOrder = $pdo->query("SHOW COLUMNS FROM branches LIKE 'display_order'")->rowCount() > 0;
+$orderBy = $checkOrder ? "(display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC" : "name ASC";
+$stmt = $pdo->prepare("SELECT * FROM branches WHERE scheme_id = ? ORDER BY $orderBy");
 $stmt->execute([$scheme_id]);
 $branches = $stmt->fetchAll();
 

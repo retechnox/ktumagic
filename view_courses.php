@@ -30,11 +30,13 @@ $sq->execute([$branch['scheme_id']]);
 $scheme = $sq->fetch();
 
 // Fetch courses under this branch + semester
+$checkOrder = $pdo->query("SHOW COLUMNS FROM courses LIKE 'display_order'")->rowCount() > 0;
+$orderBy = $checkOrder ? "(display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC" : "name ASC";
 $cq = $pdo->prepare("
     SELECT *
     FROM courses
     WHERE branch_id = ? AND semester = ?
-    ORDER BY (display_order = 0 OR display_order IS NULL) ASC, display_order ASC, name ASC
+    ORDER BY $orderBy
 ");
 $cq->execute([$branch_id, $semester]);
 $courses = $cq->fetchAll();

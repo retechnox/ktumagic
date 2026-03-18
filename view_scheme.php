@@ -1,6 +1,8 @@
 <?php
 include 'db.php';
-function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
+if (!function_exists('safe')) {
+    function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
+}
 
 $schemes = $pdo->query('SELECT * FROM schemes ORDER BY name')->fetchAll();
 
