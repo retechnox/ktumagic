@@ -1,4 +1,8 @@
-<?php include 'theme.php'; ?>
+include_once 'db.php';
+$jsonData = @file_get_contents(__DIR__ . '/data/data.json') ?: '{}';
+$data = json_decode($jsonData, true);
+$contact = $data['contact'] ?? [];
+?>
 <style>
   :root {
     --neon-purple: #8b5cf6;
@@ -458,8 +462,8 @@
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="404.php">KTU Syllabus</a>
-          <a href="404.php">Academic Calendar</a>
+          <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus']) ?>">KTU Syllabus</a>
+          <a href="<?= sign_url('view_scheme.php', ['mode' => 'calendar']) ?>">Academic Calendar</a>
         </div>
       </div>
 
@@ -471,8 +475,9 @@
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>">2024 Scheme</a>
-          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>">2019 Scheme</a>
+          <a href="<?= sign_url('view_scheme.php', ['mode' => 'notes']) ?>">KTU Notes</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>">2024 Scheme (Course List)</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>">2019 Scheme (Course List)</a>
         </div>
       </div>
 
@@ -591,8 +596,8 @@
         </svg>
       </div>
       <div class="submenu">
-        <a href="404.php" class="submenu-item">KTU Syllabus</a>
-        <a href="404.php" class="submenu-item">Academic Calendar</a>
+        <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus']) ?>" class="submenu-item">KTU Syllabus</a>
+        <a href="<?= sign_url('view_scheme.php', ['mode' => 'calendar']) ?>" class="submenu-item">Academic Calendar</a>
       </div>
     </div>
 
@@ -605,6 +610,7 @@
         </svg>
       </div>
       <div class="submenu">
+        <a href="<?= sign_url('view_scheme.php', ['mode' => 'notes']) ?>" class="submenu-item">KTU Notes</a>
         <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>" class="submenu-item">2024 Scheme</a>
         <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
       </div>
@@ -647,20 +653,20 @@
     <div class="sidebar-social-box">
       <h3>Follow Us</h3>
       <div class="social-grid-sidebar">
-        <a href="https://chat.whatsapp.com/LP2seQqrDoC5NX1OErAbSO?mode=gi_t" aria-label="WhatsApp">
+        <a href="<?= $contact['whatsapp_main'] ?? '#' ?>" aria-label="WhatsApp">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
           </svg>
         </a>
-        <a href="https://www.instagram.com/ktumagic" aria-label="Instagram"><svg width="20" height="20"
+        <a href="<?= $contact['instagram'] ?? 'https://www.instagram.com/ktumagic' ?>" aria-label="Instagram"><svg width="20" height="20"
             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
           </svg></a>
-        <a href="#" aria-label="Telegram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+        <a href="<?= $contact['telegram'] ?? '#' ?>" aria-label="Telegram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m22 2-7 20-4-9-9-4Z"></path>
             <path d="M22 2 11 13"></path>

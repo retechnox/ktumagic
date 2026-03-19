@@ -83,7 +83,11 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
       ?>
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
-      <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id']]) ?>"
+      <?php 
+        $sem_params = ['branch_id' => $b['id']];
+        if (isset($_GET['mode'])) $sem_params['mode'] = $_GET['mode'];
+      ?>
+      <a href="<?= sign_url('view_semesters.php', $sem_params) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <img referrerpolicy="no-referrer" src="<?= safe($img) ?>"

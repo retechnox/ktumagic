@@ -1109,17 +1109,17 @@ $contact = $data['contact'] ?? [];
     <div class="icon-grid">
       <?php
 $grid_links = [
-  1 => sign_url("view_scheme.php", []), // Syllabus
-  2 => sign_url("view_scheme.php", []), // KTU Notes
+  1 => sign_url("view_scheme.php", ['mode' => 'syllabus']), // Syllabus
+  2 => sign_url("view_scheme.php", ['mode' => 'notes']), // KTU Notes
   3 => "pyq.php", // Question Papers
   4 => "contact.php", // Connect With Us
-  5 => "#", // Important Topics
-  6 => "#", // Internships
+  5 => "404.php", // Important Topics
+  6 => "404.php", // Internships
   7 => sign_url("view_scheme.php", []), // KTU Tuitions
-  8 => "#" // Text Books
+  8 => "javascript:void(0)" // Text Books (Updates)
 ];
 for ($i = 1; $i <= 8; $i++): ?>
-      <a href="<?= $grid_links[$i]?>" class="fade-el" style="animation-delay: <?= $i * 50?>ms">
+      <a href="<?= $grid_links[$i]?>" class="fade-el" style="animation-delay: <?= $i * 50?>ms" <?= ($i === 8) ? 'onclick="showAllUpdates()"' : '' ?>>
         <img src="assets/<?= $i?>.jpg" alt="Icon <?= $i?>">
       </a>
       <?php
@@ -1407,6 +1407,46 @@ endif; ?>
 
     </div>
 
+
+    <div id="socialModal" class="modal-backdrop">
+      <div class="modal-card">
+        <h3>Join Our Community</h3>
+        <p>Stay updated with KTU live updates, notes, and materials.</p>
+        <div class="social-grid">
+          <a href="<?= $contact['instagram'] ?? 'https://www.instagram.com/ktumagic' ?>" target="_blank" class="social"
+            style="background: #E1306C;">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+            <span>Instagram</span>
+          </a>
+          <a href="<?= $contact['whatsapp_2024'] ?? '#' ?>" target="_blank" class="social" style="background: #25D366;">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+            </svg>
+            <span>2024 Group</span>
+          </a>
+          <a href="<?= $contact['whatsapp_2019'] ?? '#' ?>" target="_blank" class="social" style="background: #25D366;">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .01 5.437 0 12.045c0 2.112.552 4.171 1.594 5.96L0 24l6.135-1.61a11.817 11.817 0 005.908 1.569h.005c6.608 0 12.046-5.436 12.049-12.044a11.758 11.758 0 00-3.417-8.467" />
+            </svg>
+            <span>2019 Group</span>
+          </a>
+          <a href="<?= $contact['telegram'] ?? '#' ?>" target="_blank" class="social" style="background: #229ED9;">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20.665 3.717l-17.73 6.837c-1.213.486-1.203 1.163-.222 1.462l4.552 1.42 1.566 4.802c.188.518.093.723.475.723.296 0 .43-.135.594-.293l2.394-2.327 4.98 3.68c.918.506 1.577.246 1.807-.85l3.268-15.396c.335-1.343-.513-1.952-1.394-1.56z" />
+            </svg>
+            <span>Telegram</span>
+          </a>
+        </div>
+        <button onclick="closeSocial()">Close</button>
+      </div>
+    </div>
+
     <!-- <div id="updateModal" class="modal-backdrop">
   <div class="modal-card">
     <h3 id="updateTitle"></h3>
@@ -1471,11 +1511,45 @@ endif; ?>
         socialModal.style.display = "none";
       }
 
-      fetch("update.json")
+
+      function showAllUpdates() {
+        const updateTitle = document.getElementById("updateTitle");
+        const updateContent = document.getElementById("updateContent");
+        const updateModal = document.getElementById("updateModal");
+        
+        fetch("data/update.json")
+          .then(res => res.json())
+          .then(data => {
+            // Handle both object and array formats
+            const updates = Array.isArray(data) ? data : [data];
+            // Display from bottom to top (reverse)
+            const reversed = [...updates].reverse();
+            
+            updateTitle.textContent = "Latest Updates";
+            let html = '<div style="max-height: 400px; overflow-y: auto; text-align: left; padding: 10px;">';
+            reversed.forEach(upd => {
+              html += `
+                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                  <h4 style="margin: 0 0 8px; color: var(--primary-blue);">${upd.title}</h4>
+                  <p style="margin: 0; font-size: 14px; line-height: 1.6;">${upd.content}</p>
+                </div>
+              `;
+            });
+            html += '</div>';
+            updateContent.innerHTML = html;
+            updateModal.style.display = "flex";
+          })
+          .catch(err => {
+            console.error("Error loading updates:", err);
+          });
+      }
+
+      fetch("data/update.json")
         .then(res => res.json())
         .then(data => {
-          document.getElementById("updateTitle").textContent = data.title;
-          document.getElementById("updateContent").textContent = data.content;
+          const mainUpdate = Array.isArray(data) ? data[data.length - 1] : data;
+          document.getElementById("updateTitle").textContent = mainUpdate.title;
+          document.getElementById("updateContent").textContent = mainUpdate.content;
           document.getElementById("updateModal").style.display = "flex";
         })
         .catch(() => { });
@@ -1489,7 +1563,7 @@ endif; ?>
         nav.style.display = nav.style.display === "flex" ? "none" : "flex";
       }
 
-      fetch("updates_upperupdate.json", { cache: "no-store" })
+      fetch("data/updates_upperupdate.json", { cache: "no-store" })
         .then(res => res.json())
         .then(data => {
           if (data.message) {

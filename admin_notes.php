@@ -88,18 +88,32 @@ try {
             $timetable = trim($_POST['timetable_link'] ?? '');
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
+            
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
             $rawImage = trim($_POST['branch_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
+            $sem_data = [];
+            if (isset($_POST['semester_links'])) {
+                foreach ($_POST['semester_links'] as $sem => $links) {
+                    $sem_data[$sem] = [
+                        'syllabus' => trim($links['syllabus'] ?? ''),
+                        'timetable' => trim($links['timetable'] ?? ''),
+                        'calendar' => trim($links['calendar'] ?? ''),
+                        'notes' => trim($links['notes'] ?? '')
+                    ];
+                }
+            }
+            $semester_data = json_encode($sem_data);
+
             if ($checkOrderCol) {
-                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $order]);
+                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, display_order, semester_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $order, $semester_data]);
             } else {
-                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link) VALUES (?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable]);
+                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, semester_data) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $semester_data]);
             }
             flash('Branch added.', 'success');
         }
@@ -110,6 +124,20 @@ try {
             $syllabus = trim($_POST['syllabus_link'] ?? '');
             $calendar = trim($_POST['calendar_link'] ?? '');
             $timetable = trim($_POST['timetable_link'] ?? '');
+            
+            $sem_data = [];
+            if (isset($_POST['semester_links'])) {
+                foreach ($_POST['semester_links'] as $sem => $links) {
+                    $sem_data[$sem] = [
+                        'syllabus' => trim($links['syllabus'] ?? ''),
+                        'timetable' => trim($links['timetable'] ?? ''),
+                        'calendar' => trim($links['calendar'] ?? ''),
+                        'notes' => trim($links['notes'] ?? '')
+                    ];
+                }
+            }
+            $semester_data = json_encode($sem_data);
+
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
             if (!$branch_id) throw new Exception('Invalid branch id.');
@@ -120,19 +148,19 @@ try {
 
             if ($image !== null) {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $order, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $order, $semester_data, $branch_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $semester_data, $branch_id]);
                 }
             } else {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $order, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $order, $semester_data, $branch_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $semester_data, $branch_id]);
                 }
             }
             flash('Branch updated.', 'success');
@@ -161,7 +189,8 @@ try {
             foreach ($links as $l) {
                 $ln = trim($l['link_name'] ?? '');
                 $url = trim($l['url'] ?? '');
-                if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
+                $ord = intval($l['display_order'] ?? 0);
+                if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url,'display_order'=>$ord];
             }
 
             $validPyqs = [];
@@ -169,7 +198,8 @@ try {
             foreach ($pyq_links as $p) {
                 $pn = trim($p['link_name'] ?? '');
                 $url = trim($p['url'] ?? '');
-                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url];
+                $ord = intval($p['display_order'] ?? 0);
+                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url,'display_order'=>$ord];
             }
 
             $subject_code = strtoupper(trim($_POST['subject_code'] ?? ''));
@@ -227,12 +257,11 @@ try {
             flash('Course deleted.', 'success');
         }
 
-        // IMPORTANT: save_links now updates course name, semester and image_path in addition to links
+        // save_links now updates course metadata and links
         elseif ($action === 'save_links') {
             $course_id = intval($_POST['course_id'] ?? 0);
             if (!$course_id) throw new Exception('Invalid course id.');
 
-            // New editable course fields from the links editor
             $course_name = trim($_POST['course_name_edit'] ?? '');
             $semester = intval($_POST['semester_edit'] ?? 0) ?: null;
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM courses LIKE 'display_order'")->rowCount() > 0;
@@ -245,7 +274,8 @@ try {
             foreach ($links as $l) {
                 $ln = trim($l['link_name'] ?? '');
                 $url = trim($l['url'] ?? '');
-                if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url];
+                $ord = intval($l['display_order'] ?? 0);
+                if ($ln !== '' && $url !== '') $validLinks[] = ['link_name'=>$ln,'url'=>$url,'display_order'=>$ord];
             }
 
             $pyq_links = $_POST['pyqs'] ?? [];
@@ -253,16 +283,14 @@ try {
             foreach ($pyq_links as $p) {
                 $pn = trim($p['link_name'] ?? '');
                 $url = trim($p['url'] ?? '');
-                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url];
+                $ord = intval($p['display_order'] ?? 0);
+                if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url,'display_order'=>$ord];
             }
 
-            // Update links and pyqs
             $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ? WHERE id = ?');
             $stmt->execute([json_encode($validLinks), json_encode($validPyqs), $course_id]);
 
-            // Update optional course metadata if provided (name/sem/image)
             if ($course_name !== '') {
-                $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
                 $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
                 if ($image !== null) {
                     if ($checkOrderCol) {
@@ -281,54 +309,9 @@ try {
                         $u->execute([$course_name, $subject_code, $semester, $course_id]);
                     }
                 }
-            } else {
-                $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
-                $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
-                if ($image !== null) {
-                    if ($checkOrderCol) {
-                        $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ?, image_path = ?, display_order = ? WHERE id = ?');
-                        $u->execute([$subject_code, $semester, $image, $order, $course_id]);
-                    } else {
-                        $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ?, image_path = ? WHERE id = ?');
-                        $u->execute([$subject_code, $semester, $image, $course_id]);
-                    }
-                } else {
-                    if ($checkOrderCol) {
-                        $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ?, display_order = ? WHERE id = ?');
-                        $u->execute([$subject_code, $semester, $order, $course_id]);
-                    } else {
-                        $u = $pdo->prepare('UPDATE courses SET subject_code = ?, semester = ? WHERE id = ?');
-                        $u->execute([$subject_code, $semester, $course_id]);
-                    }
-                }
             }
 
             flash('Course links and metadata saved.', 'success');
-
-            // --- UPSERT Semester Resources ---
-            $sem_syllabus = trim($_POST['sem_syllabus'] ?? '');
-            $sem_timetable = trim($_POST['sem_timetable'] ?? '');
-            $sem_calendar = trim($_POST['sem_calendar'] ?? '');
-
-            // We need branch_id and semester to identify the resource set
-            $cQ = $pdo->prepare("SELECT branch_id, semester FROM courses WHERE id = ?");
-            $cQ->execute([$course_id]);
-            $cData = $cQ->fetch();
-            
-            if ($cData) {
-                $branch_id = $cData['branch_id'];
-                $curr_sem = $cData['semester'];
-                
-                $upsert = $pdo->prepare("
-                    INSERT INTO semester_resources (branch_id, semester, syllabus_link, timetable_link, calendar_link)
-                    VALUES (?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE 
-                    syllabus_link = VALUES(syllabus_link),
-                    timetable_link = VALUES(timetable_link),
-                    calendar_link = VALUES(calendar_link)
-                ");
-                $upsert->execute([$branch_id, $curr_sem, $sem_syllabus, $sem_timetable, $sem_calendar]);
-            }
         }
 
         // redirect after POST to avoid double submit
@@ -379,10 +362,13 @@ if (isset($_GET['course_id'])) {
         $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
         $pyqs = json_decode($selected_course['pyqs'] ?: '[]', true) ?: [];
         
-        // Fetch semester resources
-        $resQ = $pdo->prepare('SELECT * FROM semester_resources WHERE branch_id = ? AND semester = ?');
-        $resQ->execute([$selected_course['branch_id'], $selected_course['semester']]);
-        $sem_res = $resQ->fetch();
+        $bQ = $pdo->prepare('SELECT semester_data FROM branches WHERE id = ?');
+        $bQ->execute([$selected_course['branch_id']]);
+        $branch_data = $bQ->fetch();
+        if ($branch_data) {
+            $sem_data = json_decode($branch_data['semester_data'] ?: '{}', true);
+            $sem_res = $sem_data[$selected_course['semester']] ?? null;
+        }
     }
 }
 
@@ -613,6 +599,31 @@ $csrfToken = safe(get_csrf_token());
                   <input type="url" name="timetable_link" class="form-control form-control-sm">
                 </div>
 
+                <div class="mb-3">
+                  <label class="form-label small font-bold">Semester Resources</label>
+                  <div style="max-height: 200px; overflow-y: auto; overflow-x: hidden; padding: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                    <?php for($i=1; $i<=8; $i++): ?>
+                      <div class="mb-3 p-2 bg-light rounded border">
+                        <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
+                        <div class="row g-1">
+                          <div class="col-3">
+                            <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus">
+                          </div>
+                          <div class="col-3">
+                            <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes">
+                          </div>
+                          <div class="col-3">
+                            <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable">
+                          </div>
+                          <div class="col-3">
+                            <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar">
+                          </div>
+                        </div>
+                      </div>
+                    <?php endfor; ?>
+                  </div>
+                </div>
+
                 <?php if ($checkBranchOrder): ?>
                 <div class="mb-2">
                   <label class="form-label small">Display Order (optional)</label>
@@ -647,7 +658,8 @@ $csrfToken = safe(get_csrf_token());
                               data-syllabus="<?= safe($b['syllabus_link'] ?? '') ?>"
                               data-calendar="<?= safe($b['calendar_link'] ?? '') ?>"
                               data-timetable="<?= safe($b['timetable_link'] ?? '') ?>"
-                              data-order="<?= safe($b['display_order'] ?? 0) ?>">Edit</button>
+                              data-order="<?= safe($b['display_order'] ?? 0) ?>"
+                              data-semester-data="<?= safe($b['semester_data'] ?? '{}') ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
                               <?= csrf_field() ?>
@@ -737,9 +749,9 @@ $csrfToken = safe(get_csrf_token());
 
           <?php if ($selected_course): ?>
             <!-- EDITABLE COURSE META + LINKS -->
-            <form method="POST">
+            <form id="editCourseForm" method="POST">
               <?= csrf_field() ?>
-              <input type="hidden" name="action" value="save_links">
+              <input type="hidden" name="action" id="course_edit_action" value="save_links">
               <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
 
               <!-- Editable Course Name & Code -->
@@ -782,22 +794,7 @@ $csrfToken = safe(get_csrf_token());
               </div>
               <?php endif; ?>
 
-              <!-- Semester Resources -->
-              <h6 class="mt-4 mb-2 small font-bold">Semester-wise Resources (Syllabus, Timetable, Calendar)</h6>
-              <div class="row g-2 mb-3">
-                <div class="col-md-4">
-                  <label class="form-label small">Sem Syllabus</label>
-                  <input type="url" name="sem_syllabus" class="form-control form-control-sm" value="<?= safe($sem_res['syllabus_link'] ?? '') ?>" placeholder="URL">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label small">Sem Timetable</label>
-                  <input type="url" name="sem_timetable" class="form-control form-control-sm" value="<?= safe($sem_res['timetable_link'] ?? '') ?>" placeholder="URL">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label small">Sem Calendar</label>
-                  <input type="url" name="sem_calendar" class="form-control form-control-sm" value="<?= safe($sem_res['calendar_link'] ?? '') ?>" placeholder="URL">
-                </div>
-              </div>
+              <!-- Semester resources removed (moved to branch) -->
 
               <!-- Editable Links -->
               <label class="form-label small mt-3">Course Links</label>
@@ -805,11 +802,14 @@ $csrfToken = safe(get_csrf_token());
                 <?php if (!empty($links)): ?>
                   <?php foreach ($links as $idx => $lnk): ?>
                     <div class="row link-row g-2 mb-2">
-                      <div class="col">
+                      <div class="col-md-5">
                         <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>" required>
                       </div>
-                      <div class="col">
+                      <div class="col-md-5">
                         <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>" required>
+                      </div>
+                      <div class="col-md-1">
+                        <input type="number" name="links[<?= $idx ?>][display_order]" class="form-control form-control-sm" value="<?= safe($lnk['display_order'] ?? 0) ?>" title="Order">
                       </div>
                       <div class="col-auto">
                         <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -818,11 +818,14 @@ $csrfToken = safe(get_csrf_token());
                   <?php endforeach; ?>
                 <?php else: ?>
                   <div class="row link-row g-2 mb-2">
-                    <div class="col">
+                    <div class="col-md-5">
                       <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
                     </div>
-                    <div class="col">
+                    <div class="col-md-5">
                       <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+                    </div>
+                    <div class="col-md-1">
+                      <input type="number" name="links[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
                     </div>
                     <div class="col-auto">
                       <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -841,11 +844,14 @@ $csrfToken = safe(get_csrf_token());
                 <?php if (!empty($pyqs)): ?>
                   <?php foreach ($pyqs as $idx => $p): ?>
                     <div class="row link-row g-2 mb-2">
-                      <div class="col">
+                      <div class="col-md-5">
                         <input type="text" name="pyqs[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($p['link_name']) ?>" required>
                       </div>
-                      <div class="col">
+                      <div class="col-md-5">
                         <input type="url" name="pyqs[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($p['url']) ?>" required>
+                      </div>
+                      <div class="col-md-1">
+                        <input type="number" name="pyqs[<?= $idx ?>][display_order]" class="form-control form-control-sm" value="<?= safe($p['display_order'] ?? 0) ?>" title="Order">
                       </div>
                       <div class="col-auto">
                         <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -871,8 +877,11 @@ $csrfToken = safe(get_csrf_token());
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqUpdateBtn">Add PYQ</button>
               </div>
 
-              <div class="mt-3">
-                <button class="btn btn-primary btn-sm">Save Course</button>
+              <div class="mt-3 d-flex justify-content-between">
+                <button class="btn btn-primary btn-sm">Save Course Settings</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDeleteCourse('<?= safe($selected_course['name']) ?>')">
+                  Delete Course
+                </button>
               </div>
 
             </form>
@@ -950,11 +959,14 @@ $csrfToken = safe(get_csrf_token());
               <label class="form-label small">Course links</label>
               <div id="links-list-course">
                 <div class="row link-row g-2 mb-2">
-                  <div class="col">
+                  <div class="col-md-5">
                     <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
                   </div>
-                  <div class="col">
+                  <div class="col-md-5">
                     <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+                  </div>
+                  <div class="col-md-1">
+                    <input type="number" name="links[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
                   </div>
                   <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
@@ -972,11 +984,14 @@ $csrfToken = safe(get_csrf_token());
               <label class="form-label small">PYQ links (optional)</label>
               <div id="pyqs-list-course">
                 <div class="row link-row g-2 mb-2">
-                  <div class="col">
+                  <div class="col-md-5">
                     <input type="text" name="pyqs[0][link_name]" class="form-control form-control-sm" placeholder="PYQ name">
                   </div>
-                  <div class="col">
+                  <div class="col-md-5">
                     <input type="url" name="pyqs[0][url]" class="form-control form-control-sm" placeholder="PYQ URL">
+                  </div>
+                  <div class="col-md-1">
+                    <input type="number" name="pyqs[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
                   </div>
                   <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
@@ -1062,6 +1077,9 @@ $csrfToken = safe(get_csrf_token());
     const calendar = btn.dataset.calendar || '';
     const timetable = btn.dataset.timetable || '';
     const order = btn.dataset.order || '0';
+    const semesterDataRaw = btn.dataset.semesterData || '{}';
+    let semesterData = {};
+    try { semesterData = JSON.parse(semesterDataRaw); } catch(e) { semesterData = {}; }
     const checkOrder = <?= $checkBranchOrder ? 'true' : 'false' ?>;
 
     const orderField = checkOrder ? `
@@ -1105,6 +1123,31 @@ $csrfToken = safe(get_csrf_token());
 
           ${orderField}
 
+          <div class="mb-3">
+            <h6 class="small font-bold mb-2">Semester Resources (Syllabus, Notes, Timetable, Calendar)</h6>
+            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+              <?php for($i=1; $i<=8; $i++): ?>
+                <div class="mb-3 p-2 bg-light rounded border">
+                  <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
+                  <div class="row g-1">
+                    <div class="col-3">
+                      <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus URL" id="sem_<?= $i ?>_syllabus_edit">
+                    </div>
+                    <div class="col-3">
+                      <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes URL" id="sem_<?= $i ?>_notes_edit">
+                    </div>
+                    <div class="col-3">
+                      <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable URL" id="sem_<?= $i ?>_timetable_edit">
+                    </div>
+                    <div class="col-3">
+                      <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar URL" id="sem_<?= $i ?>_calendar_edit">
+                    </div>
+                  </div>
+                </div>
+              <?php endfor; ?>
+            </div>
+          </div>
+
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
             <button class="btn btn-sm btn-primary">Save</button>
@@ -1116,6 +1159,15 @@ $csrfToken = safe(get_csrf_token());
     document.getElementById('cancelBranchEdit').addEventListener('click', ()=>{
       branchEditContainer.innerHTML = '';
     });
+
+    // Populate semester links
+    for(let i=1; i<=8; i++){
+        const sem = semesterData[i] || {};
+        if(document.getElementById(`sem_${i}_syllabus_edit`)) document.getElementById(`sem_${i}_syllabus_edit`).value = sem.syllabus || '';
+        if(document.getElementById(`sem_${i}_notes_edit`)) document.getElementById(`sem_${i}_notes_edit`).value = sem.notes || '';
+        if(document.getElementById(`sem_${i}_timetable_edit`)) document.getElementById(`sem_${i}_timetable_edit`).value = sem.timetable || '';
+        if(document.getElementById(`sem_${i}_calendar_edit`)) document.getElementById(`sem_${i}_calendar_edit`).value = sem.calendar || '';
+    }
 
     branchEditContainer.scrollIntoView({behavior:"smooth"});
   });
@@ -1179,11 +1231,14 @@ $csrfToken = safe(get_csrf_token());
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
-        <div class="col">
+        <div class="col-md-5">
           <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
         </div>
-        <div class="col">
+        <div class="col-md-5">
           <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+        </div>
+        <div class="col-md-1">
+          <input type="number" name="links[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
         </div>
         <div class="col-auto">
           <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -1200,11 +1255,14 @@ $csrfToken = safe(get_csrf_token());
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
-        <div class="col">
+        <div class="col-md-5">
           <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name" required>
         </div>
-        <div class="col">
+        <div class="col-md-5">
           <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL" required>
+        </div>
+        <div class="col-md-1">
+          <input type="number" name="pyqs[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
         </div>
         <div class="col-auto">
           <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -1305,6 +1363,15 @@ $csrfToken = safe(get_csrf_token());
       }
     });
   });
+
+  window.confirmDeleteCourse = function(name) {
+    if (confirm(`Are you sure you want to delete the course "${name}"?`)) {
+        if (confirm(`This action is PERMANENT. Are you REALLY sure you want to delete "${name}"?`)) {
+            document.getElementById('course_edit_action').value = 'delete_course';
+            document.getElementById('editCourseForm').submit();
+        }
+    }
+  };
 
 })();
 </script>

@@ -44,10 +44,9 @@ $courses = $cq->fetchAll();
 // image fallback
 $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80";
 
-// Fetch semester resources
-$resQ = $pdo->prepare('SELECT * FROM semester_resources WHERE branch_id = ? AND semester = ?');
-$resQ->execute([$branch_id, $semester]);
-$sem_res = $resQ->fetch();
+// Get semester resources from branch data
+$sem_data = json_decode($branch['semester_data'] ?: '{}', true);
+$sem_res = $sem_data[$semester] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -324,7 +323,7 @@ else: ?>
 
       <!-- Semester Resources Section -->
       <?php
-  $has_sem_links = $sem_res && ($sem_res['syllabus_link'] || $sem_res['timetable_link'] || $sem_res['calendar_link']);
+  $has_sem_links = $sem_res && (!empty($sem_res['syllabus']) || !empty($sem_res['timetable']) || !empty($sem_res['calendar']));
   if ($has_sem_links): ?>
       <div class="mt-16 pt-8 border-t-2 border-gray-100 dark:border-gray-800">
         <h2
@@ -339,8 +338,8 @@ else: ?>
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <?php if ($sem_res['syllabus_link']): ?>
-          <a href="<?= safe($sem_res['syllabus_link'])?>" target="_blank"
+          <?php if (!empty($sem_res['syllabus'])): ?>
+          <a href="<?= safe($sem_res['syllabus'])?>" target="_blank"
             class="flex items-center gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:border-blue-500 transition-all group">
             <div
               class="w-10 h-10 md:w-14 md:h-14 bg-blue-50 dark:bg-blue-900/30 rounded-lg md:rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
@@ -359,8 +358,8 @@ else: ?>
           <?php
     endif; ?>
 
-          <?php if ($sem_res['timetable_link']): ?>
-          <a href="<?= safe($sem_res['timetable_link'])?>" target="_blank"
+          <?php if (!empty($sem_res['timetable'])): ?>
+          <a href="<?= safe($sem_res['timetable'])?>" target="_blank"
             class="flex items-center gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:border-purple-500 transition-all group">
             <div
               class="w-10 h-10 md:w-14 md:h-14 bg-purple-50 dark:bg-purple-900/30 rounded-lg md:rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
@@ -377,8 +376,8 @@ else: ?>
           <?php
     endif; ?>
 
-          <?php if ($sem_res['calendar_link']): ?>
-          <a href="<?= safe($sem_res['calendar_link'])?>" target="_blank"
+          <?php if (!empty($sem_res['calendar'])): ?>
+          <a href="<?= safe($sem_res['calendar'])?>" target="_blank"
             class="flex items-center gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:border-indigo-500 transition-all group">
             <div
               class="w-10 h-10 md:w-14 md:h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg md:rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
@@ -445,7 +444,13 @@ else: ?>
           title.innerText = categoryTitle;
           content.innerHTML = '';
 
-          const uniqueLinks = displayLinks;
+          const uniqueLinks = displayLinks.sort((a, b) => {
+            const orderA = parseInt(a.display_order || 0);
+            const orderB = parseInt(b.display_order || 0);
+            if (orderA !== orderB) return orderA - orderB;
+            // Original order fallback (array position)
+            return 0;
+          });
 
           if (uniqueLinks.length === 0) {
             content.innerHTML = `<div class="py-20 text-center"><div class="text-gray-200 dark:text-gray-800 mb-4"><svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg></div><p class="text-gray-400 font-bold uppercase tracking-widest text-xs">No entries found yet.</p></div>`;

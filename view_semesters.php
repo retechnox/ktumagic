@@ -71,58 +71,55 @@ $branch_image = $branch['image_path'] ?:
     </div>
   </div>
 
-  <!-- Quick Links Section -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16">
-    <?php if (!empty($branch['syllabus_link'])): ?>
-      <a href="<?= safe($branch['syllabus_link']) ?>" target="_blank" 
-         class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 transition-all group">
-        <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Resource</p>
-          <h4 class="font-bold text-gray-800 dark:text-white">Syllabus</h4>
-        </div>
-      </a>
-    <?php endif; ?>
-
-    <?php if (!empty($branch['calendar_link'])): ?>
-      <a href="<?= safe($branch['calendar_link']) ?>" target="_blank" 
-         class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-indigo-500 transition-all group">
-        <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Academic</p>
-          <h4 class="font-bold text-gray-800 dark:text-white">Calendar</h4>
-        </div>
-      </a>
-    <?php endif; ?>
-
-    <?php if (!empty($branch['timetable_link'])): ?>
-      <a href="<?= safe($branch['timetable_link']) ?>" target="_blank" 
-         class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-purple-500 transition-all group">
-        <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Schedule</p>
-          <h4 class="font-bold text-gray-800 dark:text-white">Timetable</h4>
-        </div>
-      </a>
-    <?php endif; ?>
-  </div>
+  <?php 
+    $mode = isset($_GET['mode']) ? trim($_GET['mode']) : null;
+    $sem_data = json_decode($branch['semester_data'] ?: '{}', true);
+  ?>
 
   <div class="flex flex-col items-center justify-center text-center mb-10">
-    <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white font-['Sora'] mb-4">Choose Semester</h2>
+    <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white font-['Sora'] mb-4">
+      <?php 
+        if (strcasecmp($mode, 'syllabus') === 0) echo "KTU Syllabus";
+        elseif (strcasecmp($mode, 'calendar') === 0) echo "Academic Calendar";
+        elseif (strcasecmp($mode, 'timetable') === 0) echo "Timetable";
+        else echo "Choose Semester";
+      ?>
+    </h2>
     <div class="w-20 h-1.5 bg-blue-600 rounded-full mb-6"></div>
-    <p class="text-gray-500 dark:text-gray-400 max-w-lg">Access study materials, previous question papers, and essential notes curated for your specific semester.</p>
+    <p class="text-gray-500 dark:text-gray-400 max-w-lg">
+      <?php 
+        if ($mode) echo "Select a semester to directly view its " . safe($mode) . ".";
+        else echo "Access study materials, previous question papers, and essential notes curated for your specific semester.";
+      ?>
+    </p>
   </div>
 
   <!-- Semester Cards -->
   <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-    <?php for ($i = 1; $i <= 8; $i++): ?>
-      <a href="<?= sign_url('view_courses.php', ['branch_id' => $branch_id, 'semester' => $i]) ?>"
+    <?php for ($i = 1; $i <= 8; $i++): 
+      $has_link = ($mode && isset($sem_data[$i][$mode]) && !empty($sem_data[$i][$mode]));
+      
+      if ($mode) {
+          if ($has_link) {
+              $target_link = $sem_data[$i][$mode];
+              $is_external = true;
+          } elseif (strcasecmp($mode, 'notes') === 0) {
+              // For notes, if no direct link, fallback to courses list
+              $target_link = sign_url('view_courses.php', ['branch_id' => $branch_id, 'semester' => $i]);
+              $is_external = false;
+          } else {
+              // Strict modes (syllabus, calendar, timetable) -> 404 if missing
+              $target_link = "404.php";
+              $is_external = false;
+          }
+      } else {
+          // Default: Courses
+          $target_link = sign_url('view_courses.php', ['branch_id' => $branch_id, 'semester' => $i]);
+          $is_external = false;
+      }
+    ?>
+      <a href="<?= $is_external ? safe($target_link) : $target_link ?>"
+         <?= $is_external ? 'target="_blank"' : '' ?>
          class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center justify-center text-center">
         
         <!-- Hover Background Glow -->
@@ -136,10 +133,31 @@ $branch_image = $branch['image_path'] ?:
         </div>
         
         <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-blue-600 transition-colors">Semester <?= $i ?></h3>
-        <p class="text-gray-400 text-sm font-medium">Explore Notes & PYQs</p>
+        <p class="text-gray-400 text-sm font-medium">
+          <?php 
+            if ($mode) {
+                if ($has_link) echo "View " . ucfirst(safe($mode));
+                elseif (strcasecmp($mode, 'notes') === 0) echo "View Course Notes";
+                else echo "Not Added";
+            } else {
+                echo "Explore Notes & PYQs";
+            }
+          ?>
+        </p>
         
         <div class="mt-6 w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          <?php if ($mode): ?>
+            <?php if ($has_link): ?>
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            <?php elseif (strcasecmp($mode, 'notes') === 0): ?>
+              <!-- Normal arrow for notes fallback -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            <?php else: ?>
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <?php endif; ?>
+          <?php else: ?>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          <?php endif; ?>
         </div>
       </a>
     <?php endfor; ?>

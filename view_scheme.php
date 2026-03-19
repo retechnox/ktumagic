@@ -39,13 +39,16 @@ if (!verify_url_sig()) {
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <?php 
+      $mode = $_GET['mode'] ?? null;
+    ?>
     <?php if (!empty($schemes)): foreach ($schemes as $s): 
       $img = 'assets/logooo.png'; // Default
       if (strpos(strtolower($s['name']), '2019') !== false) $img = 'assets/2019/1.jpg';
       if (strpos(strtolower($s['name']), '2024') !== false || strpos(strtolower($s['name']), '2025') !== false) $img = 'assets/2025/1.jpg';
     ?>
       <!-- FIX: Removed link to semesters. Now goes to branches -->
-      <a href="<?= sign_url('view_branch.php', ['scheme_id' => $s['id']]) ?>"
+      <a href="<?= sign_url('view_branch.php', ['scheme_id' => $s['id'], 'mode' => $mode]) ?>"
          class="group block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
         <div class="aspect-video w-full overflow-hidden bg-gray-200 dark:bg-gray-700">
           <img src="<?= $img ?>" alt="<?= safe($s['name']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
