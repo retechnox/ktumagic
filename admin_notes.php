@@ -314,8 +314,25 @@ try {
             flash('Course links and metadata saved.', 'success');
         }
 
+        elseif ($action === 'save_contact') {
+            $jsonPath = __DIR__ . '/data/data.json';
+            $existingData = json_decode(@file_get_contents($jsonPath) ?: '{}', true);
+            $existingData['contact']['email']         = trim($_POST['ct_email'] ?? '');
+            $existingData['contact']['phone']         = trim($_POST['ct_phone'] ?? '');
+            $existingData['contact']['whatsapp_main'] = trim($_POST['ct_whatsapp_main'] ?? '');
+            $existingData['contact']['instagram']     = trim($_POST['ct_instagram'] ?? '');
+            $existingData['contact']['telegram']      = trim($_POST['ct_telegram'] ?? '');
+            $existingData['contact']['youtube']       = trim($_POST['ct_youtube'] ?? '');
+            file_put_contents($jsonPath, json_encode($existingData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            flash('Contact settings saved.', 'success');
+        }
+
         // redirect after POST to avoid double submit
-        header('Location: ' . $_SERVER['REQUEST_URI']);
+        if ($action === 'delete_course') {
+            header('Location: admin_notes.php');
+        } else {
+            header('Location: ' . $_SERVER['REQUEST_URI']);
+        }
         exit;
     }
 
@@ -455,6 +472,7 @@ $csrfToken = safe(get_csrf_token());
       <a href="#" class="nav-link" data-target="branchesSection"><span class="nav-caption">Branches</span></a>
       <a href="#" class="nav-link" data-target="coursesSection"><span class="nav-caption">Courses</span></a>
       <a href="#" class="nav-link active" data-target="linksSection"><span class="nav-caption">Course Links</span></a>
+      <a href="#" class="nav-link" data-target="contactSection"><span class="nav-caption">Contact Settings</span></a>
     </nav>
 
     <div class="mt-auto">
@@ -879,7 +897,8 @@ $csrfToken = safe(get_csrf_token());
 
               <div class="mt-3 d-flex justify-content-between">
                 <button class="btn btn-primary btn-sm">Save Course Settings</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDeleteCourse('<?= safe($selected_course['name']) ?>')">
+                <button type="button" class="btn btn-outline-danger btn-sm" 
+                        onclick="triggerCourseDelete('<?= $selected_course['id'] ?>', '<?= safe($selected_course['name']) ?>')">
                   Delete Course
                 </button>
               </div>
@@ -1012,6 +1031,69 @@ $csrfToken = safe(get_csrf_token());
         </div>
 
       </section>
+
+      <!-- Contact Settings Section -->
+      <?php
+        $ctJsonData = @file_get_contents(__DIR__ . '/data/data.json') ?: '{}';
+        $ctData = json_decode($ctJsonData, true);
+        $ct = $ctData['contact'] ?? [];
+      ?>
+      <section id="contactSection" class="page-section" style="display:none">
+        <div class="card card-rounded p-4 mb-4">
+          <h5 class="mb-1">Contact &amp; Social Links</h5>
+          <p class="text-muted small mb-3">These values are used across the website — contact page, footer, floating buttons, etc.</p>
+
+          <form method="POST">
+            <?= csrf_field() ?>
+            <input type="hidden" name="action" value="save_contact">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">📧 Email Address</label>
+                <input type="email" name="ct_email" class="form-control form-control-sm"
+                       value="<?= safe($ct['email'] ?? '') ?>" placeholder="support@ktumagic.in">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">📞 Phone Number</label>
+                <input type="text" name="ct_phone" class="form-control form-control-sm"
+                       value="<?= safe($ct['phone'] ?? '') ?>" placeholder="+91 XXXXX XXXXX">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">💬 WhatsApp Main Link</label>
+                <input type="url" name="ct_whatsapp_main" class="form-control form-control-sm"
+                       value="<?= safe($ct['whatsapp_main'] ?? '') ?>" placeholder="https://wa.me/91...">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">📸 Instagram URL</label>
+                <input type="url" name="ct_instagram" class="form-control form-control-sm"
+                       value="<?= safe($ct['instagram'] ?? '') ?>" placeholder="https://instagram.com/...">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">✈️ Telegram URL</label>
+                <input type="url" name="ct_telegram" class="form-control form-control-sm"
+                       value="<?= safe($ct['telegram'] ?? '') ?>" placeholder="https://t.me/...">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">▶️ YouTube URL</label>
+                <input type="url" name="ct_youtube" class="form-control form-control-sm"
+                       value="<?= safe($ct['youtube'] ?? '') ?>" placeholder="https://youtube.com/@...">
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button class="btn btn-primary btn-sm">Save Contact Settings</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Hidden Delete Course Form -->
+      <form id="deleteCourseForm" method="POST" style="display:none;">
+          <?= csrf_field() ?>
+          <input type="hidden" name="action" value="delete_course">
+          <input type="hidden" name="course_id" id="delete_course_id">
+      </form>
+
       <!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1364,11 +1446,11 @@ $csrfToken = safe(get_csrf_token());
     });
   });
 
-  window.confirmDeleteCourse = function(name) {
+  window.triggerCourseDelete = function(id, name) {
     if (confirm(`Are you sure you want to delete the course "${name}"?`)) {
         if (confirm(`This action is PERMANENT. Are you REALLY sure you want to delete "${name}"?`)) {
-            document.getElementById('course_edit_action').value = 'delete_course';
-            document.getElementById('editCourseForm').submit();
+            document.getElementById('delete_course_id').value = id;
+            document.getElementById('deleteCourseForm').submit();
         }
     }
   };

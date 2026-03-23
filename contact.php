@@ -116,7 +116,7 @@ $contact = $data['contact'] ?? [];
                 <div class="contact-info">
                     <h3>Email Support</h3>
                     <p>Send us an email and we'll get back to you within 24 hours.</p>
-                    <a href="mailto:support@ktumagic.in" class="contact-link">support@ktumagic.in</a>
+                    <a href="mailto:<?= safe($contact['email'] ?? 'support@ktumagic.in') ?>" class="contact-link"><?= safe($contact['email'] ?? 'support@ktumagic.in') ?></a>
                 </div>
             </div>
 
