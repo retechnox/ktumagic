@@ -1,10 +1,12 @@
 [
   {
     "title": "KTU Update",
-    "content": "The Detailed Time Table of B. Tech S2 (S) Examination January 2026 (2024 scheme) is published "
+    "content": "The Detailed Time Table of B. Tech S2 (S) Examination January 2026 (2024 scheme) is published ",
+    "link": "index.php?updates=true"
   },
   {
     "title": "New Material Added",
-    "content": "2024 Scheme S2 Notes are now fully updated for all branches."
+    "content": "2024 Scheme S2 Notes are now fully updated for all branches.",
+    "link": "index.php?updates=true"
   }
 ]

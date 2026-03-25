@@ -1,3 +1,4 @@
+<?php
 include_once 'db.php';
 $jsonData = @file_get_contents(__DIR__ . '/data/data.json') ?: '{}';
 $data = json_decode($jsonData, true);
@@ -8,13 +9,15 @@ $contact = $data['contact'] ?? [];
     --neon-purple: #8b5cf6;
     --neon-pink: #ec4899;
     --primary-blue: #2563EB;
+    --bg-nav: #ffffff;
+    --hamburger-color: #0f172a;
+    --text-primary: #0f172a;
+    --border-color: rgba(0, 0, 0, 0.05);
   }
 
   /* ======================= NAVBAR STYLE ======================= */
   nav {
-    background: var(--bg-nav);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: var(--bg-nav) !important;
     padding: 15px 0;
     position: fixed;
     top: 0;
@@ -22,7 +25,6 @@ $contact = $data['contact'] ?? [];
     z-index: 1000;
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-    transition: background 0.3s ease;
   }
 
   .nav-inner {
@@ -195,7 +197,7 @@ $contact = $data['contact'] ?? [];
     right: -320px;
     width: 320px;
     height: 100vh;
-    background: var(--sidebar-bg);
+    background: var(--sidebar-bg) !important;
     z-index: 9999;
     transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -684,7 +686,7 @@ $contact = $data['contact'] ?? [];
   <div class="sidebar-footer">
     <div class="copyright">
       &copy; Copyright 2025 KTU Magic. All rights reserved powered by <a href="#"
-        style="color:var(--primary-blue); text-decoration:none;">ktunotes.in</a>
+        style="color:var(--primary-blue); text-decoration:none;">ktumagin.in</a>
     </div>
   </div>
 </div>

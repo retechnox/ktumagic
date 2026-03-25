@@ -65,46 +65,7 @@ $contact = $data['contact'] ?? [];
     }
 
 
-    .logo {
-      font-family: 'Sora', sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .nav-links a:hover {
-      color: var(--primary-blue);
-    }
-
-    .upload-cta {
-      background: var(--primary-blue);
-      color: white !important;
-      padding: 8px 18px;
-      border-radius: 50px;
-      transition: 0.3s;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-
-    .upload-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
-    }
+    /* Redundant nav styles removed - now handled by nav.php */
 
     .alert-bar {
       width: 100%;
@@ -1012,53 +973,9 @@ $contact = $data['contact'] ?? [];
     }
 
 
-    /* ---------- HAMBURGER ---------- */
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      gap: 5px;
-      flex-direction: column;
-    }
-
-    .hamburger span {
-      width: 22px;
-      height: 2px;
-      background: var(--hamburger-color);
-      border-radius: 2px;
-    }
-
-    /* ---------- MOBILE NAV ---------- */
-    .mobile-nav {
-      position: fixed;
-      top: 100px;
-      left: 0;
-      width: 100%;
-      background: var(--bg-secondary);
-      display: none;
-      flex-direction: column;
-      padding: 20px;
-      gap: 14px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, .1);
-      z-index: 999;
-    }
-
-    .mobile-nav a {
-      font-weight: 700;
-      text-decoration: none;
-      color: var(--text-primary);
-    }
-
-    /* ---------- RESPONSIVE ---------- */
+    /* Mobile nav now handled entirely by nav.php sidebar system */
     @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-      }
-
-      .hamburger {
-        display: flex;
-      }
+      .nav-links { display: none; }
     }
   </style>
 </head>
@@ -1118,8 +1035,17 @@ $grid_links = [
   7 => sign_url("view_scheme.php", []), // KTU Tuitions
   8 => "javascript:void(0)" // Text Books (Updates)
 ];
-for ($i = 1; $i <= 8; $i++): ?>
-      <a href="<?= $grid_links[$i]?>" class="fade-el" style="animation-delay: <?= $i * 50?>ms" <?= ($i === 8) ? 'onclick="showAllUpdates()"' : '' ?>>
+$updateJson = @file_get_contents(__DIR__ . '/data/update.json');
+$updates = json_decode($updateJson, true) ?: [];
+$latestUpdate = !empty($updates) ? end($updates) : null;
+for ($i = 1; $i <= 8; $i++): 
+    $href = ($i === 8) ? 'javascript:void(0)' : $grid_links[$i];
+    $onclick = ($i === 8) ? 'onclick="showAllUpdates()"' : '';
+?>
+      <a href="<?= $href ?>" 
+         class="fade-el" 
+         style="animation-delay: <?= $i * 50?>ms"
+         <?= $onclick ?>>
         <img src="assets/<?= $i?>.jpg" alt="Icon <?= $i?>">
       </a>
       <?php
@@ -1447,14 +1373,14 @@ endif; ?>
       </div>
     </div>
 
-    <!-- <div id="updateModal" class="modal-backdrop">
-  <div class="modal-card">
-    <h3 id="updateTitle"></h3>
-    <p id="updateContent"></p>
-    <button onclick="closeUpdate()">Close</button>
-  </div>
-</div> -->
 
+    <div id="updateModal" class="modal-backdrop">
+      <div class="modal-card" style="position: relative; padding-top: 40px;">
+        <button onclick="closeUpdate()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+        <h3 id="updateTitle" style="margin-top: 0;"></h3>
+        <div id="updateContent"></div>
+      </div>
+    </div>
 
     <script>
       // Banner Carousel Logic
@@ -1528,10 +1454,12 @@ endif; ?>
             updateTitle.textContent = "Latest Updates";
             let html = '<div style="max-height: 400px; overflow-y: auto; text-align: left; padding: 10px;">';
             reversed.forEach(upd => {
+              const linkHtml = upd.link ? `<a href="${upd.link}" style="display: inline-block; margin-top: 8px; color: var(--primary-blue); font-weight: 600; text-decoration: none;">View Details →</a>` : '';
               html += `
                 <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                   <h4 style="margin: 0 0 8px; color: var(--primary-blue);">${upd.title}</h4>
                   <p style="margin: 0; font-size: 14px; line-height: 1.6;">${upd.content}</p>
+                  ${linkHtml}
                 </div>
               `;
             });
@@ -1544,15 +1472,6 @@ endif; ?>
           });
       }
 
-      fetch("data/update.json")
-        .then(res => res.json())
-        .then(data => {
-          const mainUpdate = Array.isArray(data) ? data[data.length - 1] : data;
-          document.getElementById("updateTitle").textContent = mainUpdate.title;
-          document.getElementById("updateContent").textContent = mainUpdate.content;
-          document.getElementById("updateModal").style.display = "flex";
-        })
-        .catch(() => { });
 
       function closeUpdate() {
         document.getElementById("updateModal").style.display = "none";

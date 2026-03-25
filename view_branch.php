@@ -78,24 +78,34 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
   <?php else: ?>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-      <?php foreach ($branches as $b): 
-        $img = $b['image_path'] ?: $DEFAULT_IMG;
+      <?php 
+        $mode = $_GET['mode'] ?? '';
+        foreach ($branches as $b): 
+          $img = $b['image_path'] ?: $DEFAULT_IMG;
+          $displayName = $b['name'];
+          if ($mode === 'syllabus') {
+              // Remove "notes" (case-insensitive) from title
+              $displayName = preg_replace('/\s*notes\s*/i', ' ', $displayName);
+              $displayName = trim($displayName);
+          }
       ?>
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
       <?php 
         $sem_params = ['branch_id' => $b['id']];
-        if (isset($_GET['mode'])) $sem_params['mode'] = $_GET['mode'];
+        if ($mode) $sem_params['mode'] = $mode;
       ?>
       <a href="<?= sign_url('view_semesters.php', $sem_params) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
+        <?php if ($mode !== 'syllabus'): ?>
         <img referrerpolicy="no-referrer" src="<?= safe($img) ?>"
              class="w-full aspect-[4/3] object-cover rounded-lg mb-3"
              onerror="this.src='<?= $DEFAULT_IMG ?>'">
+        <?php endif; ?>
 
         <div class="text-lg font-semibold dark:text-white">
-          <?= safe($b['name']) ?>
+          <?= safe($displayName) ?>
         </div>
 
         <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">

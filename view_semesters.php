@@ -14,7 +14,7 @@ if (!$branch_id) {
 
 // Verify signature for anti-scraping
 if (!verify_url_sig()) {
-  header("Location: index.php");
+  header("Location: 404.php");
   exit;
 }
 
@@ -61,14 +61,14 @@ $branch_image = $branch['image_path'] ?:
     <div class="max-w-5xl mx-auto px-4 pb-10">
 
       <!-- Breadcrumb -->
-      <!--
+      
   <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
     <a href="<?= sign_url('view_scheme.php', [])?>" class="hover:underline">Schemes</a> &rsaquo;
     <a href="<?= sign_url('view_branch.php', ['scheme_id' => $scheme['id']])?>" class="hover:underline"><?= safe($scheme['name'])?></a> 
     &rsaquo;
     <span class="font-semibold"><?= safe($branch['name'])?></span>
   </div>
-  -->
+ 
 
       <!-- Header banner -->
       <div class="relative rounded-[2rem] overflow-hidden shadow-2xl mb-12 group">
@@ -82,9 +82,7 @@ $branch_image = $branch['image_path'] ?:
             class="px-4 py-1 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full mb-4 tracking-widest uppercase">
             <?= safe($scheme['name'])?>
           </span>
-          <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
-            <?= safe($branch['name'])?>
-          </h2>
+
         </div>
       </div>
 
@@ -106,8 +104,11 @@ else
       </div>
 
       <!-- Semester Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <?php for ($i = 1; $i <= 8; $i++):
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <?php 
+        $isGroup = stripos($branch['name'], 'group') !== false;
+        $maxSem = $isGroup ? 2 : 8;
+        for ($i = 1; $i <= $maxSem; $i++):
   $has_link = ($mode && isset($sem_data[$i][$mode]) && !empty($sem_data[$i][$mode]));
 
   if ($mode) {
@@ -133,8 +134,8 @@ else
   }
 ?>
         <a href="<?= $is_external ? safe($target_link) : $target_link?>" <?= $is_external ? 'target="_blank"' : '' ?>
-          class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border
-          border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex
+          class="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border
+          border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 flex
           flex-col items-center justify-center text-center">
 
           <!-- Hover Background Glow -->
@@ -142,41 +143,25 @@ else
             class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
           </div>
 
-          <div class="relative mb-6">
+          <div class="relative mb-4">
             <div
               class="absolute inset-0 bg-blue-600 blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500">
             </div>
             <div
-              class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white rounded-[2rem] flex items-center justify-center shadow-xl group-hover:rotate-6 transition-all duration-500 relative z-10">
-              <span class="text-4xl font-extrabold font-['Sora']">S
+              class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-3 transition-all duration-500 relative z-10">
+              <span class="text-2xl font-extrabold font-['Sora']">S
                 <?= $i?>
               </span>
             </div>
           </div>
 
           <h3
-            class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-blue-600 transition-colors">
+            class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-0 group-hover:text-blue-600 transition-colors">
             Semester
             <?= $i?>
           </h3>
-          <p class="text-gray-400 text-sm font-medium">
-            <?php
-  if ($mode) {
-    if ($has_link)
-      echo "View " . ucfirst(safe($mode));
-    elseif (strcasecmp($mode, 'notes') === 0)
-      echo "View Course Notes";
-    else
-      echo "Not Added";
-  }
-  else {
-    echo "Explore Notes & PYQs";
-  }
-?>
-          </p>
-
           <div
-            class="mt-6 w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+            class="mt-4 w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
             <?php if ($mode): ?>
             <?php if ($has_link): ?>
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

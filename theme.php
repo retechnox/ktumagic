@@ -17,7 +17,7 @@
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
   --bg-card: #ffffff;
-  --bg-nav: rgba(255, 255, 255, 0.65);
+  --bg-nav: #ffffff;
   --bg-dropdown: #ffffff;
   --bg-submenu: #f8fafc;
   --text-primary: #0f172a;
@@ -48,7 +48,7 @@
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --bg-card: #1e293b;
-  --bg-nav: rgba(15, 23, 42, 0.85);
+  --bg-nav: #0f172a;
   --bg-dropdown: #1e293b;
   --bg-submenu: #0f172a;
   --text-primary: #f1f5f9;

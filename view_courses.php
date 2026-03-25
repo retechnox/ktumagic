@@ -118,9 +118,6 @@ $sem_res = $sem_data[$semester] ?? null;
           <span class="px-4 py-1.5 bg-blue-600/30 backdrop-blur-md border border-white/20 text-white text-xs font-bold rounded-full mb-4 tracking-widest uppercase">
             <?= safe($scheme['name']) ?>
           </span>
-          <!-- <h2 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-2xl font-['Sora'] leading-tight">
-            <?= safe($branch['name']) ?>
-          </h2> -->
         </div>
       </div>
 
