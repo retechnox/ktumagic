@@ -895,15 +895,43 @@ $csrfToken = safe(get_csrf_token());
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqUpdateBtn">Add PYQ</button>
               </div>
 
-              <div class="mt-3 d-flex justify-content-between">
-                <button class="btn btn-primary btn-sm">Save Course Settings</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" 
-                        onclick="triggerCourseDelete('<?= $selected_course['id'] ?>', '<?= safe($selected_course['name']) ?>')">
-                  Delete Course
-                </button>
-              </div>
-
             </form>
+
+            <div class="mt-4 p-3 border-top bg-light rounded shadow-sm">
+                <h6 class="text-danger small mb-2 fw-bold">Danger Zone</h6>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">
+                    Delete Entire Course
+                </button>
+                <p class="text-muted x-small mt-2 mb-0">This will delete all links, PYQs, and metadata associated with this course. This action cannot be undone.</p>
+            </div>
+
+            <!-- Delete Course Modal -->
+            <div class="modal fade" id="deleteCourseModal" tabindex="-1" aria-labelledby="deleteCourseModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteCourseModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Are you sure you want to PERMANENTLY delete the course:</p>
+                    <p class="fw-bold fs-5 text-dark"><?= safe($selected_course['name']) ?></p>
+                    <div class="alert alert-warning py-2 mb-0 small">
+                        ⚠️ This will remove all associated links and documents. This action cannot be undone.
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="action" value="delete_course">
+                        <input type="hidden" name="course_id" value="<?= $selected_course['id'] ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">Yes, Delete Course</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           <?php endif; ?>
 
         </div>
@@ -1087,18 +1115,15 @@ $csrfToken = safe(get_csrf_token());
         </div>
       </section>
 
-      <!-- Hidden Delete Course Form -->
-      <form id="deleteCourseForm" method="POST" style="display:none;">
-          <?= csrf_field() ?>
-          <input type="hidden" name="action" value="delete_course">
-          <input type="hidden" name="course_id" id="delete_course_id">
-      </form>
+      <!-- Hidden Forms Removed -->
 
       <!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-(function(){
+  /* -------------------------
+        GLOBAL FUNCTIONS
+  -------------------------- */
 
   /* -------------------------
         SECTION HANDLING
@@ -1411,21 +1436,21 @@ $csrfToken = safe(get_csrf_token());
 
 
   /* -------------------------
-      EDIT COURSE MODAL
+      EDIT COURSE MODAL (Safety Wrap)
   -------------------------- */
   const courseEditModalEl = document.getElementById("courseEditModal");
-  const courseEditModal = new bootstrap.Modal(courseEditModalEl);
+  if (courseEditModalEl) {
+    const courseEditModal = new bootstrap.Modal(courseEditModalEl);
 
-  document.querySelectorAll(".btn-edit-course").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-
-      document.getElementById("modal_course_id").value = btn.dataset.id;
-      document.getElementById("modal_course_name").value = btn.dataset.name;
-      document.getElementById("modal_course_sem").value = btn.dataset.sem;
-
-      courseEditModal.show();
+    document.querySelectorAll(".btn-edit-course").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.getElementById("modal_course_id").value = btn.dataset.id;
+        document.getElementById("modal_course_name").value = btn.dataset.name;
+        document.getElementById("modal_course_sem").value = btn.dataset.sem;
+        courseEditModal.show();
+      });
     });
-  });
+  }
 
   /* -------------------------
       PREVENT DOUBLE SUBMISSION
@@ -1437,7 +1462,7 @@ $csrfToken = safe(get_csrf_token());
         return;
       }
       this.dataset.submitting = 'true';
-      const btn = this.querySelector('button[type="submit"], button.btn-primary, button.btn-success, button.btn-danger, button.btn-outline-primary, button.btn-outline-danger');
+      const btn = this.querySelector('button[type="submit"]');
       if (btn) {
         btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Wait...';
         btn.classList.add('disabled');
@@ -1446,16 +1471,7 @@ $csrfToken = safe(get_csrf_token());
     });
   });
 
-  window.triggerCourseDelete = function(id, name) {
-    if (confirm(`Are you sure you want to delete the course "${name}"?`)) {
-        if (confirm(`This action is PERMANENT. Are you REALLY sure you want to delete "${name}"?`)) {
-            document.getElementById('delete_course_id').value = id;
-            document.getElementById('deleteCourseForm').submit();
-        }
-    }
-  };
 
-})();
 </script>
 
 </body>
