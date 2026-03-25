@@ -43,9 +43,9 @@ if (!verify_url_sig()) {
       $mode = $_GET['mode'] ?? null;
     ?>
     <?php if (!empty($schemes)): foreach ($schemes as $s): 
-      $img = 'assets/logooo.png'; // Default
-      if (strpos(strtolower($s['name']), '2019') !== false) $img = 'assets/2019/1.jpg';
-      if (strpos(strtolower($s['name']), '2024') !== false || strpos(strtolower($s['name']), '2025') !== false) $img = 'assets/2025/1.jpg';
+      $img = 'assets/logooo.webp'; // Default
+      if (strpos(strtolower($s['name']), '2019') !== false) $img = 'assets/2019/1.webp';
+      if (strpos(strtolower($s['name']), '2024') !== false || strpos(strtolower($s['name']), '2025') !== false) $img = 'assets/2025/1.webp';
     ?>
       <!-- FIX: Removed link to semesters. Now goes to branches -->
       <a href="<?= sign_url('view_branch.php', ['scheme_id' => $s['id'], 'mode' => $mode]) ?>"

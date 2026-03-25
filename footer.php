@@ -237,7 +237,7 @@ $contact = $data['contact'] ?? [];
     <div class="container footer-grid">
         <div class="footer-brand">
             <a href="index.php" class="logo" style="display:block; margin-bottom: 24px;">
-                <img src="assets/logooo.png" alt="KTU Magic"
+                <img src="assets/logooo.webp" alt="KTU Magic"
                     style="height: 150px; width: auto; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25));">
             </a>
             <p class="footer-desc">

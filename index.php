@@ -1002,16 +1002,16 @@ $contact = $data['contact'] ?? [];
   <div class="container banner-container">
     <div class="banner-carousel" id="mainCarousel">
       <div class="carousel-slide active">
-        <img src="assets/heroimg/2.jpg.jpeg" alt="KTU Magic Banner 1" loading="eager">
+        <img src="assets/heroimg/2.jpg.webp" alt="KTU Magic Banner 1" loading="eager">
       </div>
       <div class="carousel-slide">
-        <img src="assets/heroimg/3.jpg.jpeg" alt="KTU Magic Banner 2" loading="lazy">
+        <img src="assets/heroimg/3.jpg.webp" alt="KTU Magic Banner 2" loading="lazy">
       </div>
       <div class="carousel-slide">
-        <img src="assets/heroimg/4.jpg.jpeg" alt="KTU Magic Banner 3" loading="lazy">
+        <img src="assets/heroimg/4.jpg.webp" alt="KTU Magic Banner 3" loading="lazy">
       </div>
       <div class="carousel-slide">
-        <img src="assets/heroimg/5.jpg.jpeg" alt="KTU Magic Banner 4" loading="lazy">
+        <img src="assets/heroimg/5.jpg.webp" alt="KTU Magic Banner 4" loading="lazy">
       </div>
 
       <button class="carousel-btn carousel-prev" onclick="moveSlide(-1)">❮</button>
@@ -1046,7 +1046,7 @@ for ($i = 1; $i <= 8; $i++):
          class="fade-el" 
          style="animation-delay: <?= $i * 50?>ms"
          <?= $onclick ?>>
-        <img src="assets/<?= $i?>.jpg" alt="Icon <?= $i?>">
+        <img src="assets/<?= $i?>.webp" alt="Icon <?= $i?>">
       </a>
       <?php
 endfor; ?>
@@ -1275,7 +1275,7 @@ endif; ?>
       <h2 style="font-family:'Sora'; font-size:28px; margin:60px 0 25px;">AVAILABLE SCHEMES</h2>
       <div class="scheme-grid">
         <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>" class="card scheme-card fade-el">
-          <img src="assets/2019/1.jpg" alt="2019">
+          <img src="assets/2019/1.webp" alt="2019">
           <div class="card-body">
             <h3 style="margin:0; font-family:'Sora', sans-serif; font-size: 16px;">2019 SCHEME MATERIALS</h3>
             <div
@@ -1284,7 +1284,7 @@ endif; ?>
           </div>
         </a>
         <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>" class="card scheme-card fade-el">
-          <img src="assets/2025/1.jpg" alt="2024">
+          <img src="assets/2025/1.webp" alt="2024">
           <div class="card-body">
             <h3 style="margin:0; font-family:'Sora', sans-serif; font-size: 16px;">2024 SCHEME MATERIALS</h3>
             <div
