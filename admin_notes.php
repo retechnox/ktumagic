@@ -89,6 +89,13 @@ try {
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
             
+            // Check for redirect_branch_id column
+            $checkRedirectCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'redirect_branch_id'")->rowCount() > 0;
+            if (!$checkRedirectCol) {
+                $pdo->exec("ALTER TABLE branches ADD COLUMN redirect_branch_id INT DEFAULT NULL");
+            }
+            $redirect_id = intval($_POST['redirect_branch_id'] ?? 0) ?: null;
+
             if (!$scheme_id) throw new Exception('Select a scheme.');
             if ($name === '') throw new Exception('Branch name is required.');
 
@@ -109,11 +116,11 @@ try {
             $semester_data = json_encode($sem_data);
 
             if ($checkOrderCol) {
-                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, display_order, semester_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $order, $semester_data]);
+                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, display_order, semester_data, redirect_branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $order, $semester_data, $redirect_id]);
             } else {
-                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, semester_data) VALUES (?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $semester_data]);
+                $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, semester_data, redirect_branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$scheme_id, $name, $image, $syllabus, $calendar, $timetable, $semester_data, $redirect_id]);
             }
             flash('Branch added.', 'success');
         }
@@ -125,7 +132,6 @@ try {
             $calendar = trim($_POST['calendar_link'] ?? '');
             $timetable = trim($_POST['timetable_link'] ?? '');
             
-            $sem_data = [];
             if (isset($_POST['semester_links'])) {
                 foreach ($_POST['semester_links'] as $sem => $links) {
                     $sem_data[$sem] = [
@@ -137,6 +143,13 @@ try {
                 }
             }
             $semester_data = json_encode($sem_data);
+            $redirect_id = intval($_POST['redirect_branch_id'] ?? 0) ?: null;
+
+            // Ensure column exists
+            $checkRedirectCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'redirect_branch_id'")->rowCount() > 0;
+            if (!$checkRedirectCol) {
+                $pdo->exec("ALTER TABLE branches ADD COLUMN redirect_branch_id INT DEFAULT NULL");
+            }
 
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM branches LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
@@ -148,19 +161,19 @@ try {
 
             if ($image !== null) {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $order, $semester_data, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ?, redirect_branch_id = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $order, $semester_data, $redirect_id, $branch_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $semester_data, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, image_path = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ?, redirect_branch_id = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $image, $syllabus, $calendar, $timetable, $semester_data, $redirect_id, $branch_id]);
                 }
             } else {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $order, $semester_data, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, display_order = ?, semester_data = ?, redirect_branch_id = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $order, $semester_data, $redirect_id, $branch_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ? WHERE id = ?');
-                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $semester_data, $branch_id]);
+                    $stmt = $pdo->prepare('UPDATE branches SET name = ?, syllabus_link = ?, calendar_link = ?, timetable_link = ?, semester_data = ?, redirect_branch_id = ? WHERE id = ?');
+                    $stmt->execute([$branch_name, $syllabus, $calendar, $timetable, $semester_data, $redirect_id, $branch_id]);
                 }
             }
             flash('Branch updated.', 'success');
@@ -424,6 +437,60 @@ $csrfToken = safe(get_csrf_token());
     .link-row .form-control{border-radius:6px}
     .flash{margin-bottom:16px}
 
+    /* Search bar styling */
+    .search-wrapper { position: relative; width: 100%; }
+    .search-wrapper::before {
+      content: '🔍';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: #aaa;
+      pointer-events: none;
+    }
+    #filter_search {
+      padding-left: 38px;
+      height: 42px;
+      font-size: 0.95rem;
+      border: 2px solid #e9f2ff;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+    #filter_search:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+    #search_suggestions {
+      top: 102%;
+      border-color: #e9f2ff;
+    }
+
+    /* Suggestions Dropdown */
+    #search_suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .suggestion-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: #f8fbff; color: #0d6efd; }
+    .suggestion-item .course-name { font-weight: bold; display: block; }
+    .suggestion-item .course-meta { font-size: 0.75rem; color: #6c757d; }
+
     body.sidebar-collapsed .sidebar{
       width:var(--sidebar-collapsed) !important;
     }
@@ -617,12 +684,12 @@ $csrfToken = safe(get_csrf_token());
                   <input type="url" name="timetable_link" class="form-control form-control-sm">
                 </div>
 
+                <div class="mb-2">
+                  <label class="form-label small text-primary fw-bold">Redirect S1 & S2 to Branch ID (optional)</label>
+                  <input type="number" name="redirect_branch_id" class="form-control form-control-sm" placeholder="Enter Branch ID">
+                </div>
+
                 <div class="mb-3">
-                  <label class="form-label small font-bold">Semester Resources</label>
-                  <div style="max-height: 200px; overflow-y: auto; overflow-x: hidden; padding: 5px; border: 1px solid #ddd; border-radius: 5px;">
-                    <?php for($i=1; $i<=8; $i++): ?>
-                      <div class="mb-3 p-2 bg-light rounded border">
-                        <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
                         <div class="row g-1">
                           <div class="col-3">
                             <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus">
@@ -637,9 +704,6 @@ $csrfToken = safe(get_csrf_token());
                             <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar">
                           </div>
                         </div>
-                      </div>
-                    <?php endfor; ?>
-                  </div>
                 </div>
 
                 <?php if ($checkBranchOrder): ?>
@@ -677,6 +741,7 @@ $csrfToken = safe(get_csrf_token());
                               data-calendar="<?= safe($b['calendar_link'] ?? '') ?>"
                               data-timetable="<?= safe($b['timetable_link'] ?? '') ?>"
                               data-order="<?= safe($b['display_order'] ?? 0) ?>"
+                              data-redirect="<?= safe($b['redirect_branch_id'] ?? '') ?>"
                               data-semester-data="<?= safe($b['semester_data'] ?? '{}') ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
@@ -736,8 +801,11 @@ $csrfToken = safe(get_csrf_token());
               </select>
             </div>
             <div class="col-md-4">
-              <label class="form-label small">Search</label>
-              <input id="filter_search" class="form-control form-control-sm" placeholder="Search course...">
+              <label class="form-label small fw-bold text-primary mb-1">Quick Search</label>
+              <div class="search-wrapper">
+                <input id="filter_search" class="form-control" placeholder="Search by name or code..." autocomplete="off">
+                <div id="search_suggestions"></div>
+              </div>
             </div>
           </div>
 
@@ -806,14 +874,6 @@ $csrfToken = safe(get_csrf_token());
                        value="<?= safe($selected_course['image_path']) ?>"
                           placeholder="Drive link (optional)">
               </div>
-
-              <?php if ($checkCourseOrder): ?>
-              <!-- Editable Display Order -->
-              <div class="mb-2">
-                <label class="form-label small">Display Order</label>
-                <input type="number" name="display_order" class="form-control form-control-sm" value="<?= safe($selected_course['display_order'] ?? 0) ?>">
-              </div>
-              <?php endif; ?>
 
               <!-- Semester resources removed (moved to branch) -->
 
@@ -1001,12 +1061,6 @@ $csrfToken = safe(get_csrf_token());
                 <input type="text" name="course_image" class="form-control form-control-sm">
               </div>
 
-              <?php if ($checkCourseOrder): ?>
-              <div class="col-md-1">
-                <label class="form-label small">Order</label>
-                <input type="number" name="display_order" class="form-control form-control-sm" value="0">
-              </div>
-              <?php endif; ?>
             </div>
 
             <div class="mt-3">
@@ -1191,6 +1245,7 @@ $csrfToken = safe(get_csrf_token());
     const calendar = btn.dataset.calendar || '';
     const timetable = btn.dataset.timetable || '';
     const order = btn.dataset.order || '0';
+    const redirect_id = btn.dataset.redirect || '';
     const semesterDataRaw = btn.dataset.semesterData || '{}';
     let semesterData = {};
     try { semesterData = JSON.parse(semesterDataRaw); } catch(e) { semesterData = {}; }
@@ -1235,32 +1290,37 @@ $csrfToken = safe(get_csrf_token());
             <input type="url" name="timetable_link" class="form-control form-control-sm" value="${timetable}">
           </div>
 
+          <div class="mb-2">
+            <label class="form-label small text-primary fw-bold">Redirect S1 & S2 to Branch ID (optional)</label>
+            <input type="number" name="redirect_branch_id" class="form-control form-control-sm" value="${redirect_id}" placeholder="Enter Branch ID">
+          </div>
+
           ${orderField}
 
           <div class="mb-3">
-            <h6 class="small font-bold mb-2">Semester Resources (Syllabus, Notes, Timetable, Calendar)</h6>
-            <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
-              <?php for($i=1; $i<=8; $i++): ?>
-                <div class="mb-3 p-2 bg-light rounded border">
-                  <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
-                  <div class="row g-1">
-                    <div class="col-3">
-                      <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus URL" id="sem_<?= $i ?>_syllabus_edit">
-                    </div>
-                    <div class="col-3">
-                      <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes URL" id="sem_<?= $i ?>_notes_edit">
-                    </div>
-                    <div class="col-3">
-                      <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable URL" id="sem_<?= $i ?>_timetable_edit">
-                    </div>
-                    <div class="col-3">
-                      <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar URL" id="sem_<?= $i ?>_calendar_edit">
+              <h6 class="small font-bold mb-2">Semester Resources (Syllabus, Notes, Timetable, Calendar)</h6>
+              <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+                <?php for($i=1; $i<=8; $i++): ?>
+                  <div class="mb-3 p-2 bg-light rounded border">
+                    <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
+                    <div class="row g-1">
+                      <div class="col-3">
+                        <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus URL" id="sem_<?= $i ?>_syllabus_edit">
+                      </div>
+                      <div class="col-3">
+                        <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes URL" id="sem_<?= $i ?>_notes_edit">
+                      </div>
+                      <div class="col-3">
+                        <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable URL" id="sem_<?= $i ?>_timetable_edit">
+                      </div>
+                      <div class="col-3">
+                        <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar URL" id="sem_<?= $i ?>_calendar_edit">
+                      </div>
                     </div>
                   </div>
-                </div>
-              <?php endfor; ?>
+                <?php endfor; ?>
+              </div>
             </div>
-          </div>
 
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
@@ -1294,6 +1354,7 @@ $csrfToken = safe(get_csrf_token());
   const filterBranch = document.getElementById("filter_branch");
   const filterSem = document.getElementById("filter_sem");
   const filterSearch = document.getElementById("filter_search");
+  const suggestionsBox = document.getElementById("search_suggestions");
   const courseSelect = document.getElementById("course_select_for_links");
 
   function applyFilters(){
@@ -1301,6 +1362,8 @@ $csrfToken = safe(get_csrf_token());
     const fb = (filterBranch.value || "").toLowerCase();
     const fsem = (filterSem.value || "");
     const fsearch = (filterSearch.value || "").toLowerCase();
+
+    const matches = [];
 
     Array.from(courseSelect.options).forEach((opt, idx)=>{
       if(idx === 0) return; // skip first placeholder
@@ -1318,13 +1381,53 @@ $csrfToken = safe(get_csrf_token());
 
       opt.hidden = !show;
       if(opt.hidden && opt.selected) opt.selected = false;
+
+      if(show && fsearch.length > 0) {
+        matches.push({
+          name: opt.text,
+          url: opt.value
+        });
+      }
     });
+
+    renderSuggestions(matches);
   }
+
+  function renderSuggestions(matches) {
+    if (matches.length === 0) {
+      suggestionsBox.style.display = 'none';
+      return;
+    }
+
+    suggestionsBox.innerHTML = '';
+    matches.slice(0, 10).forEach(match => {
+      const div = document.createElement('div');
+      div.className = 'suggestion-item';
+      div.innerHTML = `<span class="course-name">${match.name}</span>`;
+      div.onclick = () => {
+        window.location.href = match.url;
+      };
+      suggestionsBox.appendChild(div);
+    });
+    suggestionsBox.style.display = 'block';
+  }
+
+  // Close suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!filterSearch.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      suggestionsBox.style.display = 'none';
+    }
+  });
 
   [filterScheme, filterBranch, filterSem].forEach(x=>{
     if(x) x.addEventListener('change', applyFilters);
   });
-  if(filterSearch) filterSearch.addEventListener('input', applyFilters);
+  if(filterSearch) {
+    filterSearch.addEventListener('input', applyFilters);
+    filterSearch.addEventListener('focus', () => {
+      if(filterSearch.value.length > 0) applyFilters();
+    });
+  }
 
   applyFilters(); // first load
 
