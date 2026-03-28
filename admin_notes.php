@@ -490,7 +490,7 @@ $csrfToken = safe(get_csrf_token());
       </div>
 
       <div class="d-flex align-items-center gap-2">
-        <!-- (intentionally blank) -->
+        <button class="btn btn-primary btn-sm" onclick="showSection('coursesSection')">+ Add New Course</button>
       </div>
     </header>
 
@@ -743,7 +743,10 @@ $csrfToken = safe(get_csrf_token());
 
           <!-- SELECT COURSE -->
           <div class="mb-3">
-            <label class="form-label small">Select course</label>
+            <div class="d-flex justify-content-between align-items-end mb-1">
+              <label class="form-label small mb-0">Select course</label>
+              <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold" onclick="showSection('coursesSection')">+ Add New Course</button>
+            </div>
             <select id="course_select_for_links" class="form-select form-select-sm" onchange="location.href=this.value">
               <option value="">Select a course</option>
               <?php foreach ($courses as $course):
@@ -893,6 +896,10 @@ $csrfToken = safe(get_csrf_token());
 
               <div class="mt-2">
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqUpdateBtn">Add PYQ</button>
+              </div>
+
+              <div class="mt-4 d-grid">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
               </div>
 
             </form>
