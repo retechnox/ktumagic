@@ -310,7 +310,8 @@ else: ?>
             qp: <?= json_encode($qp_answers) ?>,
             modules: <?= json_encode($modules) ?>,
             pyq: <?= json_encode($pyqs) ?>,
-            other: <?= json_encode($links) ?>
+            other: <?= json_encode($links) ?>,
+            is_404_1: <?= intval($c['is_404_1'] ?? 0) ?>
         };
         </script>
 
@@ -426,13 +427,16 @@ else: ?>
           if (category === 'pyq') {
             displayLinks = data.pyq || [];
             categoryTitle = 'Question Papers';
+            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else if (category === 'qp') {
             displayLinks = data.qp || [];
             categoryTitle = 'Answer Keys';
+            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else if (category === 'modules') {
             // Merge modules and other resources for a complete view
             displayLinks = [...(data.modules || []), ...(data.other || [])];
             categoryTitle = 'Study Materials';
+            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else {
             displayLinks = data.other || [];
             categoryTitle = 'Resources';

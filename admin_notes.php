@@ -194,6 +194,12 @@ try {
             $semester = intval($_POST['semester'] ?? 0) ?: null;
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM courses LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
+            $check404Col = $pdo->query("SHOW COLUMNS FROM courses LIKE 'is_404_1'")->rowCount() > 0;
+            if (!$check404Col) {
+                $pdo->exec("ALTER TABLE courses ADD COLUMN is_404_1 TINYINT(1) DEFAULT 0");
+            }
+            $is_404_1 = isset($_POST['is_404_1']) ? 1 : 0;
+
             if (!$scheme_id || !$branch_id) throw new Exception('Select scheme and branch.');
             if ($course_name === '') throw new Exception('Course name required.');
 
@@ -220,43 +226,51 @@ try {
             $image = convertDriveLink($rawImage);
 
             if ($checkOrderCol) {
-                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester, display_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester, $order]);
+                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester, display_order, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester, $order, $is_404_1]);
             } else {
-                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester]);
+                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester, $is_404_1]);
             }
             flash('Course added.', 'success');
         }
 
         elseif ($action === 'edit_course') {
             $course_id = intval($_POST['course_id'] ?? 0);
-            $course_name = trim($_POST['course_name_edit'] ?? '');
-            $semester = intval($_POST['semester_edit'] ?? 0) ?: null;
+            $name = trim($_POST['course_name'] ?? '');
+            $code = trim($_POST['subject_code'] ?? '');
+            
+            // Check for is_404_1 column
+            $check404Col = $pdo->query("SHOW COLUMNS FROM courses LIKE 'is_404_1'")->rowCount() > 0;
+            if (!$check404Col) {
+                $pdo->exec("ALTER TABLE courses ADD COLUMN is_404_1 TINYINT(1) DEFAULT 0");
+            }
+            $is_404_1 = isset($_POST['is_404_1']) ? 1 : 0;
+
+            if (!$course_id) throw new Exception('Invalid course id.');
             $checkOrderCol = $pdo->query("SHOW COLUMNS FROM courses LIKE 'display_order'")->rowCount() > 0;
             $order = $checkOrderCol ? intval($_POST['display_order'] ?? 0) : 0;
 
-            if (!$course_id) throw new Exception('Invalid course id.');
-            if ($course_name === '') throw new Exception('Course name required.');
+            if ($name === '') throw new Exception('Course name required.');
 
             $rawImage = trim($_POST['course_image_edit'] ?? '');
             $image = $rawImage !== '' ? convertDriveLink($rawImage) : null;
 
             if ($image !== null) {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ?, image_path = ?, display_order = ? WHERE id = ?');
-                    $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $image, $order, $course_id]);
+                    $stmt = $pdo->prepare('UPDATE courses SET name=?, subject_code=?, image_path=?, display_order=?, is_404_1=? WHERE id=?');
+                    $stmt->execute([$name, $code, $image, $order, $is_404_1, $course_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ?, image_path = ? WHERE id = ?');
-                    $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $image, $course_id]);
+                    $stmt = $pdo->prepare('UPDATE courses SET name=?, subject_code=?, image_path=?, is_404_1=? WHERE id=?');
+                    $stmt->execute([$name, $code, $image, $is_404_1, $course_id]);
                 }
             } else {
                 if ($checkOrderCol) {
-                    $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ?, display_order = ? WHERE id = ?');
-                    $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $order, $course_id]);
+                    $stmt = $pdo->prepare('UPDATE courses SET name=?, subject_code=?, display_order=?, is_404_1=? WHERE id=?');
+                    $stmt->execute([$name, $code, $order, $is_404_1, $course_id]);
                 } else {
-                    $stmt = $pdo->prepare('UPDATE courses SET name = ?, subject_code = ?, semester = ? WHERE id = ?');
-                    $stmt->execute([$course_name, strtoupper(trim($_POST['subject_code_edit'] ?? '')), $semester, $course_id]);
+                    $stmt = $pdo->prepare('UPDATE courses SET name=?, subject_code=?, is_404_1=? WHERE id=?');
+                    $stmt->execute([$name, $code, $is_404_1, $course_id]);
                 }
             }
             flash('Course updated.', 'success');
@@ -274,6 +288,12 @@ try {
         elseif ($action === 'save_links') {
             $course_id = intval($_POST['course_id'] ?? 0);
             if (!$course_id) throw new Exception('Invalid course id.');
+
+            $is_404_1 = isset($_POST['is_404_1']) ? 1 : 0;
+            $check404Col = $pdo->query("SHOW COLUMNS FROM courses LIKE 'is_404_1'")->rowCount() > 0;
+            if (!$check404Col) {
+                $pdo->exec("ALTER TABLE courses ADD COLUMN is_404_1 TINYINT(1) DEFAULT 0");
+            }
 
             $course_name = trim($_POST['course_name_edit'] ?? '');
             $semester = intval($_POST['semester_edit'] ?? 0) ?: null;
@@ -300,8 +320,8 @@ try {
                 if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url,'display_order'=>$ord];
             }
 
-            $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ? WHERE id = ?');
-            $stmt->execute([json_encode($validLinks), json_encode($validPyqs), $course_id]);
+            $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ?, is_404_1 = ? WHERE id = ?');
+            $stmt->execute([json_encode($validLinks), json_encode($validPyqs), $is_404_1, $course_id]);
 
             if ($course_name !== '') {
                 $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
@@ -786,8 +806,11 @@ $csrfToken = safe(get_csrf_token());
               <label class="form-label small">Branch</label>
               <select id="filter_branch" class="form-select form-select-sm">
                 <option value="">All branches</option>
-                <?php foreach ($branches as $b): ?>
-                  <option value="<?= safe(strtolower($b['name'])) ?>"><?= safe($b['name']) ?></option>
+                <?php foreach ($branches as $b): 
+                    $scheme_name_for_filter = "";
+                    foreach($schemes as $s) if($s['id'] == $b['scheme_id']) { $scheme_name_for_filter = strtolower($s['name']); break; }
+                ?>
+                  <option value="<?= safe(strtolower($b['name'])) ?>" data-scheme-name="<?= safe($scheme_name_for_filter) ?>"><?= safe($b['name']) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -852,6 +875,15 @@ $csrfToken = safe(get_csrf_token());
                 <div class="col-md-4">
                   <label class="form-label small">Subject Code</label>
                   <input type="text" name="subject_code_edit" class="form-control form-control-sm" value="<?= safe($selected_course['subject_code']) ?>" placeholder="MAT101">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="is_404_1" id="is_404_1_check" <?= ($selected_course['is_404_1'] ? 'checked' : '') ?>>
+                  <label class="form-check-label small" for="is_404_1_check">
+                    Redirect to specialized 404_1 page (with Contribute button) if resources are 404
+                  </label>
                 </div>
               </div>
 
@@ -1029,7 +1061,7 @@ $csrfToken = safe(get_csrf_token());
                 <select id="branch_id_course" name="branch_id" class="form-select form-select-sm" required>
                   <option value="">Select branch</option>
                   <?php foreach ($branches as $b): ?>
-                    <option value="<?= $b['id'] ?>"><?= safe($b['name']) ?></option>
+                    <option value="<?= $b['id'] ?>" data-scheme-id="<?= $b['scheme_id'] ?>"><?= safe($b['name']) ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
@@ -1109,6 +1141,15 @@ $csrfToken = safe(get_csrf_token());
 
               <div class="mt-2">
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqCourseBtn">Add PYQ</button>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_404_1" id="add_is_404_1" value="1">
+                <label class="form-check-label small" for="add_is_404_1">
+                  Redirect to specialized 404_1 page (with Contribute button) if resources are 404
+                </label>
               </div>
             </div>
 
@@ -1359,6 +1400,19 @@ $csrfToken = safe(get_csrf_token());
 
   function applyFilters(){
     const fs = (filterScheme.value || "").toLowerCase();
+
+    // First, filter the branch dropdown based on selected scheme
+    const branchOpts = Array.from(filterBranch.options);
+    let currentBranchValid = false;
+    branchOpts.forEach((opt, idx) => {
+        if(idx === 0) return;
+        const os = opt.dataset.schemeName;
+        const showBranch = !fs || fs === os;
+        opt.hidden = !showBranch;
+        if(showBranch && opt.selected) currentBranchValid = true;
+    });
+    if(fs && !currentBranchValid) filterBranch.value = "";
+
     const fb = (filterBranch.value || "").toLowerCase();
     const fsem = (filterSem.value || "");
     const fsearch = (filterSearch.value || "").toLowerCase();
@@ -1391,6 +1445,25 @@ $csrfToken = safe(get_csrf_token());
     });
 
     renderSuggestions(matches);
+  }
+
+  // Also implement filtering for "Add Course" form
+  const addCourseScheme = document.getElementById("scheme_id_course");
+  const addCourseBranch = document.getElementById("branch_id_course");
+  if(addCourseScheme && addCourseBranch) {
+      const addBranchOpts = Array.from(addCourseBranch.options);
+      addCourseScheme.addEventListener('change', function() {
+          const sid = this.value;
+          let valid = false;
+          addBranchOpts.forEach((opt, idx) => {
+              if(idx === 0) return;
+              const osid = opt.dataset.schemeId;
+              const show = !sid || sid === osid;
+              opt.hidden = !show;
+              if(show && opt.selected) valid = true;
+          });
+          if(sid && !valid) addCourseBranch.value = "";
+      });
   }
 
   function renderSuggestions(matches) {
@@ -1554,9 +1627,17 @@ $csrfToken = safe(get_csrf_token());
 
     document.querySelectorAll(".btn-edit-course").forEach(btn=>{
       btn.addEventListener("click", ()=>{
-        document.getElementById("modal_course_id").value = btn.dataset.id;
-        document.getElementById("modal_course_name").value = btn.dataset.name;
-        document.getElementById("modal_course_sem").value = btn.dataset.sem;
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        const code = btn.dataset.code;
+        const semester = btn.dataset.semester;
+        const is_404_1 = btn.dataset.is404_1 === '1';
+
+        document.getElementById('course_id_edit').value = id;
+        document.getElementById('course_name_edit').value = name;
+        document.getElementById('subject_code_edit').value = code;
+        document.getElementById('course_is_404_1_edit').checked = is_404_1;
+        document.getElementById('semester_edit').value = semester;
         courseEditModal.show();
       });
     });

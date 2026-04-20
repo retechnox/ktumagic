@@ -76,7 +76,7 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
             
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Scheme</label>
-                <select name="scheme_id" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <select name="scheme_id" id="scheme_select" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <option value="">All Schemes</option>
                     <?php foreach($schemes as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= $scheme_filter == $s['id'] ? 'selected' : '' ?>><?= safe($s['name']) ?></option>
@@ -86,10 +86,10 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
 
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Branch</label>
-                <select name="branch_id" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <select name="branch_id" id="branch_select" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <option value="">All Branches</option>
                     <?php foreach($branches as $b): ?>
-                        <option value="<?= $b['id'] ?>" <?= $branch_filter == $b['id'] ? 'selected' : '' ?>><?= safe($b['name']) ?></option>
+                        <option value="<?= $b['id'] ?>" data-scheme="<?= $b['scheme_id'] ?>" <?= $branch_filter == $b['id'] ? 'selected' : '' ?>><?= safe($b['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -137,5 +137,45 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
     </div>
 
     <?php include 'footer.php'; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const schemeSelect = document.getElementById('scheme_select');
+            const branchSelect = document.getElementById('branch_select');
+            const branchOptions = Array.from(branchSelect.options);
+
+            function filterBranches(resetSelection = false) {
+                const selectedScheme = schemeSelect.value;
+                
+                let firstVisible = null;
+                let currentValid = false;
+
+                branchOptions.forEach(option => {
+                    if (option.value === "") { // "All Branches"
+                        option.hidden = false;
+                        return;
+                    }
+
+                    const branchScheme = option.getAttribute('data-scheme');
+                    if (selectedScheme === "" || branchScheme === selectedScheme) {
+                        option.hidden = false;
+                        if (!firstVisible) firstVisible = option.value;
+                        if (option.value === branchSelect.value) currentValid = true;
+                    } else {
+                        option.hidden = true;
+                    }
+                });
+
+                if (resetSelection && !currentValid) {
+                    branchSelect.value = "";
+                }
+            }
+
+            schemeSelect.addEventListener('change', () => filterBranches(true));
+            
+            // Initial filter
+            filterBranches(false);
+        });
+    </script>
 </body>
 </html>
