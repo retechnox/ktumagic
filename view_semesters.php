@@ -127,7 +127,7 @@ else
       $is_external = false;
     }
     else {
-      // Strict modes (syllabus, calendar, timetable) -> 404 if missing
+      // Strict modes (calendar, timetable) -> 404 if missing
       $target_link = "404.php";
       $is_external = false;
     }

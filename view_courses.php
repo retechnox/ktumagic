@@ -179,8 +179,11 @@ else: ?>
     $img = $c['image_path'] ?: $DEFAULT_IMG;
     $links = json_decode($c['links'] ?? '[]', true) ?: [];
     $pyqs = json_decode($c['pyqs'] ?? '[]', true) ?: [];
+    $syllabus = json_decode($c['syllabus'] ?? '[]', true) ?: [];
     $modules = json_decode($c['modules'] ?? '[]', true) ?: [];
     $qp_answers = json_decode($c['qp_answers'] ?? '[]', true) ?: [];
+
+    $hasSyllabus = !empty($syllabus);
 
     $hasPyq = !empty($pyqs);
     $hasModules = !empty($modules);
@@ -228,7 +231,12 @@ else: ?>
           <!-- Action Buttons Area -->
           <div class="px-6 pb-6 space-y-6">
             <!-- Main Link: Module Notes -->
-            <a href="<?= sign_url('view_link.php', ['course_id' => $c['id']])?>"
+            <?php 
+              $mainUrl = (isset($c['is_404_1']) && $c['is_404_1']) 
+                ? sign_url('404_1.php', ['course_id' => $c['id']])
+                : sign_url('view_link.php', ['course_id' => $c['id']]);
+            ?>
+            <a href="<?= $mainUrl ?>"
               class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn no-underline">
               <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,19 +246,30 @@ else: ?>
               <span class="text-base font-black uppercase tracking-wider">Module Notes</span>
             </a>
 
-            <!-- Status Row: QP & PYQ -->
-            <div class="flex items-center justify-between gap-4 px-2">
-              <button onclick='showDrawer("<?= $c['id']?>", "qp")' 
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">QP & Answers</span>
-              </button>
+            <!-- Status Row: QP, PYQ, SYLLABUS -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-4 px-2">
+                <button onclick='showDrawer("<?= $c['id']?>", "qp")' 
+                  class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">QP & Answers</span>
+                </button>
 
-              <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                  <?= $hasPyq ? 'PYQ Available' : 'No PYQ' ?>
-                </span>
-              </button>
+                <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
+                  class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
+                    <?= $hasPyq ? 'PYQ Available' : 'No PYQ' ?>
+                  </span>
+                </button>
+              </div>
+
+              <div class="px-2">
+                <button onclick='showDrawer("<?= $c['id']?>", "syllabus")'
+                  class="w-full flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasSyllabus ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
+                    <?= $hasSyllabus ? 'Syllabus Available' : 'No Syllabus' ?>
+                  </span>
+                </button>
+              </div>
             </div>
 
             <!-- Bottom Action: Contribute -->
@@ -426,11 +445,15 @@ else: ?>
 
           if (category === 'pyq') {
             displayLinks = data.pyq || [];
-            categoryTitle = 'Question Papers';
+            categoryTitle = 'Previous Year Questions';
             if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else if (category === 'qp') {
             displayLinks = data.qp || [];
             categoryTitle = 'Answer Keys';
+            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
+          } else if (category === 'syllabus') {
+            displayLinks = data.syllabus || [];
+            categoryTitle = 'Course Syllabus';
             if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else if (category === 'modules') {
             // Merge modules and other resources for a complete view

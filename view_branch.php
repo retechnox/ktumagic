@@ -79,23 +79,13 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
       <?php 
-        $mode = $_GET['mode'] ?? '';
         foreach ($branches as $b): 
           $img = $b['image_path'] ?: $DEFAULT_IMG;
           $displayName = $b['name'];
-          if ($mode === 'syllabus') {
-              // Remove "notes" (case-insensitive) from title
-              $displayName = preg_replace('/\s*notes\s*/i', ' ', $displayName);
-              $displayName = trim($displayName);
-          }
       ?>
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
-      <?php 
-        $sem_params = ['branch_id' => $b['id']];
-        if ($mode) $sem_params['mode'] = $mode;
-      ?>
-      <a href="<?= sign_url('view_semesters.php', $sem_params) ?>"
+      <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id']]) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <?php if ($mode !== 'syllabus'): ?>

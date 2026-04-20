@@ -198,6 +198,10 @@ try {
             if (!$check404Col) {
                 $pdo->exec("ALTER TABLE courses ADD COLUMN is_404_1 TINYINT(1) DEFAULT 0");
             }
+            $checkSyllabusCol = $pdo->query("SHOW COLUMNS FROM courses LIKE 'syllabus'")->rowCount() > 0;
+            if (!$checkSyllabusCol) {
+                $pdo->exec("ALTER TABLE courses ADD COLUMN syllabus TEXT DEFAULT NULL");
+            }
             $is_404_1 = isset($_POST['is_404_1']) ? 1 : 0;
 
             if (!$scheme_id || !$branch_id) throw new Exception('Select scheme and branch.');
@@ -221,16 +225,25 @@ try {
                 if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url,'display_order'=>$ord];
             }
 
+            $validSyllabus = [];
+            $syllabus_links = $_POST['syllabus'] ?? [];
+            foreach ($syllabus_links as $s) {
+                $sn = trim($s['link_name'] ?? '');
+                $url = trim($s['url'] ?? '');
+                $ord = intval($s['display_order'] ?? 0);
+                if ($sn !== '' && $url !== '') $validSyllabus[] = ['link_name'=>$sn,'url'=>$url,'display_order'=>$ord];
+            }
+
             $subject_code = strtoupper(trim($_POST['subject_code'] ?? ''));
             $rawImage = trim($_POST['course_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
             if ($checkOrderCol) {
-                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester, display_order, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester, $order, $is_404_1]);
+                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, syllabus, image_path, semester, display_order, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), json_encode($validSyllabus), $image, $semester, $order, $is_404_1]);
             } else {
-                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, image_path, semester, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), $image, $semester, $is_404_1]);
+                $stmt = $pdo->prepare('INSERT INTO courses (branch_id, scheme_id, name, subject_code, links, pyqs, syllabus, image_path, semester, is_404_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$branch_id, $scheme_id, $course_name, $subject_code, json_encode($validLinks), json_encode($validPyqs), json_encode($validSyllabus), $image, $semester, $is_404_1]);
             }
             flash('Course added.', 'success');
         }
@@ -320,8 +333,17 @@ try {
                 if ($pn !== '' && $url !== '') $validPyqs[] = ['link_name'=>$pn,'url'=>$url,'display_order'=>$ord];
             }
 
-            $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ?, is_404_1 = ? WHERE id = ?');
-            $stmt->execute([json_encode($validLinks), json_encode($validPyqs), $is_404_1, $course_id]);
+            $syllabus_links = $_POST['syllabus'] ?? [];
+            $validSyllabus = [];
+            foreach ($syllabus_links as $s) {
+                $sn = trim($s['link_name'] ?? '');
+                $url = trim($s['url'] ?? '');
+                $ord = intval($s['display_order'] ?? 0);
+                if ($sn !== '' && $url !== '') $validSyllabus[] = ['link_name'=>$sn,'url'=>$url,'display_order'=>$ord];
+            }
+
+            $stmt = $pdo->prepare('UPDATE courses SET links = ?, pyqs = ?, syllabus = ?, is_404_1 = ? WHERE id = ?');
+            $stmt->execute([json_encode($validLinks), json_encode($validPyqs), json_encode($validSyllabus), $is_404_1, $course_id]);
 
             if ($course_name !== '') {
                 $subject_code = strtoupper(trim($_POST['subject_code_edit'] ?? ''));
@@ -411,6 +433,7 @@ if (isset($_GET['course_id'])) {
     if ($selected_course) {
         $links = json_decode($selected_course['links'] ?: '[]', true) ?: [];
         $pyqs = json_decode($selected_course['pyqs'] ?: '[]', true) ?: [];
+        $syllabus = json_decode($selected_course['syllabus'] ?: '[]', true) ?: [];
         
         $bQ = $pdo->prepare('SELECT semester_data FROM branches WHERE id = ?');
         $bQ->execute([$selected_course['branch_id']]);
@@ -916,10 +939,10 @@ $csrfToken = safe(get_csrf_token());
                   <?php foreach ($links as $idx => $lnk): ?>
                     <div class="row link-row g-2 mb-2">
                       <div class="col-md-5">
-                        <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>" required>
+                        <input type="text" name="links[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($lnk['link_name']) ?>">
                       </div>
                       <div class="col-md-5">
-                        <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>" required>
+                        <input type="url" name="links[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($lnk['url']) ?>">
                       </div>
                       <div class="col-md-1">
                         <input type="number" name="links[<?= $idx ?>][display_order]" class="form-control form-control-sm" value="<?= safe($lnk['display_order'] ?? 0) ?>" title="Order">
@@ -932,10 +955,10 @@ $csrfToken = safe(get_csrf_token());
                 <?php else: ?>
                   <div class="row link-row g-2 mb-2">
                     <div class="col-md-5">
-                      <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+                      <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name">
                     </div>
                     <div class="col-md-5">
-                      <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+                      <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL">
                     </div>
                     <div class="col-md-1">
                       <input type="number" name="links[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
@@ -958,10 +981,10 @@ $csrfToken = safe(get_csrf_token());
                   <?php foreach ($pyqs as $idx => $p): ?>
                     <div class="row link-row g-2 mb-2">
                       <div class="col-md-5">
-                        <input type="text" name="pyqs[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($p['link_name']) ?>" required>
+                        <input type="text" name="pyqs[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($p['link_name']) ?>">
                       </div>
                       <div class="col-md-5">
-                        <input type="url" name="pyqs[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($p['url']) ?>" required>
+                        <input type="url" name="pyqs[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($p['url']) ?>">
                       </div>
                       <div class="col-md-1">
                         <input type="number" name="pyqs[<?= $idx ?>][display_order]" class="form-control form-control-sm" value="<?= safe($p['display_order'] ?? 0) ?>" title="Order">
@@ -988,6 +1011,45 @@ $csrfToken = safe(get_csrf_token());
 
               <div class="mt-2">
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqUpdateBtn">Add PYQ</button>
+              </div>
+
+              <!-- SYLLABUS LINKS FOR UPDATE -->
+              <label class="form-label small mt-3">Syllabus Links (optional)</label>
+              <div id="syllabus-list-update">
+                <?php if (!empty($syllabus)): ?>
+                  <?php foreach ($syllabus as $idx => $s): ?>
+                    <div class="row link-row g-2 mb-2">
+                      <div class="col-md-5">
+                        <input type="text" name="syllabus[<?= $idx ?>][link_name]" class="form-control form-control-sm" value="<?= safe($s['link_name']) ?>">
+                      </div>
+                      <div class="col-md-5">
+                        <input type="url" name="syllabus[<?= $idx ?>][url]" class="form-control form-control-sm" value="<?= safe($s['url']) ?>">
+                      </div>
+                      <div class="col-md-1">
+                        <input type="number" name="syllabus[<?= $idx ?>][display_order]" class="form-control form-control-sm" value="<?= safe($s['display_order'] ?? 0) ?>" title="Order">
+                      </div>
+                      <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <div class="row link-row g-2 mb-2">
+                    <div class="col">
+                      <input type="text" name="syllabus[0][link_name]" class="form-control form-control-sm" placeholder="Syllabus Link name">
+                    </div>
+                    <div class="col">
+                      <input type="url" name="syllabus[0][url]" class="form-control form-control-sm" placeholder="Syllabus URL">
+                    </div>
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                    </div>
+                  </div>
+                <?php endif; ?>
+              </div>
+
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="addSyllabusUpdateBtn">Add Syllabus</button>
               </div>
 
               <div class="mt-4 d-grid">
@@ -1100,10 +1162,10 @@ $csrfToken = safe(get_csrf_token());
               <div id="links-list-course">
                 <div class="row link-row g-2 mb-2">
                   <div class="col-md-5">
-                    <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+                    <input type="text" name="links[0][link_name]" class="form-control form-control-sm" placeholder="Link name">
                   </div>
                   <div class="col-md-5">
-                    <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+                    <input type="url" name="links[0][url]" class="form-control form-control-sm" placeholder="Link URL">
                   </div>
                   <div class="col-md-1">
                     <input type="number" name="links[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
@@ -1139,8 +1201,33 @@ $csrfToken = safe(get_csrf_token());
                 </div>
               </div>
 
-              <div class="mt-2">
+              <div class="mt-2 text-end">
                 <button type="button" class="btn btn-sm btn-secondary" id="addPyqCourseBtn">Add PYQ</button>
+              </div>
+            </div>
+
+            <!-- SYLLABUS LINKS FOR ADD -->
+            <div class="mt-3">
+              <label class="form-label small">Syllabus links (optional)</label>
+              <div id="syllabus-list-course">
+                <div class="row link-row g-2 mb-2">
+                  <div class="col-md-5">
+                    <input type="text" name="syllabus[0][link_name]" class="form-control form-control-sm" placeholder="Syllabus Link name">
+                  </div>
+                  <div class="col-md-5">
+                    <input type="url" name="syllabus[0][url]" class="form-control form-control-sm" placeholder="Syllabus URL">
+                  </div>
+                  <div class="col-md-1">
+                    <input type="number" name="syllabus[0][display_order]" class="form-control form-control-sm" value="0" title="Order">
+                  </div>
+                  <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link" style="display:none">✕</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-2 text-end">
+                <button type="button" class="btn btn-sm btn-secondary" id="addSyllabusCourseBtn">Add Syllabus</button>
               </div>
             </div>
 
@@ -1316,10 +1403,6 @@ $csrfToken = safe(get_csrf_token());
             <input type="text" name="branch_image_edit" class="form-control form-control-sm">
           </div>
 
-          <div class="mb-2">
-            <label class="form-label small">Syllabus Link (optional)</label>
-            <input type="url" name="syllabus_link" class="form-control form-control-sm" value="${syllabus}">
-          </div>
 
           <div class="mb-2">
             <label class="form-label small">Academic Calendar Link (optional)</label>
@@ -1346,7 +1429,6 @@ $csrfToken = safe(get_csrf_token());
                     <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
                     <div class="row g-1">
                       <div class="col-3">
-                        <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus URL" id="sem_<?= $i ?>_syllabus_edit">
                       </div>
                       <div class="col-3">
                         <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes URL" id="sem_<?= $i ?>_notes_edit">
@@ -1378,7 +1460,6 @@ $csrfToken = safe(get_csrf_token());
     // Populate semester links
     for(let i=1; i<=8; i++){
         const sem = semesterData[i] || {};
-        if(document.getElementById(`sem_${i}_syllabus_edit`)) document.getElementById(`sem_${i}_syllabus_edit`).value = sem.syllabus || '';
         if(document.getElementById(`sem_${i}_notes_edit`)) document.getElementById(`sem_${i}_notes_edit`).value = sem.notes || '';
         if(document.getElementById(`sem_${i}_timetable_edit`)) document.getElementById(`sem_${i}_timetable_edit`).value = sem.timetable || '';
         if(document.getElementById(`sem_${i}_calendar_edit`)) document.getElementById(`sem_${i}_calendar_edit`).value = sem.calendar || '';
@@ -1510,7 +1591,10 @@ $csrfToken = safe(get_csrf_token());
   -------------------------- */
   let linkUpdateCount = <?= !empty($links) ? count($links) : 1 ?>;
   let pyqUpdateCount = <?= !empty($pyqs) ? count($pyqs) : 1 ?>;
+  let syllabusUpdateCount = <?= !empty($syllabus) ? count($syllabus) : 1 ?>;
   let linkAddCount = 1;
+  let pyqAddCount = 1;
+  let syllabusAddCount = 1;
 
   document.addEventListener('click', (e) => {
     // Add Link Update
@@ -1522,10 +1606,10 @@ $csrfToken = safe(get_csrf_token());
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
         <div class="col-md-5">
-          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name">
         </div>
         <div class="col-md-5">
-          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL">
         </div>
         <div class="col-md-1">
           <input type="number" name="links[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
@@ -1546,10 +1630,10 @@ $csrfToken = safe(get_csrf_token());
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
         <div class="col-md-5">
-          <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name" required>
+          <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name">
         </div>
         <div class="col-md-5">
-          <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL" required>
+          <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL">
         </div>
         <div class="col-md-1">
           <input type="number" name="pyqs[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
@@ -1561,6 +1645,30 @@ $csrfToken = safe(get_csrf_token());
       pyqsListUpdate.appendChild(row);
     }
 
+    // Add Syllabus Update
+    if (e.target.id === 'addSyllabusUpdateBtn') {
+      const idx = syllabusUpdateCount++;
+      const syllabusListUpdate = document.getElementById('syllabus-list-update');
+      if (!syllabusListUpdate) return;
+      const row = document.createElement('div');
+      row.className = "row link-row g-2 mb-2";
+      row.innerHTML = `
+        <div class="col-md-5">
+          <input type="text" name="syllabus[${idx}][link_name]" class="form-control form-control-sm" placeholder="Syllabus Link name">
+        </div>
+        <div class="col-md-5">
+          <input type="url" name="syllabus[${idx}][url]" class="form-control form-control-sm" placeholder="Syllabus URL">
+        </div>
+        <div class="col-md-1">
+          <input type="number" name="syllabus[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
+        </div>
+      `;
+      syllabusListUpdate.appendChild(row);
+    }
+
     // Add Link Course
     if (e.target.id === 'addLinkCourseBtn') {
       const idx = linkAddCount++;
@@ -1570,10 +1678,10 @@ $csrfToken = safe(get_csrf_token());
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
         <div class="col">
-          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name" required>
+          <input type="text" name="links[${idx}][link_name]" class="form-control form-control-sm" placeholder="Link name">
         </div>
         <div class="col">
-          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL" required>
+          <input type="url" name="links[${idx}][url]" class="form-control form-control-sm" placeholder="Link URL">
         </div>
         <div class="col-auto">
           <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
@@ -1581,32 +1689,32 @@ $csrfToken = safe(get_csrf_token());
       `;
       linksListCourse.appendChild(row);
     }
-  });
 
-  /* PYQ ADD FORM ROWS */
-  let pyqAddCount = 1;
-  const addPyqCourseBtn = document.getElementById('addPyqCourseBtn');
-  const pyqsListCourse = document.getElementById('pyqs-list-course');
-
-  if(addPyqCourseBtn){
-    addPyqCourseBtn.addEventListener('click', ()=>{
-      const idx = pyqAddCount++;
+    // Add Syllabus Course
+    if (e.target.id === 'addSyllabusCourseBtn') {
+      const idx = syllabusAddCount++;
+      const syllabusListCourse = document.getElementById('syllabus-list-course');
+      if (!syllabusListCourse) return;
       const row = document.createElement('div');
       row.className = "row link-row g-2 mb-2";
       row.innerHTML = `
-        <div class="col">
-          <input type="text" name="pyqs[${idx}][link_name]" class="form-control form-control-sm" placeholder="PYQ name" required>
+        <div class="col-md-5">
+          <input type="text" name="syllabus[${idx}][link_name]" class="form-control form-control-sm" placeholder="Syllabus Link name">
         </div>
-        <div class="col">
-          <input type="url" name="pyqs[${idx}][url]" class="form-control form-control-sm" placeholder="PYQ URL" required>
+        <div class="col-md-5">
+          <input type="url" name="syllabus[${idx}][url]" class="form-control form-control-sm" placeholder="Syllabus URL">
+        </div>
+        <div class="col-md-1">
+          <input type="number" name="syllabus[${idx}][display_order]" class="form-control form-control-sm" value="0" title="Order">
         </div>
         <div class="col-auto">
           <button type="button" class="btn btn-sm btn-outline-danger btn-remove-link">✕</button>
         </div>
       `;
-      pyqsListCourse.appendChild(row);
-    });
-  }
+      syllabusListCourse.appendChild(row);
+    }
+  });
+
 
   // Delegate remove buttons
   document.addEventListener("click", function(e){

@@ -1,4 +1,4 @@
-<?php include 'theme.php'; 
+<?php
 include 'db.php';
 $course_id = intval($_GET['course_id'] ?? 0);
 $contribute_url = sign_url('submit_material.php', ['course_id' => $course_id]);
@@ -10,10 +10,28 @@ $contribute_url = sign_url('submit_material.php', ['course_id' => $course_id]);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resources Coming Soon | KTU Magic</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    // Apply theme ASAP to prevent flash
+    (function(){
+      const saved = localStorage.getItem('ktu-theme');
+      if(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)){
+        document.documentElement.classList.add('dark');
+      }
+    })();
+    </script>
     <style>
         :root {
             --primary-blue: #2563EB;
+            --bg-primary: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
         }
+        :root.dark {
+            --bg-primary: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
         body {
             margin: 0;
             padding: 0;

@@ -17,6 +17,12 @@ $cq->execute([$course_id]);
 $course = $cq->fetch();
 if (!$course) { header("Location: view_scheme.php"); exit; }
 
+if (isset($course['is_404_1']) && $course['is_404_1']) {
+    $redirectUrl = sign_url('404_1.php', ['course_id' => $course['id']]);
+    header("Location: $redirectUrl");
+    exit;
+}
+
 // Fetch branch
 $bq = $pdo->prepare("SELECT * FROM branches WHERE id = ?");
 $bq->execute([$course['branch_id']]);
@@ -31,6 +37,7 @@ $links = json_decode($course['links'] ?? '[]', true) ?: [];
 $modules = json_decode($course['modules'] ?? '[]', true) ?: [];
 $qp_answers = json_decode($course['qp_answers'] ?? '[]', true) ?: [];
 $pyqs_data = json_decode($course['pyqs'] ?? '[]', true) ?: [];
+$syllabus_data = json_decode($course['syllabus'] ?? '[]', true) ?: [];
 
 // Convert normal Google Drive link → preview link
 function toPreview($url) {
@@ -136,6 +143,16 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
 
   <div class="space-y-4">
 
+    <!-- SYLLABUS SECTION -->
+    <?php if ($syllabus_data): ?>
+      <h2 class="text-2xl font-black mt-10 mb-6 text-green-600 dark:text-green-400 uppercase font-['Sora'] tracking-tight">
+        Course Syllabus
+      </h2>
+      <div class="grid grid-cols-1 gap-4">
+        <?php foreach ($syllabus_data as $s): echo renderResourceCard($s, 'border-green-600'); endforeach; ?>
+      </div>
+    <?php endif; ?>
+
     <!-- MODULES SECTION -->
     <?php if ($modules): ?>
       <h2 class="text-2xl font-black mt-10 mb-6 text-blue-600 dark:text-blue-400 uppercase font-['Sora'] tracking-tight">
@@ -176,7 +193,7 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
       </div>
     <?php endif; ?>
 
-    <?php if (!$modules && !$qp_answers && !$pyqs_data && !$links): ?>
+    <?php if (!$modules && !$qp_answers && !$pyqs_data && !$links && !$syllabus_data): ?>
       <div class="py-20 text-center">
         <p class="text-gray-500 dark:text-gray-400 text-lg">No academic resources found for this course yet.</p>
       </div>

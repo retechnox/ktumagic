@@ -23,18 +23,9 @@ $contact = $data['contact'] ?? [];
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
     rel="stylesheet">
-  <?php include 'theme.php'; ?>
-
   <style>
-    :root {
-      --neon-purple: #8b5cf6;
-      --neon-pink: #ec4899;
-      --primary-blue: #2563EB;
-      --soft-bg: #f8fafc;
-      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    }
-
     * {
+
       box-sizing: border-box;
       -webkit-font-smoothing: antialiased;
     }
@@ -459,6 +450,63 @@ $contact = $data['contact'] ?? [];
       gap: 20px;
       margin-bottom: 50px;
     }
+
+    /* ======================= UPDATES GRID ======================= */
+    .updates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+
+    .update-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--card-shadow);
+      height: 100%;
+    }
+
+    .update-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+      border-color: var(--primary-blue);
+    }
+
+    .update-body h4 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--primary-blue);
+    }
+
+    .update-body p {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .update-link {
+      margin-top: auto;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: gap 0.2s;
+    }
+
+    .update-link:hover {
+      gap: 10px;
+    }
+
 
     /* ======================= ANIMATIONS ======================= */
     @keyframes fadeIn {
@@ -1292,6 +1340,7 @@ endif; ?>
               BROWSE MATERIALS →</div>
           </div>
         </a>
+      
       </div>
 
 
@@ -1300,36 +1349,29 @@ endif; ?>
       </h2>
 
       <?php
-$updates = [];
-for ($i = 1; $i <= 3; $i++) {
-  if (file_exists(__DIR__ . "/assets/updates/$i.png")) {
-    $updates[] = $i;
-  }
-}
-?>
+        $updateJson = @file_get_contents(__DIR__ . '/data/update.json');
+        $announcements = json_decode($updateJson, true) ?: [];
+        $announcements = array_reverse($announcements);
+        $displayUpdates = array_slice($announcements, 0, 3);
+      ?>
 
-      <?php if (count($updates) > 0): ?>
+      <?php if (!empty($displayUpdates)): ?>
       <div class="updates-grid">
-        <?php foreach ($updates as $i): ?>
+        <?php foreach ($displayUpdates as $upd): ?>
         <div class="update-card fade-el">
-          <img src="assets/updates/<?= $i?>.png" alt="Update <?= $i?>">
           <div class="update-body">
-            <h3>Update
-              <?= $i?>
-            </h3>
-            <p>Latest KTU related announcement.</p>
+            <h4 style="font-family: 'Sora', sans-serif;"><?= safe($upd['title']) ?></h4>
+            <p><?= safe($upd['content']) ?></p>
+            <?php if (!empty($upd['link'])): ?>
+              <a href="<?= safe($upd['link']) ?>" class="update-link">View Details →</a>
+            <?php endif; ?>
           </div>
         </div>
-        <?php
-  endforeach; ?>
+        <?php endforeach; ?>
       </div>
-      <?php
-else: ?>
-      <p style="color:#64748b; font-size:14px;">
-        No recent updates available.
-      </p>
-      <?php
-endif; ?>
+      <?php else: ?>
+      <p style="color:#64748b; font-size:14px;">No recent updates available.</p>
+      <?php endif; ?>
 
     </div>
 
