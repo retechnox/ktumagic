@@ -184,10 +184,10 @@ else: ?>
     $qp_answers = json_decode($c['qp_answers'] ?? '[]', true) ?: [];
 
     $hasSyllabus = !empty($syllabus);
-
-    $hasPyq = !empty($pyqs);
+    // Combine PYQ and QP availability
+    $hasPyqCombined = !empty($pyqs) || !empty($qp_answers);
+    
     $hasModules = !empty($modules);
-    $hasQp = !empty($qp_answers);
     $hasOther = !empty($links);
 
     $canModules = $hasModules || $hasOther;
@@ -246,30 +246,21 @@ else: ?>
               <span class="text-base font-black uppercase tracking-wider">Module Notes</span>
             </a>
 
-            <!-- Status Row: QP, PYQ, SYLLABUS -->
-            <div class="space-y-3">
-              <div class="flex items-center justify-between gap-4 px-2">
-                <button onclick='showDrawer("<?= $c['id']?>", "qp")' 
-                  class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasQp ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">QP & Answers</span>
-                </button>
+            <!-- Status Row: PYQ & SYLLABUS -->
+            <div class="flex items-center justify-between gap-4 px-2 pb-2">
+              <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyqCombined ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
+                  <?= $hasPyqCombined ? 'PYQ Available' : 'No PYQ' ?>
+                </span>
+              </button>
 
-                <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
-                  class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyq ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                    <?= $hasPyq ? 'PYQ Available' : 'No PYQ' ?>
-                  </span>
-                </button>
-              </div>
-
-              <div class="px-2">
-                <button onclick='showDrawer("<?= $c['id']?>", "syllabus")'
-                  class="w-full flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasSyllabus ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                  <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                    <?= $hasSyllabus ? 'Syllabus Available' : 'No Syllabus' ?>
-                  </span>
-                </button>
-              </div>
+              <button onclick='showDrawer("<?= $c['id']?>", "syllabus")'
+                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasSyllabus ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
+                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
+                  <?= $hasSyllabus ? 'Syllabus' : 'No Syllabus' ?>
+                </span>
+              </button>
             </div>
 
             <!-- Bottom Action: Contribute -->
@@ -444,8 +435,8 @@ else: ?>
           let categoryTitle = '';
 
           if (category === 'pyq') {
-            displayLinks = data.pyq || [];
-            categoryTitle = 'Previous Year Questions';
+            displayLinks = [...(data.pyq || []), ...(data.qp || [])];
+            categoryTitle = 'PYQ & Question Bank';
             if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
           } else if (category === 'qp') {
             displayLinks = data.qp || [];

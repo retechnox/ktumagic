@@ -163,23 +163,16 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
       </div>
     <?php endif; ?>
 
-    <!-- QP & ANSWERS SECTION -->
-    <?php if ($qp_answers): ?>
-      <h2 class="text-2xl font-black mt-10 mb-6 text-purple-600 dark:text-purple-400 uppercase font-['Sora'] tracking-tight">
-        QP & Answer Keys
-      </h2>
-      <div class="grid grid-cols-1 gap-4">
-        <?php foreach ($qp_answers as $q): echo renderResourceCard($q, 'border-purple-600'); endforeach; ?>
-      </div>
-    <?php endif; ?>
-
-    <!-- PYQS SECTION -->
-    <?php if ($pyqs_data): ?>
+    <!-- PYQ & QUESTION BANK SECTION -->
+    <?php 
+    $combined_pyqs = array_merge($pyqs_data, $qp_answers);
+    if ($combined_pyqs): 
+    ?>
       <h2 class="text-2xl font-black mt-10 mb-6 text-indigo-600 dark:text-indigo-400 uppercase font-['Sora'] tracking-tight">
-        Previous Year Questions
+        PYQ & Question Bank
       </h2>
       <div class="grid grid-cols-1 gap-4">
-        <?php foreach ($pyqs_data as $p): echo renderResourceCard($p, 'border-indigo-600'); endforeach; ?>
+        <?php foreach ($combined_pyqs as $p): echo renderResourceCard($p, 'border-indigo-600'); endforeach; ?>
       </div>
     <?php endif; ?>
 
