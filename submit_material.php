@@ -63,8 +63,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="bg-white dark:bg-gray-800 p-8 sm:p-10 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full -mr-16 -mt-16"></div>
             
-            <h1 class="text-3xl font-black mb-2 font-['Sora'] tracking-tight">Submit Resource</h1>
-            <p class="text-gray-500 dark:text-gray-400 mb-10 font-medium">Contribute to the community: <span class="text-blue-600 dark:text-blue-400 font-bold"><?= safe($course['name']) ?></span></p>
+            <h1 class="text-3xl font-black mb-2 font-['Sora'] tracking-tight">Support Community</h1>
+            <p class="text-gray-500 dark:text-gray-400 mb-8 font-medium">
+                You are contributing resources for:
+                <span class="block mt-2 px-6 py-3 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-2xl border border-blue-100 dark:border-blue-800 font-black text-xl uppercase tracking-tight">
+                    <?= safe($course['name']) ?>
+                    <?php if($course['subject_code']): ?>
+                        <span class="block text-xs opacity-60 font-bold mt-1"><?= safe($course['subject_code']) ?></span>
+                    <?php endif; ?>
+                </span>
+            </p>
 
             <?php if ($success): ?>
                 <div class="p-6 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-2xl mb-8 border border-green-100 dark:border-green-800 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">

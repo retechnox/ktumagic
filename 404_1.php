@@ -1,7 +1,19 @@
-<?php
 include 'db.php';
 $course_id = intval($_GET['course_id'] ?? 0);
+
+// Fetch course details for context
+$course_name = "this course";
+if ($course_id > 0) {
+    $cq = $pdo->prepare("SELECT name FROM courses WHERE id = ?");
+    $cq->execute([$course_id]);
+    $course = $cq->fetch();
+    if ($course) {
+        $course_name = $course['name'];
+    }
+}
+
 $contribute_url = sign_url('submit_material.php', ['course_id' => $course_id]);
+function safe($v){ return htmlspecialchars((string)$v, ENT_QUOTES); }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -158,9 +170,9 @@ $contribute_url = sign_url('submit_material.php', ['course_id' => $course_id]);
     
     <div class="error-container">
         <h1 class="error-code">404</h1>
-        <h2 class="error-title">Work in Progress!</h2>
+        <h2 class="error-title">Missing Resources!</h2>
         <p class="error-message">
-            We are currently gathering resources for this topic. Help us and your fellow students by contributing what you have!
+            We are currently gathering resources for <span style="color: var(--primary-blue); font-weight: 800;"><?= safe($course_name) ?></span>. Help us and your fellow students by contributing what you have!
         </p>
         
         <div class="btn-group">

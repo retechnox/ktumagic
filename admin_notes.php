@@ -102,18 +102,7 @@ try {
             $rawImage = trim($_POST['branch_image'] ?? '');
             $image = convertDriveLink($rawImage);
 
-            $sem_data = [];
-            if (isset($_POST['semester_links'])) {
-                foreach ($_POST['semester_links'] as $sem => $links) {
-                    $sem_data[$sem] = [
-                        'syllabus' => trim($links['syllabus'] ?? ''),
-                        'timetable' => trim($links['timetable'] ?? ''),
-                        'calendar' => trim($links['calendar'] ?? ''),
-                        'notes' => trim($links['notes'] ?? '')
-                    ];
-                }
-            }
-            $semester_data = json_encode($sem_data);
+            $semester_data = json_encode([]);
 
             if ($checkOrderCol) {
                 $stmt = $pdo->prepare('INSERT INTO branches (scheme_id, name, image_path, syllabus_link, calendar_link, timetable_link, display_order, semester_data, redirect_branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
@@ -712,42 +701,7 @@ $csrfToken = safe(get_csrf_token());
                   <input type="text" name="branch_image" class="form-control form-control-sm">
                 </div>
 
-                <div class="mb-2">
-                  <label class="form-label small">Syllabus Link (optional)</label>
-                  <input type="url" name="syllabus_link" class="form-control form-control-sm">
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small">Academic Calendar Link (optional)</label>
-                  <input type="url" name="calendar_link" class="form-control form-control-sm">
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small">Timetable Link (optional)</label>
-                  <input type="url" name="timetable_link" class="form-control form-control-sm">
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small text-primary fw-bold">Redirect S1 & S2 to Branch ID (optional)</label>
-                  <input type="number" name="redirect_branch_id" class="form-control form-control-sm" placeholder="Enter Branch ID">
-                </div>
-
-                <div class="mb-3">
-                        <div class="row g-1">
-                          <div class="col-3">
-                            <input type="url" name="semester_links[<?= $i ?>][syllabus]" class="form-control form-control-sm" placeholder="Syllabus">
-                          </div>
-                          <div class="col-3">
-                            <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes">
-                          </div>
-                          <div class="col-3">
-                            <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable">
-                          </div>
-                          <div class="col-3">
-                            <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar">
-                          </div>
-                        </div>
-                </div>
+                <!-- Legacy branch resources removed -->
 
                 <?php if ($checkBranchOrder): ?>
                 <div class="mb-2">
@@ -780,12 +734,8 @@ $csrfToken = safe(get_csrf_token());
                             <button class="btn btn-sm btn-outline-warning btn-branch-edit"
                               data-id="<?= $b['id'] ?>"
                               data-name="<?= safe($b['name']) ?>"
-                              data-syllabus="<?= safe($b['syllabus_link'] ?? '') ?>"
-                              data-calendar="<?= safe($b['calendar_link'] ?? '') ?>"
-                              data-timetable="<?= safe($b['timetable_link'] ?? '') ?>"
                               data-order="<?= safe($b['display_order'] ?? 0) ?>"
-                              data-redirect="<?= safe($b['redirect_branch_id'] ?? '') ?>"
-                              data-semester-data="<?= safe($b['semester_data'] ?? '{}') ?>">Edit</button>
+                              data-redirect="<?= safe($b['redirect_branch_id'] ?? '') ?>">Edit</button>
 
                             <form method="POST" style="display:inline-block" onsubmit="return confirm('Delete branch?');">
                               <?= csrf_field() ?>
@@ -1404,46 +1354,7 @@ $csrfToken = safe(get_csrf_token());
           </div>
 
 
-          <div class="mb-2">
-            <label class="form-label small">Academic Calendar Link (optional)</label>
-            <input type="url" name="calendar_link" class="form-control form-control-sm" value="${calendar}">
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small">Timetable Link (optional)</label>
-            <input type="url" name="timetable_link" class="form-control form-control-sm" value="${timetable}">
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label small text-primary fw-bold">Redirect S1 & S2 to Branch ID (optional)</label>
-            <input type="number" name="redirect_branch_id" class="form-control form-control-sm" value="${redirect_id}" placeholder="Enter Branch ID">
-          </div>
-
-          ${orderField}
-
-          <div class="mb-3">
-              <h6 class="small font-bold mb-2">Semester Resources (Syllabus, Notes, Timetable, Calendar)</h6>
-              <div style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
-                <?php for($i=1; $i<=8; $i++): ?>
-                  <div class="mb-3 p-2 bg-light rounded border">
-                    <label class="form-label x-small font-bold d-block mb-1">Semester <?= $i ?></label>
-                    <div class="row g-1">
-                      <div class="col-3">
-                      </div>
-                      <div class="col-3">
-                        <input type="url" name="semester_links[<?= $i ?>][notes]" class="form-control form-control-sm" placeholder="Notes URL" id="sem_<?= $i ?>_notes_edit">
-                      </div>
-                      <div class="col-3">
-                        <input type="url" name="semester_links[<?= $i ?>][timetable]" class="form-control form-control-sm" placeholder="Timetable URL" id="sem_<?= $i ?>_timetable_edit">
-                      </div>
-                      <div class="col-3">
-                        <input type="url" name="semester_links[<?= $i ?>][calendar]" class="form-control form-control-sm" placeholder="Calendar URL" id="sem_<?= $i ?>_calendar_edit">
-                      </div>
-                    </div>
-                  </div>
-                <?php endfor; ?>
-              </div>
-            </div>
+          <!-- Legacy branch semester resources removed -->
 
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>
@@ -1457,13 +1368,7 @@ $csrfToken = safe(get_csrf_token());
       branchEditContainer.innerHTML = '';
     });
 
-    // Populate semester links
-    for(let i=1; i<=8; i++){
-        const sem = semesterData[i] || {};
-        if(document.getElementById(`sem_${i}_notes_edit`)) document.getElementById(`sem_${i}_notes_edit`).value = sem.notes || '';
-        if(document.getElementById(`sem_${i}_timetable_edit`)) document.getElementById(`sem_${i}_timetable_edit`).value = sem.timetable || '';
-        if(document.getElementById(`sem_${i}_calendar_edit`)) document.getElementById(`sem_${i}_calendar_edit`).value = sem.calendar || '';
-    }
+    // Legacy semester population removed
 
     branchEditContainer.scrollIntoView({behavior:"smooth"});
   });

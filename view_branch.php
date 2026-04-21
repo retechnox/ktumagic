@@ -6,6 +6,7 @@ if (!function_exists('safe')) {
 }
 
 $scheme_id = intval($_GET['scheme_id'] ?? 0);
+$mode = $_GET['mode'] ?? '';
 if (!$scheme_id) { header("Location: view_scheme.php"); exit; }
 
 // Verify signature for anti-scraping
@@ -85,7 +86,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
       ?>
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
-      <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id']]) ?>"
+      <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id'], 'mode' => $mode]) ?>"
          class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <?php if ($mode !== 'syllabus'): ?>

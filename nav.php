@@ -256,6 +256,10 @@ $contact = $data['contact'] ?? [];
     transition: opacity 0.3s ease;
   }
 
+  .dark .mobile-overlay {
+    background: rgba(15, 23, 42, 0.85);
+  }
+
   .mobile-sidebar {
     position: fixed;
     top: 0;

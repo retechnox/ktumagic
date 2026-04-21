@@ -123,7 +123,7 @@ else
       $target_branch_id = (($i === 1 || $i === 2) && isset($branch['redirect_branch_id']) && $branch['redirect_branch_id']) 
                           ? $branch['redirect_branch_id'] 
                           : $branch_id;
-      $target_link = sign_url('view_courses.php', ['branch_id' => $target_branch_id, 'semester' => $i]);
+      $target_link = sign_url('view_courses.php', ['branch_id' => $target_branch_id, 'semester' => $i, 'mode' => $mode]);
       $is_external = false;
     }
     else {
@@ -137,7 +137,7 @@ else
     $target_branch_id = (($i === 1 || $i === 2) && isset($branch['redirect_branch_id']) && $branch['redirect_branch_id']) 
                         ? $branch['redirect_branch_id'] 
                         : $branch_id;
-    $target_link = sign_url('view_courses.php', ['branch_id' => $target_branch_id, 'semester' => $i]);
+    $target_link = sign_url('view_courses.php', ['branch_id' => $target_branch_id, 'semester' => $i, 'mode' => $mode]);
     $is_external = false;
   }
 ?>

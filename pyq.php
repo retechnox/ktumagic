@@ -9,9 +9,9 @@ $branch_filter = $_GET['branch_id'] ?? '';
 // Verify signature for anti-scraping
 if (!verify_url_sig()) {
     // Only allow if no filters are set (base search page)
-    if ($search || $scheme_filter || $branch_filter) {
-        header("Location: pyq.php");
-        exit;
+    // Actually, we relax this to allow GET searches to work for standard users
+    if (!$search && !$scheme_filter && !$branch_filter) {
+        // Just load the base page
     }
 }
 

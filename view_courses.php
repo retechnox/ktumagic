@@ -3,6 +3,7 @@ include 'db.php';
 
 $branch_id = intval($_GET['branch_id'] ?? 0);
 $semester = intval($_GET['semester'] ?? 0);
+$mode = $_GET['mode'] ?? '';
 
 if (!$branch_id || !$semester) {
   header("Location: view_scheme.php");
@@ -230,20 +231,30 @@ else: ?>
 
           <!-- Action Buttons Area -->
           <div class="px-6 pb-6 space-y-6">
-            <!-- Main Link: Module Notes -->
+            <!-- Main Link: Module Notes / Syllabus Mode Toggle -->
             <?php 
-              $mainUrl = (isset($c['is_404_1']) && $c['is_404_1']) 
-                ? sign_url('404_1.php', ['course_id' => $c['id']])
-                : sign_url('view_link.php', ['course_id' => $c['id']]);
+              $isSyllabusMode = ($mode === 'syllabus');
+              
+              if ($isSyllabusMode) {
+                  // In Syllabus mode, prioritize syllabus access
+                  $mainUrl = "javascript:showDrawer('" . $c['id'] . "', 'syllabus')";
+                  $mainText = "Syllabus";
+                  $mainIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
+              } else {
+                  // Default: Module Notes
+                  $mainUrl = (isset($c['is_404_1']) && $c['is_404_1']) 
+                    ? sign_url('404_1.php', ['course_id' => $c['id']])
+                    : sign_url('view_link.php', ['course_id' => $c['id']]);
+                  $mainText = "Module Notes";
+                  $mainIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
+              }
             ?>
             <a href="<?= $mainUrl ?>"
               class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-4 group/btn no-underline">
               <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
+                <?= $mainIcon ?>
               </div>
-              <span class="text-base font-black uppercase tracking-wider">Module Notes</span>
+              <span class="text-base font-black uppercase tracking-wider"><?= $mainText ?></span>
             </a>
 
             <!-- Status Row: PYQ & SYLLABUS -->
@@ -255,12 +266,14 @@ else: ?>
                 </span>
               </button>
 
+              <?php if (!$isSyllabusMode): ?>
               <button onclick='showDrawer("<?= $c['id']?>", "syllabus")'
                 class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasSyllabus ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
                 <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
                   <?= $hasSyllabus ? 'Syllabus' : 'No Syllabus' ?>
                 </span>
               </button>
+              <?php endif; ?>
             </div>
 
             <!-- Bottom Action: Contribute -->
