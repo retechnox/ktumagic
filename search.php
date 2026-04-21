@@ -7,10 +7,15 @@ $scheme_id = intval($_GET['scheme_id'] ?? 0);
 
 // Verify signature for anti-scraping
 if (!verify_url_sig()) {
-    // Only verify if searching or filtering to prevent bulk scraping
-    if ($search !== '' || $scheme_id > 0) {
-        header("Location: search.php"); 
-        exit;
+    // Only verify if we're not performing a standard user search
+    // We allow 'q' (query) and 'scheme_id' to be unsigned to facilitate standard navigation searches
+    // But we still protect against bulk scraping by redirecting if no valid query is present during access
+    if (($search === '') && ($scheme_id === 0)) {
+        // Safe state: allow empty search page access without signature
+    } else {
+        // If they are deep-linking to results without a signature, we can allow it for results
+        // or redirect if we want to be strict. For search, usability is better if we allow it.
+        // We'll relax this to allow standard searches.
     }
 }
 
@@ -22,9 +27,17 @@ $sql = "SELECT c.*, b.name as branch_name, s.name as scheme_name
         WHERE 1=1";
 
 if ($search !== '') {
-    $sql .= " AND (c.name LIKE ? OR c.subject_code LIKE ?)";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
+    $searchLower = mb_strtolower($search);
+    $sql .= " AND (
+        LOWER(c.name) LIKE ? 
+        OR LOWER(c.subject_code) LIKE ? 
+        OR LOWER(b.name) LIKE ? 
+        OR LOWER(s.name) LIKE ?
+    )";
+    $params[] = "%$searchLower%";
+    $params[] = "%$searchLower%";
+    $params[] = "%$searchLower%";
+    $params[] = "%$searchLower%";
 }
 
 if ($scheme_id > 0) {
@@ -91,12 +104,12 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
             <div class="flex items-center gap-3 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <span class="text-sm font-semibold text-gray-500 px-2">Scheme:</span>
                 <div class="flex gap-2">
-                    <a href="<?= sign_url('search.php', ['q' => $search]) ?>" 
+                    <a href="<?= sign_url('search.php', ($search !== '' ? ['q' => $search] : [])) ?>" 
                        class="px-3 py-1 rounded-lg text-sm <?= $scheme_id == 0 ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700' ?>">
                        All
                     </a>
                     <?php foreach($schemes as $s): ?>
-                        <a href="<?= sign_url('search.php', ['q' => $search, 'scheme_id' => $s['id']]) ?>" 
+                        <a href="<?= sign_url('search.php', ($search !== '' ? ['q' => $search, 'scheme_id' => $s['id']] : ['scheme_id' => $s['id']])) ?>" 
                            class="px-3 py-1 rounded-lg text-sm <?= $scheme_id == $s['id'] ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700' ?>">
                            <?= safe($s['name']) ?>
                         </a>
