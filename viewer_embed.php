@@ -12,8 +12,18 @@ if (!$raw) {
 // Security Hardening: Enforce domain whitelist for viewer
 $parsed = parse_url($raw);
 $host = strtolower($parsed['host'] ?? '');
-if ($host !== 'drive.google.com') {
+if (!str_contains($host, 'drive.google.com')) {
     die("<h3>Security Error: Only Google Drive links are allowed.</h3>");
+}
+
+// Optimization: Convert /view to /preview for proper iframing (prevents SAMEORIGIN blocks)
+if (str_contains($raw, '/file/d/')) {
+    // Extract base link before any trailing slashes or params
+    // Format: https://drive.google.com/file/d/ID/view... -> https://drive.google.com/file/d/ID/preview
+    $raw = preg_replace('/\/view(\?.*)?$/', '/preview', $raw);
+    if (!str_ends_with($raw, '/preview')) {
+        $raw = rtrim($raw, '/') . '/preview';
+    }
 }
 
 $url = htmlspecialchars($raw);

@@ -600,7 +600,18 @@ $contact = $data['contact'] ?? [];
         </div>
       </div>
 
-      <a href="<?= sign_url('pyq.php', []) ?>">PYQ Search</a>
+      <div class="desktop-menu-group">
+        <a href="#" class="desktop-dropdown">
+          Syllabus <svg class="desktop-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </a>
+        <div class="desktop-submenu">
+          <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 2]) ?>">2024 Scheme</a>
+          <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 1]) ?>">2019 Scheme</a>
+        </div>
+      </div>
 
 
 
@@ -721,7 +732,19 @@ $contact = $data['contact'] ?? [];
       </div>
     </div>
 
-    <a href="<?= sign_url('pyq.php', []) ?>" class="menu-item" ><span>PYQ Search</span></a>
+    <div class="menu-group">
+      <div class="menu-item" onclick="toggleSubmenu(this)">
+        <span>Syllabus</span>
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      <div class="submenu">
+        <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 2]) ?>" class="submenu-item">2025 Scheme</a>
+        <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
+      </div>
+    </div>
 
     <div class="menu-group">
       <div class="menu-item" onclick="toggleSubmenu(this)">
