@@ -107,8 +107,8 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php foreach($courses as $c): 
-                    $pyqs = json_decode($c['pyqs'], true) ?: [];
-                    $qps = json_decode($c['qp_answers'], true) ?: [];
+                    $pyqs = json_decode((string)$c['pyqs'], true) ?: [];
+                    $qps = json_decode((string)$c['qp_answers'], true) ?: [];
                     $pyq_links = array_merge($pyqs, $qps);
                 ?>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition transform hover:-translate-y-1">
