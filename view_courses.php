@@ -262,7 +262,7 @@ else: ?>
               <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
                 class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyqCombined ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
                 <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                  <?= $hasPyqCombined ? 'PYQ Available' : 'No PYQ' ?>
+                  <?= $hasPyqCombined ? 'Question Paper' : 'No PYQ' ?>
                 </span>
               </button>
 
