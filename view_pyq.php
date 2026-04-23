@@ -126,7 +126,7 @@ function toPreview($url) {
 
             <!-- Contribute Footer -->
             <div class="mt-20 pt-10 border-t border-gray-100 dark:border-gray-800 text-center">
-                <a href="submit_material.php?course_id=<?= $course_id ?>" class="inline-flex items-center gap-3 px-10 py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-[2rem] font-black text-sm hover:scale-105 transition-all shadow-2xl uppercase tracking-widest">
+                <a href="<?= sign_url('submit_material.php', ['course_id' => $course_id]) ?>" class="inline-flex items-center gap-3 px-10 py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-[2rem] font-black text-sm hover:scale-105 transition-all shadow-2xl uppercase tracking-widest">
                     Contribute Material +
                 </a>
             </div>

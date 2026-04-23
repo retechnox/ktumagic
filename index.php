@@ -1074,7 +1074,7 @@ $contact = $data['contact'] ?? [];
     <div class="icon-grid">
       <?php
 $grid_links = [
-  1 => sign_url("view_scheme.php", ['mode' => 'syllabus']), // Syllabus
+  1 => "syllabus.php", // Syllabus
   2 => sign_url("view_scheme.php", ['mode' => 'notes']), // KTU Notes
   3 => "pyq.php", // Question Papers
   4 => "contact.php", // Connect With Us

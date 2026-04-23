@@ -608,8 +608,8 @@ $contact = $data['contact'] ?? [];
           </svg>
         </a>
         <div class="desktop-submenu">
-          <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 2]) ?>">2024 Scheme</a>
-          <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 1]) ?>">2019 Scheme</a>
+          <a href="<?= sign_url('syllabus.php', ['scheme_id' => 2]) ?>">2024 Scheme</a>
+          <a href="<?= sign_url('syllabus.php', ['scheme_id' => 1]) ?>">2019 Scheme</a>
         </div>
       </div>
 
@@ -741,8 +741,8 @@ $contact = $data['contact'] ?? [];
         </svg>
       </div>
       <div class="submenu">
-        <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 2]) ?>" class="submenu-item">2025 Scheme</a>
-        <a href="<?= sign_url('view_scheme.php', ['mode' => 'syllabus', 'scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
+        <a href="<?= sign_url('syllabus.php', ['scheme_id' => 2]) ?>" class="submenu-item">2025 Scheme</a>
+        <a href="<?= sign_url('syllabus.php', ['scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
       </div>
     </div>
 

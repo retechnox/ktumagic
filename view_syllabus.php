@@ -101,11 +101,6 @@ function toPreview($url) {
                     ?>
                         <div class="course-card group bg-white dark:bg-gray-800 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:border-green-500 dark:hover:border-green-400 transition-all duration-300 flex flex-col overflow-hidden">
                             <div class="px-6 py-8 flex-grow text-center flex flex-col justify-center items-center">
-                                <div class="w-16 h-16 bg-green-50 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-600 dark:text-green-400 mb-6 group-hover:scale-110 transition-transform">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                    </svg>
-                                </div>
                                 <h3 class="text-xl font-extrabold text-gray-900 dark:text-white leading-tight font-['Sora'] uppercase tracking-tight line-clamp-2">
                                     <?= safe($s['link_name']) ?>
                                 </h3>
@@ -115,12 +110,10 @@ function toPreview($url) {
                             <div class="px-6 pb-6 space-y-3">
                                 <a href="<?= $preview ?>" target="_blank"
                                    class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white rounded-2xl shadow-lg shadow-green-500/20 transition-all flex items-center justify-center gap-4 font-black uppercase tracking-wider">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     VIEW SYLLABUS
                                 </a>
                                 <a href="<?= $download ?>" target="_blank"
                                    class="w-full py-3 px-6 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 hover:bg-gray-200 dark:hover:bg-gray-600 uppercase tracking-widest">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                     Download
                                 </a>
                             </div>

@@ -6,21 +6,12 @@ $search = $_GET['search'] ?? '';
 $scheme_filter = $_GET['scheme_id'] ?? '';
 $branch_filter = $_GET['branch_id'] ?? '';
 
-// Verify signature for anti-scraping
-if (!verify_url_sig()) {
-    // Only allow if no filters are set (base search page)
-    // Actually, we relax this to allow GET searches to work for standard users
-    if (!$search && !$scheme_filter && !$branch_filter) {
-        // Just load the base page
-    }
-}
-
 $params = [];
 $sql = "SELECT c.*, b.name as branch_name, s.name as scheme_name 
         FROM courses c 
         JOIN branches b ON c.branch_id = b.id 
         JOIN schemes s ON c.scheme_id = s.id 
-        WHERE (JSON_LENGTH(c.pyqs) > 0 OR JSON_LENGTH(c.qp_answers) > 0)";
+        WHERE (JSON_LENGTH(c.syllabus) > 0)";
 
 if ($search) {
     $sql .= " AND c.name LIKE ?";
@@ -58,30 +49,24 @@ $branches = $bz->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PYQ Search — KTU Magic</title>
+    <title>Syllabus Search — KTU Magic</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --neon-purple: #8b5cf6;
-            --primary-blue: #2563EB;
-        }
-    </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
     <?php include 'nav.php'; ?>
 
     <div class="max-w-6xl mx-auto px-4 py-12">
-        <h1 class="text-4xl font-extrabold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            Previous Year Questions (PYQs)
+        <h1 class="text-4xl font-extrabold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-600">
+            Course Syllabuses
         </h1>
 
         <form method="GET" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl mb-12 flex flex-wrap gap-6 items-end justify-center">
             
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Scheme</label>
-                <select name="scheme_id" id="scheme_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-blue-500">
+                <select name="scheme_id" id="scheme_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-green-500 text-sm">
                     <option value="">All Schemes</option>
                     <?php foreach($schemes as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= $scheme_filter == $s['id'] ? 'selected' : '' ?>><?= safe($s['name']) ?></option>
@@ -91,42 +76,36 @@ $branches = $bz->fetchAll();
 
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Branch</label>
-                <select name="branch_id" id="branch_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-blue-500">
+                <select name="branch_id" id="branch_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-green-500 text-sm">
                     <option value="">All Branches</option>
                     <?php foreach($branches as $b): ?>
                         <option value="<?= $b['id'] ?>" data-scheme="<?= $b['scheme_id'] ?>" <?= $branch_filter == $b['id'] ? 'selected' : '' ?>><?= safe($b['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
-            <!-- Auto-submitting form, button removed -->
         </form>
 
         <?php if (empty($courses)): ?>
-            <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-inner">
-                <p class="text-gray-500 dark:text-gray-400 text-xl">No PYQs found matching your criteria. 🔍</p>
-                <a href="pyq.php" class="text-blue-600 mt-4 inline-block hover:underline">Clear all filters</a>
+            <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-inner border border-gray-100 dark:border-gray-700">
+                <p class="text-gray-500 dark:text-gray-400 text-xl">No syllabuses found matching your criteria. 📚</p>
+                <a href="syllabus.php" class="text-green-600 mt-4 inline-block hover:underline font-bold">Clear all filters</a>
             </div>
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <?php foreach($courses as $c): 
-                    $pyqs = json_decode((string)$c['pyqs'], true) ?: [];
-                    $qps = json_decode((string)$c['qp_answers'], true) ?: [];
-                    $pyq_links = array_merge($pyqs, $qps);
-                ?>
+                <?php foreach($courses as $c): ?>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition transform hover:-translate-y-1">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight"><?= safe($c['name']) ?></h3>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
                                 S<?= $c['semester'] ?>
                             </span>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4"><?= safe($c['scheme_name']) ?> — <?= safe($c['branch_name']) ?></p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6"><?= safe($c['scheme_name']) ?> — <?= safe($c['branch_name']) ?></p>
                         
                         <div class="mt-auto">
-                            <a href="<?= sign_url('view_pyq.php', ['course_id' => $c['id']]) ?>" 
-                               class="w-full inline-flex items-center justify-center gap-3 py-4 bg-blue-600 text-white rounded-[1.5rem] text-sm font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 group/btn">
-                                View all papers
+                            <a href="<?= sign_url('view_syllabus.php', ['course_id' => $c['id']]) ?>" 
+                               class="w-full inline-flex items-center justify-center gap-3 py-4 bg-green-600 text-white rounded-[1.5rem] text-sm font-black uppercase tracking-widest hover:bg-green-700 transition shadow-lg shadow-green-500/20 group/btn">
+                                View Syllabus
                             </a>
                         </div>
                     </div>
@@ -145,16 +124,14 @@ $branches = $bz->fetchAll();
 
             function filterBranches(resetSelection = false) {
                 const selectedScheme = schemeSelect.value;
-                
                 let firstVisible = null;
                 let currentValid = false;
 
                 branchOptions.forEach(option => {
-                    if (option.value === "") { // "All Branches"
+                    if (option.value === "") {
                         option.hidden = false;
                         return;
                     }
-
                     const branchScheme = option.getAttribute('data-scheme');
                     if (selectedScheme === "" || branchScheme === selectedScheme) {
                         option.hidden = false;
@@ -171,8 +148,6 @@ $branches = $bz->fetchAll();
             }
 
             schemeSelect.addEventListener('change', () => filterBranches(true));
-            
-            // Initial filter
             filterBranches(false);
         });
     </script>
