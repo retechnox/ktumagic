@@ -628,8 +628,8 @@ $contact = $data['contact'] ?? [];
         </div>
       </div>
 
-      <a href="404.php">Internships</a>
-      <a href="<?= sign_url('view_scheme.php', []) ?>">KTU Tuitions</a>
+      <a href="internships.php">Internships</a>
+      <a href="404.php">KTU Tuitions</a>
       <a href="404.php">Upload Notes</a>
 
       <div class="desktop-menu-group">
@@ -760,8 +760,8 @@ $contact = $data['contact'] ?? [];
       </div>
     </div>
 
-    <a href="404.php" class="menu-item"><span>Internships</span></a>
-    <a href="<?= sign_url('view_scheme.php', []) ?>" class="menu-item"><span>KTU Tuitions</span></a>
+    <a href="internships.php" class="menu-item"><span>Internships</span></a>
+    <a href="404.php" class="menu-item"><span>KTU Tuitions</span></a>
     <a href="404.php" class="menu-item"><span>Upload Notes</span></a>
 
     <div class="menu-group">

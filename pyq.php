@@ -41,7 +41,17 @@ $stmt->execute($params);
 $courses = $stmt->fetchAll();
 
 $schemes = $pdo->query("SELECT * FROM schemes ORDER BY name")->fetchAll();
-$branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
+
+$branch_sql = "SELECT * FROM branches";
+$branch_params = [];
+if ($scheme_filter) {
+    $branch_sql .= " WHERE scheme_id = ?";
+    $branch_params[] = $scheme_filter;
+}
+$branch_sql .= " ORDER BY name";
+$bz = $pdo->prepare($branch_sql);
+$bz->execute($branch_params);
+$branches = $bz->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -67,16 +77,11 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
             Previous Year Questions (PYQs)
         </h1>
 
-        <form method="GET" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl mb-12 flex flex-wrap gap-4 items-end">
-            <div class="flex-1 min-w-[200px]">
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Search Course</label>
-                <input type="text" name="search" value="<?= safe($search) ?>" placeholder="e.g. Calculus, Physics..." 
-                       class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
+        <form method="GET" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl mb-12 flex flex-wrap gap-6 items-end justify-center">
             
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Scheme</label>
-                <select name="scheme_id" id="scheme_select" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <select name="scheme_id" id="scheme_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-blue-500">
                     <option value="">All Schemes</option>
                     <?php foreach($schemes as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= $scheme_filter == $s['id'] ? 'selected' : '' ?>><?= safe($s['name']) ?></option>
@@ -86,7 +91,7 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
 
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Branch</label>
-                <select name="branch_id" id="branch_select" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <select name="branch_id" id="branch_select" onchange="this.form.submit()" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-blue-500">
                     <option value="">All Branches</option>
                     <?php foreach($branches as $b): ?>
                         <option value="<?= $b['id'] ?>" data-scheme="<?= $b['scheme_id'] ?>" <?= $branch_filter == $b['id'] ? 'selected' : '' ?>><?= safe($b['name']) ?></option>
@@ -94,9 +99,7 @@ $branches = $pdo->query("SELECT * FROM branches ORDER BY name")->fetchAll();
                 </select>
             </div>
 
-            <button type="submit" class="bg-blue-600 text-white px-8 py-2 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg">
-                Search
-            </button>
+            <!-- Auto-submitting form, button removed -->
         </form>
 
         <?php if (empty($courses)): ?>

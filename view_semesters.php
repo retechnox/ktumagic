@@ -75,9 +75,11 @@ $branch_image = $branch['image_path'] ?:
       <!-- Header banner -->
       <div class="relative rounded-[2rem] overflow-hidden shadow-2xl mb-12 group">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+        <?php if ($mode !== 'syllabus'): ?>
         <img referrerpolicy="no-referrer" src="<?= safe($branch_image)?>"
           class="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-700"
           onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80'">
+        <?php endif; ?>
 
         <div class="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 text-center">
           <span

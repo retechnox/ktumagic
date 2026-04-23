@@ -1079,8 +1079,8 @@ $grid_links = [
   3 => "pyq.php", // Question Papers
   4 => "contact.php", // Connect With Us
   5 => "404.php", // Important Topics
-  6 => "404.php", // Internships
-  7 => sign_url("view_scheme.php", []), // KTU Tuitions
+  6 => "internships.php", // Internships
+  7 => "404.php", // KTU Tuitions
   8 => "javascript:void(0)" // Text Books (Updates)
 ];
 $updateJson = @file_get_contents(__DIR__ . '/data/update.json');
