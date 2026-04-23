@@ -1352,7 +1352,7 @@ endif; ?>
         $updateJson = @file_get_contents(__DIR__ . '/data/update.json');
         $announcements = json_decode($updateJson, true) ?: [];
         $announcements = array_reverse($announcements);
-        $displayUpdates = array_slice($announcements, 0, 3);
+        $displayUpdates = $announcements;
       ?>
 
       <?php if (!empty($displayUpdates)): ?>
