@@ -1,12 +1,17 @@
 [
   {
-    "title": "KTU Update",
+    "title": "KTU UPDATES",
     "content": "The Detailed Time Table of B. Tech S2 (S) Examination January 2026 (2024 scheme) is published ",
     "link": "index.php?updates=true"
   },
   {
     "title": "New Material Added",
     "content": "2024 Scheme S2 Notes are now fully updated for all branches.",
+    "link": "index.php?updates=true"
+  },
+  {
+    "title": "KTU UPDATES",
+    "content": "EXAM SCHEDULED FOR 24/04/2026 HAS BEEN RESCHEDULED TO 14/05/2026.ALL CONCERNED STUDENTS ARE REQUESTED TO TAKE NOTE OF THE ABOVE CHANGE AND PLAN ACCORDINGLY.",
     "link": "index.php?updates=true"
   }
 ]
