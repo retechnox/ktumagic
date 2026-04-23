@@ -245,7 +245,7 @@ else: ?>
                   $mainUrl = (isset($c['is_404_1']) && $c['is_404_1']) 
                     ? sign_url('404_1.php', ['course_id' => $c['id']])
                     : sign_url('view_link.php', ['course_id' => $c['id']]);
-                  $mainText = "Course Material";
+                  $mainText = "Module Notes";
                   $mainIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
               }
             ?>
@@ -257,8 +257,30 @@ else: ?>
               <span class="text-sm font-black uppercase tracking-widest leading-none"><?= $mainText ?></span>
             </a>
 
-            <!-- Bottom spacing for card -->
-            <div class="pb-2"></div>
+            <!-- Status Row: PYQ & SYLLABUS -->
+            <div class="flex items-center justify-between gap-4 px-2 pb-2">
+              <a href="<?= $hasPyqCombined ? sign_url('view_pyq.php', ['course_id' => $c['id']]) : '#' ?>"
+                 class="flex-1 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl transition-all <?= $hasPyqCombined ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/40 hover:-translate-y-0.5 opacity-100' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 opacity-40 cursor-not-allowed' ?>">
+                  <svg class="w-5 h-5 flex-shrink-0 <?= $hasPyqCombined ? 'text-white' : 'text-gray-400' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span class="text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none">
+                      <?= $hasPyqCombined ? 'Question Paper' : 'No PYQ' ?>
+                  </span>
+              </a>
+
+              <?php if (!$isSyllabusMode): ?>
+              <a href="<?= $hasSyllabus ? sign_url('view_syllabus.php', ['course_id' => $c['id']]) : '#' ?>"
+                 class="flex-1 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl transition-all <?= $hasSyllabus ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/40 hover:-translate-y-0.5 opacity-100' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 opacity-40 cursor-not-allowed' ?>">
+                  <svg class="w-5 h-5 flex-shrink-0 <?= $hasSyllabus ? 'text-white' : 'text-gray-400' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
+                  <span class="text-[10px] md:text-[11px] font-bold uppercase tracking-widest leading-none">
+                      <?= $hasSyllabus ? 'Syllabus' : 'No Syllabus' ?>
+                  </span>
+              </a>
+              <?php endif; ?>
+            </div>
 
             <!-- Bottom Action: Contribute -->
             <div class="pt-4 border-t border-gray-100 dark:border-gray-700/50 flex justify-center">
