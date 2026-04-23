@@ -121,6 +121,7 @@ try {
             $calendar = trim($_POST['calendar_link'] ?? '');
             $timetable = trim($_POST['timetable_link'] ?? '');
             
+            $sem_data = [];
             if (isset($_POST['semester_links'])) {
                 foreach ($_POST['semester_links'] as $sem => $links) {
                     $sem_data[$sem] = [
@@ -734,6 +735,10 @@ $csrfToken = safe(get_csrf_token());
                             <button class="btn btn-sm btn-outline-warning btn-branch-edit"
                               data-id="<?= $b['id'] ?>"
                               data-name="<?= safe($b['name']) ?>"
+                              data-image="<?= safe($b['image_path'] ?? '') ?>"
+                              data-syllabus="<?= safe($b['syllabus_link'] ?? '') ?>"
+                              data-calendar="<?= safe($b['calendar_link'] ?? '') ?>"
+                              data-timetable="<?= safe($b['timetable_link'] ?? '') ?>"
                               data-order="<?= safe($b['display_order'] ?? 0) ?>"
                               data-redirect="<?= safe($b['redirect_branch_id'] ?? '') ?>">Edit</button>
 
@@ -1319,6 +1324,7 @@ $csrfToken = safe(get_csrf_token());
 
     const id = btn.dataset.id;
     const name = btn.dataset.name;
+    const image = btn.dataset.image || '';
     const syllabus = btn.dataset.syllabus || '';
     const calendar = btn.dataset.calendar || '';
     const timetable = btn.dataset.timetable || '';
@@ -1348,13 +1354,38 @@ $csrfToken = safe(get_csrf_token());
             <input type="text" name="branch_name" class="form-control form-control-sm" value="${name}" required>
           </div>
 
-          <div class="mb-2">
-            <label class="form-label small">Drive image link (optional)</label>
-            <input type="text" name="branch_image_edit" class="form-control form-control-sm">
+          <div class="row g-2 mb-2">
+            <div class="col-md-6">
+              <label class="form-label small">Drive image link (optional)</label>
+              <input type="text" name="branch_image_edit" class="form-control form-control-sm" value="${image}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Syllabus Link (Global)</label>
+              <input type="url" name="syllabus_link" class="form-control form-control-sm" value="${syllabus}">
+            </div>
           </div>
 
+          <div class="row g-2 mb-2">
+            <div class="col-md-6">
+              <label class="form-label small">Calendar Link</label>
+              <input type="url" name="calendar_link" class="form-control form-control-sm" value="${calendar}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Timetable Link</label>
+              <input type="url" name="timetable_link" class="form-control form-control-sm" value="${timetable}">
+            </div>
+          </div>
 
-          <!-- Legacy branch semester resources removed -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small">Display Order</label>
+              <input type="number" name="display_order" class="form-control form-control-sm" value="${order}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Redirect to Branch ID (optional)</label>
+              <input type="number" name="redirect_branch_id" class="form-control form-control-sm" value="${redirect_id}">
+            </div>
+          </div>
 
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-sm btn-secondary" id="cancelBranchEdit">Cancel</button>

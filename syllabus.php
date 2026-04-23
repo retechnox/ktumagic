@@ -26,7 +26,7 @@ if ($branch_filter) {
     $params[] = $branch_filter;
 }
 
-$sql .= " ORDER BY c.name ASC";
+$sql .= " ORDER BY c.semester ASC, c.name ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $courses = $stmt->fetchAll();
