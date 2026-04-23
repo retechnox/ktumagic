@@ -245,7 +245,7 @@ else: ?>
                   $mainUrl = (isset($c['is_404_1']) && $c['is_404_1']) 
                     ? sign_url('404_1.php', ['course_id' => $c['id']])
                     : sign_url('view_link.php', ['course_id' => $c['id']]);
-                  $mainText = "Module Notes";
+                  $mainText = "Course Material";
                   $mainIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
               }
             ?>
@@ -254,27 +254,11 @@ else: ?>
               <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center transition-transform group-hover/btn:scale-110">
                 <?= $mainIcon ?>
               </div>
-              <span class="text-base font-black uppercase tracking-wider"><?= $mainText ?></span>
+              <span class="text-sm font-black uppercase tracking-widest leading-none"><?= $mainText ?></span>
             </a>
 
-            <!-- Status Row: PYQ & SYLLABUS -->
-            <div class="flex items-center justify-between gap-4 px-2 pb-2">
-              <button onclick='showDrawer("<?= $c['id']?>", "pyq")'
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasPyqCombined ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                  <?= $hasPyqCombined ? 'Question Paper' : 'No PYQ' ?>
-                </span>
-              </button>
-
-              <?php if (!$isSyllabusMode): ?>
-              <button onclick='showDrawer("<?= $c['id']?>", "syllabus")'
-                class="flex-1 flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl border border-black dark:border-white group/status transition-all <?= $hasSyllabus ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 opacity-100' : 'opacity-40 cursor-not-allowed' ?>">
-                <span class="text-[10px] md:text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest group-hover/status:text-inherit transition-colors">
-                  <?= $hasSyllabus ? 'Syllabus' : 'No Syllabus' ?>
-                </span>
-              </button>
-              <?php endif; ?>
-            </div>
+            <!-- Bottom spacing for card -->
+            <div class="pb-2"></div>
 
             <!-- Bottom Action: Contribute -->
             <div class="pt-4 border-t border-gray-100 dark:border-gray-700/50 flex justify-center">
@@ -287,56 +271,9 @@ else: ?>
             </div>
           </div>
 
-          <!-- Resource Drawer (Slide-up menu) -->
-          <div id="drawer-<?= $c['id']?>"
-            class="resource-drawer pointer-events-none opacity-0 translate-y-full absolute inset-0 bg-white dark:bg-gray-900 z-30 flex flex-col p-5 md:p-8 transition-all duration-500 rounded-[3rem]">
-            <div class="flex justify-between items-center mb-6 md:mb-10">
-              <div class="space-y-1">
-                <p class="text-[9px] md:text-[11px] font-black text-blue-500 uppercase tracking-[0.3em]">Resource List</p>
-                <h4 id="drawer-title-<?= $c['id']?>"
-                  class="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase font-['Sora'] tracking-tight">
-                  Resources</h4>
-              </div>
-              <button onclick='hideDrawer("<?= $c['id']?>")' class="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center
-                bg-gray-50 dark:bg-gray-800 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20
-                rounded-xl md:rounded-[1.25rem] transition-all">
-                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12">
-                  </path>
-                </svg>
-              </button>
-            </div>
-
-            <div id="drawer-content-<?= $c['id']?>" class="flex-grow space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-              <!-- Links injected via JS -->
-            </div>
-
-            <div class="mt-8 pt-8 border-t dark:border-gray-800 flex justify-center">
-              <a href="<?= sign_url('view_link.php', ['course_id' => $c['id']])?>"
-                class="flex items-center gap-3 text-[11px] font-black text-gray-400 hover:text-blue-500 transition-all uppercase tracking-[0.2em] group/link">
-                View Full Details
-                <svg class="w-4 h-4 group-hover/link:translate-x-2 transition-transform" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3">
-                  </path>
-                </svg>
-              </a>
-            </div>
-          </div>
 
         </div>
 
-        <!-- Data for this course -->
-        <script>
-          window.courseData = window.courseData || {};
-          window.courseData["<?= $c['id']?>"] = {
-            qp: <?= json_encode($qp_answers) ?>,
-            modules: <?= json_encode($modules) ?>,
-            pyq: <?= json_encode($pyqs) ?>,
-            other: <?= json_encode($links) ?>,
-            is_404_1: <?= intval($c['is_404_1'] ?? 0) ?>
-        };
-        </script>
 
         <?php
   endforeach; ?>
@@ -438,87 +375,6 @@ else: ?>
           return url;
         }
 
-        function showDrawer(courseId, category) {
-          const drawer = document.getElementById(`drawer-${courseId}`);
-          const content = document.getElementById(`drawer-content-${courseId}`);
-          const title = document.getElementById(`drawer-title-${courseId}`);
-          const data = window.courseData[courseId];
-
-          let displayLinks = [];
-          let categoryTitle = '';
-
-          if (category === 'pyq') {
-            displayLinks = [...(data.pyq || []), ...(data.qp || [])];
-            categoryTitle = 'PYQ & Question Bank';
-            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
-          } else if (category === 'qp') {
-            displayLinks = data.qp || [];
-            categoryTitle = 'Answer Keys';
-            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
-          } else if (category === 'syllabus') {
-            displayLinks = data.syllabus || [];
-            categoryTitle = 'Course Syllabus';
-            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
-          } else if (category === 'modules') {
-            // Merge modules and other resources for a complete view
-            displayLinks = [...(data.modules || []), ...(data.other || [])];
-            categoryTitle = 'Study Materials';
-            if (displayLinks.length === 0 && data.is_404_1) { window.location.href = `404_1.php?course_id=${courseId}`; return; }
-          } else {
-            displayLinks = data.other || [];
-            categoryTitle = 'Resources';
-          }
-
-          title.innerText = categoryTitle;
-          content.innerHTML = '';
-
-          const uniqueLinks = displayLinks.sort((a, b) => {
-            const orderA = parseInt(a.display_order || 0);
-            const orderB = parseInt(b.display_order || 0);
-            if (orderA !== orderB) return orderA - orderB;
-            // Original order fallback (array position)
-            return 0;
-          });
-
-          if (uniqueLinks.length === 0) {
-            content.innerHTML = `<div class="py-20 text-center"><div class="text-gray-200 dark:text-gray-800 mb-4"><svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg></div><p class="text-gray-400 font-bold uppercase tracking-widest text-xs">No entries found yet.</p></div>`;
-          } else {
-            uniqueLinks.forEach(item => {
-              const previewUrl = toPreview(item.url);
-              const signedUrl = `viewer_embed.php?url=${encodeURIComponent(previewUrl)}`;
-              
-              const escapedName = item.link_name
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-
-              content.innerHTML += `
-                    <a href="${signedUrl}" target="_blank" class="flex items-center justify-between p-3 md:p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl md:rounded-[1.5rem] border-2 border-transparent hover:border-blue-500 hover:bg-white dark:hover:bg-gray-800 transition-all group/item shadow-sm">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-gray-700 rounded-xl md:rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm transition-transform group-hover/item:rotate-12">
-                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            </div>
-                            <div class="text-left">
-                               <p class="text-xs md:text-sm font-black text-gray-800 dark:text-gray-100 group-hover/item:text-blue-600 transition-colors line-clamp-1">${escapedName}</p>
-                               <span class="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest">Click to open doc</span>
-                            </div>
-                        </div>
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all">
-                           <svg class="w-4 h-4 md:w-5 md:h-5 group-hover/item:translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                        </div>
-                    </a>
-                `;
-            });
-          }
-
-          drawer.classList.add('active');
-        }
-
-        function hideDrawer(courseId) {
-          document.getElementById(`drawer-${courseId}`).classList.remove('active');
-        }
 
         document.getElementById('courseSearch')?.addEventListener('input', function (e) {
           const term = e.target.value.toLowerCase();

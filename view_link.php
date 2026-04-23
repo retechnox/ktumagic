@@ -137,21 +137,12 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
     </div>
   </div>
 
-  <h2 class="text-2xl font-bold mt-3 mb-4 dark:text-white">
-    Academic Resources
+  <h2 class="text-2xl font-black mt-3 mb-4 dark:text-white uppercase font-['Sora'] tracking-tight">
+    Course Material
   </h2>
 
   <div class="space-y-4">
 
-    <!-- SYLLABUS SECTION -->
-    <?php if ($syllabus_data): ?>
-      <h2 class="text-2xl font-black mt-10 mb-6 text-green-600 dark:text-green-400 uppercase font-['Sora'] tracking-tight">
-        Course Syllabus
-      </h2>
-      <div class="grid grid-cols-1 gap-4">
-        <?php foreach ($syllabus_data as $s): echo renderResourceCard($s, 'border-green-600'); endforeach; ?>
-      </div>
-    <?php endif; ?>
 
     <!-- MODULES SECTION -->
     <?php if ($modules): ?>
@@ -163,18 +154,6 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
       </div>
     <?php endif; ?>
 
-    <!-- PYQ & QUESTION BANK SECTION -->
-    <?php 
-    $combined_pyqs = array_merge($pyqs_data, $qp_answers);
-    if ($combined_pyqs): 
-    ?>
-      <h2 class="text-2xl font-black mt-10 mb-6 text-indigo-600 dark:text-indigo-400 uppercase font-['Sora'] tracking-tight">
-        PYQ & Question Bank
-      </h2>
-      <div class="grid grid-cols-1 gap-4">
-        <?php foreach ($combined_pyqs as $p): echo renderResourceCard($p, 'border-indigo-600'); endforeach; ?>
-      </div>
-    <?php endif; ?>
 
     <!-- OTHER LINKS SECTION -->
     <?php if ($links): ?>
@@ -186,9 +165,9 @@ function renderResourceCard($l, $colorClass = 'border-blue-600') {
       </div>
     <?php endif; ?>
 
-    <?php if (!$modules && !$qp_answers && !$pyqs_data && !$links && !$syllabus_data): ?>
+    <?php if (!$modules && !$links): ?>
       <div class="py-20 text-center">
-        <p class="text-gray-500 dark:text-gray-400 text-lg">No academic resources found for this course yet.</p>
+        <p class="text-gray-500 dark:text-gray-400 text-lg">No course material found for this course yet.</p>
       </div>
     <?php endif; ?>
 

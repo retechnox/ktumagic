@@ -12,8 +12,12 @@ if (!$raw) {
 // Security Hardening: Enforce domain whitelist for viewer
 $parsed = parse_url($raw);
 $host = strtolower($parsed['host'] ?? '');
-if (!str_contains($host, 'drive.google.com')) {
-    die("<h3>Security Error: Only Google Drive links are allowed.</h3>");
+$allowed = false;
+if (str_contains($host, 'drive.google.com')) $allowed = true;
+if (str_contains($host, 'mbcetlibrary.wordpress.com')) $allowed = true;
+
+if (!$allowed) {
+    die("<h3>Security Error: This domain is not authorized for embedding.</h3>");
 }
 
 // Optimization: Convert /view to /preview for proper iframing (prevents SAMEORIGIN blocks)
