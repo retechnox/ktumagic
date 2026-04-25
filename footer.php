@@ -297,9 +297,9 @@ $contact = $data['contact'] ?? [];
         <div>
             <h4 class="footer-heading">Support</h4>
             <ul class="footer-links">
-                <li><a href="#">Help Center</a></li>
+                <li><a href="<?= $contact['whatsapp_main'] ?? '#' ?>" target="_blank">WhatsApp Support</a></li>
                 <li><a href="contact.php">Contact Us</a></li>
-                <li><a href="#">Upload Notes</a></li>
+                <li><a href="https://forms.gle/fZAdbW2EkLJBFXoBA" target="_blank">Upload Notes</a></li>
                 <li><a href="login.php">Admin Login</a></li>
             </ul>
         </div>
