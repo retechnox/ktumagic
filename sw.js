@@ -12,8 +12,8 @@ self.addEventListener('message', (event) => {
     event.waitUntil(
         self.registration.showNotification(title || 'KTU Magic', {
             body: body || '',
-            icon: icon || '/ktumagic/assets/favicon.png',
-            badge: '/ktumagic/assets/favicon.png',
+            icon: icon || '/ktumagic/assets/logooo.webp',
+            badge: '/ktumagic/assets/logooo.webp',
             data: { link: link || '' },
             tag: 'ktu-broadcast',          // Replaces previous unread notification
             requireInteraction: false,     // Still dismissable but stays in panel
@@ -53,8 +53,8 @@ self.addEventListener('push', (event) => {
         event.waitUntil(
             self.registration.showNotification(title || 'KTU Magic', {
                 body: body || '',
-                icon: icon || '/assets/favicon.png',
-                badge: '/assets/favicon.png',
+                icon: icon || '/assets/logooo.webp',
+                badge: '/assets/logooo.webp',
                 data: { link: link || '' },
                 tag: 'ktu-broadcast',
                 requireInteraction: false,

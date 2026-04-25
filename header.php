@@ -10,7 +10,7 @@ header("Content-Encoding: none");
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KTU Magic – Notes & Resources</title>
 
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" type="image/webp" href="assets/logooo.webp">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

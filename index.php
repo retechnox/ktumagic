@@ -20,9 +20,10 @@ $contact = $data['contact'] ?? [];
     content="KTU, KTU Notes, KTU Question Papers, KTU Syllabus, KTU Magic, KTU Results, KTU Academic Support">
   <meta name="author" content="KTU Magic">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
-    rel="stylesheet">
+    <link rel="icon" type="image/webp" href="assets/logooo.webp">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
+      rel="stylesheet">
   <style>
     * {
 

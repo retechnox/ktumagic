@@ -11,6 +11,12 @@ $contact = $data['contact'] ?? [];
   if(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)){
     document.documentElement.classList.add('dark');
   }
+  // Set favicon dynamically
+  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+  link.type = 'image/webp';
+  link.rel = 'shortcut icon';
+  link.href = 'assets/logooo.webp';
+  document.getElementsByTagName('head')[0].appendChild(link);
 })();
 </script>
 <style>
@@ -101,13 +107,16 @@ $contact = $data['contact'] ?? [];
   }
 
   .logo {
-    font-family: 'Sora', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     text-decoration: none;
+  }
+  
+  .logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
   }
 
   .nav-links {
@@ -580,7 +589,9 @@ $contact = $data['contact'] ?? [];
 
 <nav>
   <div class="nav-inner">
-    <a href="index.php" class="logo">KTU Magic</a>
+    <a href="index.php" class="logo">
+      <img src="assets/logooo.webp" alt="KTU Magic">
+    </a>
 
     <!-- DESKTOP LINKS -->
     <div class="nav-links">
@@ -595,8 +606,8 @@ $contact = $data['contact'] ?? [];
         </a>
         <div class="desktop-submenu">
           <a href="<?= sign_url('view_scheme.php', ['mode' => 'notes']) ?>">KTU Notes</a>
-          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>">2024 Scheme (Course List)</a>
-          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>">2019 Scheme (Course List)</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 2]) ?>">2024 Scheme</a>
+          <a href="<?= sign_url('view_branch.php', ['scheme_id' => 1]) ?>">2019 Scheme</a>
         </div>
       </div>
 
@@ -703,7 +714,9 @@ $contact = $data['contact'] ?? [];
 <!-- MOBILE SIDEBAR -->
 <div id="mobileSidebar" class="mobile-sidebar">
   <div class="sidebar-header">
-    <h2>KTUNOTES</h2>
+    <a href="index.php" class="logo">
+      <img src="assets/logooo.webp" alt="KTU Magic" style="height: 35px;">
+    </a>
     <button class="close-sidebar" onclick="closeSidebar()">&times;</button>
   </div>
 
@@ -741,7 +754,7 @@ $contact = $data['contact'] ?? [];
         </svg>
       </div>
       <div class="submenu">
-        <a href="<?= sign_url('syllabus.php', ['scheme_id' => 2]) ?>" class="submenu-item">2025 Scheme</a>
+        <a href="<?= sign_url('syllabus.php', ['scheme_id' => 2]) ?>" class="submenu-item">2024 Scheme</a>
         <a href="<?= sign_url('syllabus.php', ['scheme_id' => 1]) ?>" class="submenu-item">2019 Scheme</a>
       </div>
     </div>
@@ -811,7 +824,7 @@ $contact = $data['contact'] ?? [];
 
   <div class="sidebar-footer">
     <div class="copyright">
-      &copy; Copyright 2025 KTU Magic. All rights reserved powered by <a href="#"
+      &copy; Copyright <?= date('Y') ?> KTU Magic. All rights reserved powered by <a href="#"
         style="color:var(--primary-blue); text-decoration:none;">ktumagin.in</a>
     </div>
   </div>
