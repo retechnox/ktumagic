@@ -87,7 +87,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
 
       <!-- FIXED FLOW: Branch now goes to semesters based on BRANCH -->
       <a href="<?= sign_url('view_semesters.php', ['branch_id' => $b['id'], 'mode' => $mode]) ?>"
-         class="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
+         class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl p-6 shadow hover:shadow-xl transition">
 
         <?php if ($mode !== 'syllabus'): ?>
         <img referrerpolicy="no-referrer" src="<?= safe($img) ?>"
@@ -99,7 +99,7 @@ $DEFAULT_IMG = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1
           <?= safe($displayName) ?>
         </div>
 
-        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-auto pt-2">
           View semesters →
         </div>
       </a>

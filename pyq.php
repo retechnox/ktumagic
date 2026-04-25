@@ -114,7 +114,7 @@ $branches = $bz->fetchAll();
                     $qps = json_decode((string)$c['qp_answers'], true) ?: [];
                     $pyq_links = array_merge($pyqs, $qps);
                 ?>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition transform hover:-translate-y-1">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition transform hover:-translate-y-1 flex flex-col">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight"><?= safe($c['name']) ?></h3>
                             <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">

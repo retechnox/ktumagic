@@ -109,14 +109,24 @@ $contact = $data['contact'] ?? [];
   .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-decoration: none;
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
   }
   
   .logo img {
-    height: 40px;
+    height: 38px;
     width: auto;
     object-fit: contain;
+  }
+
+  .logo span {
+    background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
   }
 
   .nav-links {
@@ -591,6 +601,7 @@ $contact = $data['contact'] ?? [];
   <div class="nav-inner">
     <a href="index.php" class="logo">
       <img src="assets/logooo.webp" alt="KTU Magic">
+      <span>KTU Magic</span>
     </a>
 
     <!-- DESKTOP LINKS -->
@@ -715,7 +726,8 @@ $contact = $data['contact'] ?? [];
 <div id="mobileSidebar" class="mobile-sidebar">
   <div class="sidebar-header">
     <a href="index.php" class="logo">
-      <img src="assets/logooo.webp" alt="KTU Magic" style="height: 35px;">
+      <img src="assets/logooo.webp" alt="KTU Magic" style="height: 32px;">
+      <span>KTU Magic</span>
     </a>
     <button class="close-sidebar" onclick="closeSidebar()">&times;</button>
   </div>
