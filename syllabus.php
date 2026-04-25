@@ -22,7 +22,8 @@ if ($scheme_filter) {
     $params[] = $scheme_filter;
 }
 if ($branch_filter) {
-    $sql .= " AND c.branch_id = ?";
+    $sql .= " AND (c.branch_id = ? OR c.branch_id = (SELECT redirect_branch_id FROM branches WHERE id = ? AND redirect_branch_id IS NOT NULL))";
+    $params[] = $branch_filter;
     $params[] = $branch_filter;
 }
 
@@ -62,7 +63,13 @@ $branches = $bz->fetchAll();
             Course Syllabuses
         </h1>
 
-        <form method="GET" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl mb-12 flex flex-wrap gap-6 items-end justify-center">
+        <form method="GET" id="filterForm" class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl mb-12 flex flex-wrap gap-6 items-end justify-center">
+            
+            <div class="w-full md:w-64">
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Search Course</label>
+                <input type="text" name="search" id="searchInput" value="<?= safe($search) ?>" placeholder="Enter course name..." 
+                       class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all focus:border-green-500 text-sm">
+            </div>
             
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Scheme</label>
@@ -149,6 +156,18 @@ $branches = $bz->fetchAll();
 
             schemeSelect.addEventListener('change', () => filterBranches(true));
             filterBranches(false);
+
+            // Debounce for search
+            const searchInput = document.getElementById('searchInput');
+            const filterForm = document.getElementById('filterForm');
+            let debounceTimer;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    filterForm.submit();
+                }, 500); // 500ms debounce
+            });
         });
     </script>
 </body>

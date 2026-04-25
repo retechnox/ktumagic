@@ -123,9 +123,7 @@ $contact = $data['contact'] ?? [];
   }
 
   .logo span {
-    background: linear-gradient(to right, var(--primary-blue), var(--neon-purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
     letter-spacing: -0.5px;
   }
 
