@@ -641,7 +641,7 @@ $contact = $data['contact'] ?? [];
 
       <a href="internships.php">Internships</a>
       <a href="404.php">KTU Tuitions</a>
-      <a href="404.php">Upload Notes</a>
+      <a href="https://forms.gle/fZAdbW2EkLJBFXoBA" target="_blank">Upload Notes</a>
 
       <div class="desktop-menu-group">
         <a href="#" class="desktop-dropdown">
@@ -775,7 +775,7 @@ $contact = $data['contact'] ?? [];
 
     <a href="internships.php" class="menu-item"><span>Internships</span></a>
     <a href="404.php" class="menu-item"><span>KTU Tuitions</span></a>
-    <a href="404.php" class="menu-item"><span>Upload Notes</span></a>
+    <a href="https://forms.gle/fZAdbW2EkLJBFXoBA" target="_blank" class="menu-item"><span>Upload Notes</span></a>
 
     <div class="menu-group">
       <div class="menu-item" onclick="toggleSubmenu(this)">

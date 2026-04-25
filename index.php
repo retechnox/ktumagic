@@ -1471,9 +1471,15 @@ endif; ?>
       });
 
       const socialModal = document.getElementById("socialModal");
+      
+      const showSocial = () => {
+        socialModal.style.display = "flex";
+      };
 
       window.addEventListener("load", () => {
-        socialModal.style.display = "flex";
+        showSocial();
+        // Re-show every 6 minutes
+        setInterval(showSocial, 360000); 
       });
 
       function closeSocial() {
