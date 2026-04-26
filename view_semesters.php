@@ -36,6 +36,9 @@ $scheme = $sq->fetch();
 
 $branch_image = $branch['image_path'] ?:
   "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80";
+
+$mode = isset($_GET['mode']) ? trim($_GET['mode']) : null;
+$sem_data = json_decode($branch['semester_data'] ?: '{}', true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,11 +92,6 @@ $branch_image = $branch['image_path'] ?:
 
         </div>
       </div>
-
-      <?php
-$mode = isset($_GET['mode']) ? trim($_GET['mode']) : null;
-$sem_data = json_decode($branch['semester_data'] ?: '{}', true);
-?>
 
       <div class="flex flex-col items-center justify-center text-center mb-10">
         <div class="w-20 h-1.5 bg-blue-600 rounded-full mb-6"></div>
