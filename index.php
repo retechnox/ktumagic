@@ -20,7 +20,11 @@ $contact = $data['contact'] ?? [];
     content="KTU, KTU Notes, KTU Question Papers, KTU Syllabus, KTU Magic, KTU Results, KTU Academic Support">
   <meta name="author" content="KTU Magic">
 
-    <link rel="icon" type="image/webp" href="assets/logooo.webp">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
       rel="stylesheet">

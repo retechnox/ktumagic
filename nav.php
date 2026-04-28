@@ -11,12 +11,23 @@ $contact = $data['contact'] ?? [];
   if(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)){
     document.documentElement.classList.add('dark');
   }
-  // Set favicon dynamically
-  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-  link.type = 'image/webp';
-  link.rel = 'shortcut icon';
-  link.href = 'assets/logooo.webp';
-  document.getElementsByTagName('head')[0].appendChild(link);
+  // Set favicons dynamically
+  const head = document.head || document.getElementsByTagName('head')[0];
+  const favicons = [
+    { rel: 'icon', type: 'image/png', href: 'favicon-96x96.png', sizes: '96x96' },
+    { rel: 'icon', type: 'image/svg+xml', href: 'favicon.svg' },
+    { rel: 'shortcut icon', href: 'favicon.ico' },
+    { rel: 'apple-touch-icon', sizes: '180x180', href: 'apple-touch-icon.png' },
+    { rel: 'manifest', href: 'site.webmanifest' }
+  ];
+
+  favicons.forEach(favicon => {
+    if (!document.querySelector(`link[href*="${favicon.href}"]`)) {
+      const link = document.createElement('link');
+      Object.keys(favicon).forEach(key => link.setAttribute(key, favicon[key]));
+      head.appendChild(link);
+    }
+  });
 })();
 </script>
 <style>

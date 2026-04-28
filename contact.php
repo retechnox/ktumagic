@@ -126,19 +126,33 @@ $contact = $data['contact'] ?? [];
                 </div>
                 <div class="contact-info">
                     <h3>WHATSAPP SUPPORT</h3>
-                    <p>Join our group for instant updates and study peer support.</p>
-                    <a href="<?= $contact['whatsapp_main'] ?? '#' ?>" class="contact-link">Join Group →</a>
+                    <p>Join our groups for instant updates and study peer support.</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="<?= safe($contact['whatsapp_2024'] ?? 'https://chat.whatsapp.com/KVF5tjauFFEH3eq7HpCYsn?mode=gi_t') ?>" class="contact-link">2024 Scheme Group →</a>
+                        <a href="<?= safe($contact['whatsapp_2019'] ?? 'https://chat.whatsapp.com/CD8bPjElkgXAmIukTiIPV9?mode=gi_t') ?>" class="contact-link">2019 Scheme Group →</a>
+                    </div>
                 </div>
             </div>
 
             <div class="contact-card fade-el" style="animation-delay: 200ms;">
-                <div class="icon-box" style="background: rgba(37, 99, 235, 0.1);">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <div class="icon-box" style="background: rgba(225, 48, 108, 0.1); color: #E1306C;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </div>
                 <div class="contact-info">
-                    <h3>Phone Support</h3>
-                    <p>Call or Message us for urgent assistance.</p>
-                    <a href="tel:<?= str_replace(' ', '', $contact['phone'] ?? '+917907552296') ?>" class="contact-link"><?= $contact['phone'] ?? '+91 79075 52296' ?></a>
+                    <h3>Instagram</h3>
+                    <p>Follow us for the latest updates and study tips.</p>
+                    <a href="https://www.instagram.com/ktumagic" target="_blank" class="contact-link">@ktumagic →</a>
+                </div>
+            </div>
+
+            <div class="contact-card fade-el" style="animation-delay: 300ms;">
+                <div class="icon-box" style="background: rgba(34, 158, 217, 0.1); color: #229ED9;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.665 3.717l-17.73 6.837c-1.213.486-1.203 1.163-.222 1.462l4.552 1.42 1.566 4.802c.188.518.093.723.475.723.296 0 .43-.135.594-.293l2.394-2.327 4.98 3.68c.918.506 1.577.246 1.807-.85l3.268-15.396c.335-1.343-.513-1.952-1.394-1.56z"/></svg>
+                </div>
+                <div class="contact-info">
+                    <h3>Telegram</h3>
+                    <p>Join our Telegram channel for fast document downloads.</p>
+                    <a href="https://tx.me/ktu_studymaterials" target="_blank" class="contact-link">Join Channel →</a>
                 </div>
             </div>
         </div>
