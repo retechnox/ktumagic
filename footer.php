@@ -359,8 +359,13 @@ $contact = $data['contact'] ?? [];
         </a>
     </div>
 
+    <script>
+        const _basePath = '';
+        const _iconPath = 'assets/logooo.webp';
+        const _isProduction = <?= (getenv('APP_ENV') === 'production' || strpos($_SERVER['HTTP_HOST'], 'ktumagic.in') !== false) ? 'true' : 'false' ?>;
+        const _vapidPublicKey = '<?= getenv('VAPID_PUBLIC_KEY') ?>';
 
-    // ── Service Worker registration ──────────────────────────────────────────
+        // ── Service Worker registration ──────────────────────────────────────────
         // Helper to convert VAPID key
         function urlBase64ToUint8Array(base64String) {
             const padding = '='.repeat((4 - base64String.length % 4) % 4);
