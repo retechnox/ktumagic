@@ -12,6 +12,7 @@ $contact = $data['contact'] ?? [];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us — KTU Magic</title>
     <meta name="description" content="Get in touch with the KTU Magic team for support, inquiries, or feedback.">
+    <meta name="keywords" content="KTU, KTU Notes, KTU Question Papers, KTU Syllabus, KTU Magic, KTU Login, KTU Results, KTU Academic Support, Best KTU Study Materials, Engineering Students Kerala, KTU 2019 Scheme, KTU 2024 Scheme, KTU B.Tech Notes, Engineering Course Materials, KTU Previous Year Questions, KTU PYQ, Semester Exam Notes, KTU Student Portal, KTU Module-wise Notes, KTU Textbook PDF, KTU Notifications, KTU Exam Updates, KTU Civil Engineering, KTU Computer Science, KTU Mechanical Engineering, KTU Electronics Engineering, KTU Electrical Engineering, KTU Semester Results, Engineering Study App, KTU Resource Hub">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet">
     <style>
         body {

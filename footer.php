@@ -360,13 +360,7 @@ $contact = $data['contact'] ?? [];
     </div>
 
 
-    <script>
-        // ── Derive base path (works on localhost/ktumagic AND ktumagic.in root) ────
-        const _isProduction = (location.hostname === 'ktumagic.in' || location.hostname === 'www.ktumagic.in');
-        const _basePath = _isProduction ? '' : '/ktumagic';
-        const _iconPath = _basePath + '/assets/logooo.webp';
-        const _vapidPublicKey = '<?= getenv("VAPID_PUBLIC_KEY") ?>';
-
+    // ── Service Worker registration ──────────────────────────────────────────
         // Helper to convert VAPID key
         function urlBase64ToUint8Array(base64String) {
             const padding = '='.repeat((4 - base64String.length % 4) % 4);
